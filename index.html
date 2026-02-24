@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Weekplanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+    }
+
+    header {
+      background: #2d6cdf;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 15px;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      min-height: 150px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+      font-weight: bold;
+    }
+
+    .login-screen {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    @media print {
+      button {
+        display: none !important;
+      }
+      body {
+        background: white;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
+    authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
+    projectId: "weekplanner-pro-b16d8",
+    storageBucket: "weekplanner-pro-b16d8.firebasestorage.app",
+    messagingSenderId: "838954104666",
+    appId: "1:838954104666:web:02d663508cad4c073f6563",
+    measurementId: "G-0EKD9MXP8L"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const appDiv = document.getElementById("app");
+
+  function showLogin() {
+    appDiv.innerHTML = `
+      <div class="login-screen">
+        <h1>Weekplanner</h1>
+        <button onclick="login()">Inloggen met Google</button>
+      </div>
+    `;
+  }
+
+  window.login = async function() {
+    const result = await signInWithPopup(auth, provider);
+    showPlanner(result.user);
+  };
+
+  window.logout = async function() {
+    await signOut(auth);
+    showLogin();
+  };
+
+  function showPlanner(user) {
+    const children = [
+      { name: "Kind 1", color: "#FF6B6B" },
+      { name: "Kind 2", color: "#4D96FF" },
+      { name: "Kind 3", color: "#6BCB77" },
+      { name: "Kind 4", color: "#FFD93D" },
+      { name: "Kind 5", color: "#B980F0" }
+    ];
+
+    appDiv.innerHTML = `
+      <header>Welkom ${user.displayName}</header>
+      <div class="container">
+        <button onclick="logout()">Uitloggen</button>
+        <button onclick="window.print()">Print</button>
+        <div class="grid">
+          ${children.map(child => `
+            <div class="card" style="background:${child.color}">
+              ${child.name}<br><br>
+              Activiteiten...
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  showLogin();
+</script>
+
+</body>
+</html>
