@@ -73,8 +73,24 @@
 <div id="app"></div>
 
 <script type="module">
+  <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { 
+    getAuth, 
+    GoogleAuthProvider, 
+    signInWithPopup, 
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    where
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
@@ -88,9 +104,18 @@
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
   const provider = new GoogleAuthProvider();
 
   const appDiv = document.getElementById("app");
+
+  const children = [
+    { name: "Kind 1", color: "#FF6B6B" },
+    { name: "Kind 2", color: "#4D96FF" },
+    { name: "Kind 3", color: "#6BCB77" },
+    { name: "Kind 4", color: "#FFD93D" },
+    { name: "Kind 5", color: "#B980F0" }
+  ];
 
   function showLogin() {
     appDiv.innerHTML = `
@@ -102,24 +127,47 @@
   }
 
   window.login = async function() {
-    const result = await signInWithPopup(auth, provider);
-    showPlanner(result.user);
+    await signInWithPopup(auth, provider);
   };
 
   window.logout = async function() {
     await signOut(auth);
-    showLogin();
   };
 
-  function showPlanner(user) {
-    const children = [
-      { name: "Kind 1", color: "#FF6B6B" },
-      { name: "Kind 2", color: "#4D96FF" },
-      { name: "Kind 3", color: "#6BCB77" },
-      { name: "Kind 4", color: "#FFD93D" },
-      { name: "Kind 5", color: "#B980F0" }
-    ];
+  async function addActivity(user, childName) {
+    const text = prompt("Nieuwe activiteit:");
+    if (!text) return;
 
+    await addDoc(collection(db, "activities"), {
+      userId: user.uid,
+      child: childName,
+      text: text
+    });
+
+    loadActivities(user);
+  }
+
+  async function loadActivities(user) {
+    const q = query(
+      collection(db, "activities"),
+      where("userId", "==", user.uid)
+    );
+
+    const snapshot = await getDocs(q);
+
+    const activities = {};
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (!activities[data.child]) {
+        activities[data.child] = [];
+      }
+      activities[data.child].push(data.text);
+    });
+
+    renderPlanner(user, activities);
+  }
+
+  function renderPlanner(user, activities = {}) {
     appDiv.innerHTML = `
       <header>Welkom ${user.displayName}</header>
       <div class="container">
@@ -129,15 +177,28 @@
           ${children.map(child => `
             <div class="card" style="background:${child.color}">
               ${child.name}<br><br>
-              Activiteiten...
+              ${(activities[child.name] || [])
+                .map(a => `<div>• ${a}</div>`)
+                .join("")}
+              <br>
+              <button onclick="add('${child.name}')">+ Toevoegen</button>
             </div>
           `).join("")}
         </div>
       </div>
     `;
+
+    window.add = (childName) => addActivity(user, childName);
   }
 
-  showLogin();
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      loadActivities(user);
+    } else {
+      showLogin();
+    }
+  });
+</script>
 </script>
 
 </body>
