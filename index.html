@@ -1,126 +1,113 @@
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { 
-    getAuth, 
-    GoogleAuthProvider, 
-    signInWithPopup, 
-    signOut,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  import {
-    getFirestore,
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    where
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
+  authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
+  projectId: "weekplanner-pro-b16d8",
+};
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
-    authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
-    projectId: "weekplanner-pro-b16d8",
-    storageBucket: "weekplanner-pro-b16d8.firebasestorage.app",
-    messagingSenderId: "838954104666",
-    appId: "1:838954104666:web:02d663508cad4c073f6563",
-    measurementId: "G-0EKD9MXP8L"
-  };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const provider = new GoogleAuthProvider();
+// 👇 BELANGRIJK: agenda toestemming toevoegen
+provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 
-  const appDiv = document.getElementById("app");
+const appDiv = document.getElementById("app");
 
-  const children = [
-    { name: "Kind 1", color: "#FF6B6B" },
-    { name: "Kind 2", color: "#4D96FF" },
-    { name: "Kind 3", color: "#6BCB77" },
-    { name: "Kind 4", color: "#FFD93D" },
-    { name: "Kind 5", color: "#B980F0" }
-  ];
+function showLogin() {
+  appDiv.innerHTML = `
+    <div style="text-align:center;margin-top:100px;">
+      <h1>Weekplanner</h1>
+      <button id="loginBtn">Inloggen met Google</button>
+    </div>
+  `;
 
-  function showLogin() {
-    appDiv.innerHTML = `
-      <div class="login-screen">
-        <h1>Weekplanner</h1>
-        <button onclick="login()">Inloggen met Google</button>
-      </div>
-    `;
-  }
+  document.getElementById("loginBtn").onclick = () =>
+    signInWithPopup(auth, provider);
+}
 
-  window.login = async function() {
-    await signInWithPopup(auth, provider);
-  };
+async function loadCalendars(user) {
+  const token = await user.getIdToken();
 
-  window.logout = async function() {
-    await signOut(auth);
-  };
-
-  async function addActivity(user, childName) {
-    const text = prompt("Nieuwe activiteit:");
-    if (!text) return;
-
-    await addDoc(collection(db, "activities"), {
-      userId: user.uid,
-      child: childName,
-      text: text
-    });
-
-    loadActivities(user);
-  }
-
-  async function loadActivities(user) {
-    const q = query(
-      collection(db, "activities"),
-      where("userId", "==", user.uid)
-    );
-
-    const snapshot = await getDocs(q);
-
-    const activities = {};
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (!activities[data.child]) {
-        activities[data.child] = [];
-      }
-      activities[data.child].push(data.text);
-    });
-
-    renderPlanner(user, activities);
-  }
-
-  function renderPlanner(user, activities = {}) {
-    appDiv.innerHTML = `
-      <header>Welkom ${user.displayName}</header>
-      <div class="container">
-        <button onclick="logout()">Uitloggen</button>
-        <button onclick="window.print()">Print</button>
-        <div class="grid">
-          ${children.map(child => `
-            <div class="card" style="background:${child.color}">
-              ${child.name}<br><br>
-              ${(activities[child.name] || [])
-                .map(a => `<div>• ${a}</div>`)
-                .join("")}
-              <br>
-              <button onclick="add('${child.name}')">+ Toevoegen</button>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-    `;
-
-    window.add = (childName) => addActivity(user, childName);
-  }
-
-  onAuthStateChanged(auth, user => {
-    if (user) {
-      loadActivities(user);
-    } else {
-      showLogin();
+  const res = await fetch(
+    "https://www.googleapis.com/calendar/v3/users/me/calendarList",
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     }
-  });
+  );
+
+  const data = await res.json();
+  renderCalendars(user, data.items);
+}
+
+async function loadEvents(calendarId, token) {
+  const today = new Date().toISOString();
+
+  const res = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?timeMin=${today}&maxResults=10&singleEvents=true&orderBy=startTime`,
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
+
+  return await res.json();
+}
+
+function getIcon(text) {
+  text = text.toLowerCase();
+
+  if (text.includes("school")) return "🏫";
+  if (text.includes("voetbal")) return "⚽";
+  if (text.includes("dokter")) return "🩺";
+  if (text.includes("feest")) return "🎉";
+  if (text.includes("zwem")) return "🏊";
+  return "📌";
+}
+
+async function renderCalendars(user, calendars) {
+  const token = await user.getIdToken();
+
+  appDiv.innerHTML = `<h2 style="text-align:center;">Welkom ${user.displayName}</h2><div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;"></div>`;
+
+  const container = appDiv.querySelector("div");
+
+  for (let cal of calendars) {
+    const eventsData = await loadEvents(cal.id, token);
+
+    const card = document.createElement("div");
+    card.style.background = "#f2f2f2";
+    card.style.padding = "20px";
+    card.style.width = "250px";
+    card.style.borderRadius = "10px";
+
+    let html = `<h3>${cal.summary}</h3>`;
+
+    if (eventsData.items.length === 0) {
+      html += "<p>Geen komende activiteiten</p>";
+    } else {
+      eventsData.items.forEach(e => {
+        html += `<div>${getIcon(e.summary)} ${e.summary}</div>`;
+      });
+    }
+
+    card.innerHTML = html;
+    container.appendChild(card);
+  }
+}
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    loadCalendars(user);
+  } else {
+    showLogin();
+  }
+});
 </script>
