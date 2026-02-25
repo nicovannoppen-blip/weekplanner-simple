@@ -1,3 +1,77 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <title>Weekplanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+    }
+
+    header {
+      background: #2d6cdf;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 15px;
+      color: white;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      min-height: 150px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      margin: 5px;
+      font-weight: bold;
+    }
+
+    .login-screen {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    @media print {
+      button {
+        display: none !important;
+      }
+      body {
+        background: white;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="app"></div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } 
@@ -111,3 +185,6 @@ onAuthStateChanged(auth, user => {
   }
 });
 </script>
+
+</body>
+</html>
