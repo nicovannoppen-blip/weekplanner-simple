@@ -182,8 +182,15 @@ async function renderCalendars(calendars) {
   }
 }
 
-onAuthStateChanged(auth, user => {
-  if (!user) {
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const result = await user.getIdTokenResult();
+    // opnieuw Google login doen om access token te krijgen
+    const signInResult = await signInWithPopup(auth, provider);
+    const credential = GoogleAuthProvider.credentialFromResult(signInResult);
+    accessToken = credential.accessToken;
+    loadCalendars();
+  } else {
     showLogin();
   }
 });
