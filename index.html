@@ -71,11 +71,14 @@
 <body>
 
 <div id="app"></div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  signInWithPopup,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
@@ -87,10 +90,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// 👇 BELANGRIJK: agenda toestemming toevoegen
 provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 
 const appDiv = document.getElementById("app");
+
+let accessToken = null;
 
 function showLogin() {
   appDiv.innerHTML = `
@@ -100,34 +104,36 @@ function showLogin() {
     </div>
   `;
 
-  document.getElementById("loginBtn").onclick = () =>
-    signInWithPopup(auth, provider);
+  document.getElementById("loginBtn").onclick = async () => {
+    const result = await signInWithPopup(auth, provider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    accessToken = credential.accessToken;
+    loadCalendars();
+  };
 }
 
-async function loadCalendars(user) {
-  const token = await user.getIdToken();
-
+async function loadCalendars() {
   const res = await fetch(
     "https://www.googleapis.com/calendar/v3/users/me/calendarList",
     {
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: "Bearer " + accessToken,
       },
     }
   );
 
   const data = await res.json();
-  renderCalendars(user, data.items);
+  renderCalendars(data.items);
 }
 
-async function loadEvents(calendarId, token) {
+async function loadEvents(calendarId) {
   const today = new Date().toISOString();
 
   const res = await fetch(
     `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?timeMin=${today}&maxResults=10&singleEvents=true&orderBy=startTime`,
     {
       headers: {
-        Authorization: "Bearer " + token,
+        Authorization: "Bearer " + accessToken,
       },
     }
   );
@@ -137,24 +143,23 @@ async function loadEvents(calendarId, token) {
 
 function getIcon(text) {
   text = text.toLowerCase();
-
   if (text.includes("school")) return "🏫";
   if (text.includes("voetbal")) return "⚽";
   if (text.includes("dokter")) return "🩺";
   if (text.includes("feest")) return "🎉";
-  if (text.includes("zwem")) return "🏊";
   return "📌";
 }
 
-async function renderCalendars(user, calendars) {
-  const token = await user.getIdToken();
+async function renderCalendars(calendars) {
+  appDiv.innerHTML = `
+    <h2 style="text-align:center;">Welkom ${auth.currentUser.displayName}</h2>
+    <div id="container" style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;"></div>
+  `;
 
-  appDiv.innerHTML = `<h2 style="text-align:center;">Welkom ${user.displayName}</h2><div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;"></div>`;
-
-  const container = appDiv.querySelector("div");
+  const container = document.getElementById("container");
 
   for (let cal of calendars) {
-    const eventsData = await loadEvents(cal.id, token);
+    const eventsData = await loadEvents(cal.id);
 
     const card = document.createElement("div");
     card.style.background = "#f2f2f2";
@@ -164,7 +169,7 @@ async function renderCalendars(user, calendars) {
 
     let html = `<h3>${cal.summary}</h3>`;
 
-    if (eventsData.items.length === 0) {
+    if (!eventsData.items || eventsData.items.length === 0) {
       html += "<p>Geen komende activiteiten</p>";
     } else {
       eventsData.items.forEach(e => {
@@ -178,9 +183,7 @@ async function renderCalendars(user, calendars) {
 }
 
 onAuthStateChanged(auth, user => {
-  if (user) {
-    loadCalendars(user);
-  } else {
+  if (!user) {
     showLogin();
   }
 });
