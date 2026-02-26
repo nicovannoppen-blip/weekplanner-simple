@@ -100,18 +100,26 @@ appDiv.innerHTML = `
 `;
 
 document.getElementById("loginBtn").onclick = async () => {
+
   const result = await signInWithPopup(auth, provider);
+  const user = result.user;
+
+  const tokenResponse = await user.getIdTokenResult();
+  console.log("Firebase token:", tokenResponse.token);
+
   const credential = GoogleAuthProvider.credentialFromResult(result);
-accessToken = credential.accessToken;
 
-console.log("Access token:", accessToken);
+  if (!credential || !credential.accessToken) {
+    alert("Geen Google access token ontvangen!");
+    console.error("Credential:", credential);
+    return;
+  }
 
-if (!accessToken) {
-  alert("GEEN ACCESS TOKEN!");
-  return;
-}
+  accessToken = credential.accessToken;
 
-loadCalendars(result.user.displayName);
+  console.log("Google Access Token:", accessToken);
+
+  loadCalendars(user.displayName);
 };
 
 async function loadCalendars(name) {
