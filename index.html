@@ -125,7 +125,13 @@ async function loadCalendars(name) {
   );
 
   const data = await res.json();
-  renderCalendars(name, data.items);
+  if (!data.items) {
+  console.error("API ERROR:", data);
+  alert("Calendar API error – kijk in console");
+  return;
+}
+
+renderCalendars(name, data.items);
 }
 
 async function loadEvents(calendarId) {
