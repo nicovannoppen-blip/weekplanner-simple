@@ -102,9 +102,16 @@ appDiv.innerHTML = `
 document.getElementById("loginBtn").onclick = async () => {
   const result = await signInWithPopup(auth, provider);
   const credential = GoogleAuthProvider.credentialFromResult(result);
-  accessToken = credential.accessToken;
+accessToken = credential.accessToken;
 
-  loadCalendars(result.user.displayName);
+console.log("Access token:", accessToken);
+
+if (!accessToken) {
+  alert("GEEN ACCESS TOKEN!");
+  return;
+}
+
+loadCalendars(result.user.displayName);
 };
 
 async function loadCalendars(name) {
