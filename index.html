@@ -4,50 +4,32 @@
 <meta charset="UTF-8">
 <title>AgendaPicto</title>
 
-<link rel="manifest" href="/manifest.json">
-
 <style>
-body { font-family: Arial; margin: 0; background: #f1f3f4; }
-header { background: #4285F4; color: white; padding: 15px; font-size: 20px; }
-button { padding: 8px 14px; margin: 5px; border: none; background: #4285F4; color: white; border-radius: 4px; cursor: pointer; }
-#calendar { padding: 15px; }
-.event {
-  background: white;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.icon { width: 48px; height: 48px; }
-select { margin-left: auto; }
-.kids .icon { width: 80px; height: 80px; }
+body { font-family: Arial; margin:0; background:#f1f3f4;}
+header { background:#4285F4; color:white; padding:15px;}
+button { padding:8px 14px; margin:5px; border:none; background:#4285F4; color:white; border-radius:4px; cursor:pointer;}
+#calendar { padding:15px;}
+.event { background:white; padding:10px; margin-bottom:8px; border-radius:6px; display:flex; gap:10px; align-items:center;}
+.icon { width:48px; height:48px;}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
 <body>
 
 <header>
 AgendaPicto
-<button onclick="login()">Login</button>
-<button onclick="logout()">Logout</button>
-<button onclick="exportPDF()">PDF</button>
-<button onclick="toggleKids()">Kindermodus</button>
+<button id="loginBtn">Login</button>
+<button id="logoutBtn">Logout</button>
+<span id="userInfo"></span>
 </header>
 
 <div id="calendar"></div>
 
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js');
-}
-
-/* FIREBASE */
+// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
   authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
@@ -57,119 +39,68 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 
+// 🔥 GOOGLE PROVIDER
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 
-function login(){ auth.signInWithPopup(provider); }
-function logout(){ auth.signOut(); }
+// 🔥 LOGIN (redirect, geen popup)
+document.getElementById("loginBtn").onclick = () => {
+  auth.signInWithRedirect(provider);
+};
 
+// 🔥 LOGOUT
+document.getElementById("logoutBtn").onclick = () => {
+  auth.signOut();
+};
+
+// 🔥 RESULT NA REDIRECT
+auth.getRedirectResult().then(result => {
+  if (result.credential) {
+    console.log("Ingelogd!");
+  }
+}).catch(error => {
+  console.error(error);
+});
+
+// 🔥 STATE LISTENER
 auth.onAuthStateChanged(async user => {
   if (user) {
-    const credential = await user.getIdTokenResult();
-    const token = user.accessToken || credential.token;
+    document.getElementById("userInfo").innerText = "Welkom " + user.displayName;
+    const token = (await user.getIdTokenResult()).token;
     loadCalendar(token);
+  } else {
+    document.getElementById("userInfo").innerText = "";
+    document.getElementById("calendar").innerHTML = "";
   }
 });
 
-/* ICON DATABASE (BETROUWBARE CDN ICONS) */
-const ICONS = {
-  school: "https://cdn-icons-png.flaticon.com/512/3135/3135755.png",
-  sport: "https://cdn-icons-png.flaticon.com/512/857/857455.png",
-  dokter: "https://cdn-icons-png.flaticon.com/512/2966/2966488.png",
-  verjaardag: "https://cdn-icons-png.flaticon.com/512/3468/3468371.png",
-  werk: "https://cdn-icons-png.flaticon.com/512/2910/2910791.png",
-  eten: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png",
-  algemeen: "https://cdn-icons-png.flaticon.com/512/1828/1828884.png"
-};
-
-/* GRATIS AI ENGINE */
-const AI_DB = {
-  school:["school","les","examen","toets","huiswerk"],
-  sport:["voetbal","training","wedstrijd","sport","zwemmen"],
-  dokter:["dokter","tandarts","ziekenhuis","consultatie"],
-  verjaardag:["verjaardag","feest","party"],
-  werk:["werk","meeting","vergadering","kantoor"],
-  eten:["eten","restaurant","diner","lunch"]
-};
-
-function normalize(text){
-  return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-}
-
-function smartIcon(text){
-  const t = normalize(text);
-
-  // check opgeslagen correcties
-  const saved = localStorage.getItem("icon_"+t);
-  if(saved) return saved;
-
-  for(const cat in AI_DB){
-    if(AI_DB[cat].some(word=>t.includes(word))){
-      return cat;
-    }
-  }
-  return "algemeen";
-}
-
-/* CALENDAR */
-async function loadCalendar(token){
+// 🔥 GOOGLE CALENDAR
+async function loadCalendar(token) {
   const res = await fetch(
     "https://www.googleapis.com/calendar/v3/calendars/primary/events",
     { headers:{ Authorization:"Bearer "+token } }
   );
+
   const data = await res.json();
   renderEvents(data.items || []);
 }
 
-function renderEvents(events){
+function renderEvents(events) {
   const container = document.getElementById("calendar");
   container.innerHTML = "";
 
   events.forEach(e=>{
-    const iconKey = smartIcon(e.summary);
     const div = document.createElement("div");
     div.className="event";
-
     div.innerHTML = `
-      <img class="icon" src="${ICONS[iconKey]}" />
+      <img class="icon" src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png">
       <div>
         <strong>${e.summary}</strong><br>
         ${e.start?.dateTime || e.start?.date}
       </div>
-      <select onchange="changeIcon(this,'${normalize(e.summary)}')">
-        ${Object.keys(ICONS).map(k=>`<option value="${k}" ${k==iconKey?'selected':''}>${k}</option>`).join("")}
-      </select>
     `;
     container.appendChild(div);
   });
-}
-
-/* HANDMATIGE CORRECTIE + ZELFLEREND */
-function changeIcon(select,key){
-  localStorage.setItem("icon_"+key, select.value);
-  location.reload();
-}
-
-/* KINDERMODUS */
-function toggleKids(){
-  document.body.classList.toggle("kids");
-}
-
-/* PDF */
-async function exportPDF(){
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFontSize(18);
-  doc.text("AgendaPicto Overzicht",20,15);
-  let y=30;
-
-  document.querySelectorAll(".event").forEach(ev=>{
-    doc.setFontSize(12);
-    doc.text(ev.innerText,20,y);
-    y+=10;
-  });
-
-  doc.save("AgendaPicto.pdf");
 }
 </script>
 
