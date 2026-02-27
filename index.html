@@ -15,6 +15,12 @@ body{font-family:Arial;background:#f1f3f4;margin:0;padding:15px;}
 button{background:#4285f4;color:white;border:none;padding:10px 18px;border-radius:8px;cursor:pointer;margin:5px;}
 .kids .icon{width:60px;height:60px;}
 </style>
+  <link rel="manifest" href="/manifest.json">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js');
+}
+</script>
 </head>
 
 <body>
