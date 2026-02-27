@@ -4,56 +4,16 @@
 <meta charset="UTF-8">
 <title>AgendaPicto</title>
 
-<link rel="manifest" href="/manifest.json">
-
 <style>
-body {
-  font-family: Arial;
-  margin: 0;
-  background: #f1f3f4;
-}
-
-header {
-  background: #4285F4;
-  color: white;
-  padding: 15px;
-  font-size: 20px;
-}
-
-button {
-  padding: 8px 14px;
-  margin: 5px;
-  border: none;
-  background: #4285F4;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-#calendar {
-  padding: 15px;
-}
-
-.event {
-  background: white;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.icon {
-  width: 40px;
-  height: 40px;
-}
+body { font-family: Arial; margin:0; background:#f1f3f4; }
+header { background:#4285F4; color:white; padding:15px; font-size:20px; }
+button { padding:8px 14px; margin:5px; border:none; background:#4285F4; color:white; border-radius:4px; cursor:pointer; }
+#calendar { padding:15px; }
+.event { background:white; padding:10px; margin-bottom:8px; border-radius:6px; display:flex; align-items:center; gap:10px; }
+.icon { width:40px; height:40px; }
 </style>
 
-<!-- 🔥 Firebase V8 (BELANGRIJK!) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
@@ -69,46 +29,48 @@ AgendaPicto
 <div id="calendar"></div>
 
 <script>
-  console.log(firebase);
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js');
-}
 
-const firebaseConfig = {
-  apiKey: "JOUW_API_KEY",
-  authDomain: "JOUW_PROJECT.firebaseapp.com",
-  projectId: "JOUW_PROJECT_ID"
-};
+const CLIENT_ID = "PLAATS_HIER_JOUW_CLIENT_ID";
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-const provider = new firebase.auth.GoogleAuthProvider();
-provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
+let accessToken = null;
 
 function login() {
-  auth.signInWithPopup(provider)
-    .then(result => {
-      const credential = result.credential;
-      const token = credential.accessToken;
-      loadCalendar(token);
-    })
-    .catch(error => {
-      console.error(error);
-      alert("Login mislukt");
-    });
+  const oauth2Endpoint = "https://accounts.google.com/o/oauth2/v2/auth";
+
+  const params = {
+    client_id: CLIENT_ID,
+    redirect_uri: window.location.origin,
+    response_type: "token",
+    scope: "https://www.googleapis.com/auth/calendar.readonly",
+    include_granted_scopes: "true",
+    state: "pass-through value"
+  };
+
+  const queryString = new URLSearchParams(params).toString();
+  window.location = oauth2Endpoint + "?" + queryString;
 }
 
 function logout() {
-  auth.signOut();
+  accessToken = null;
   document.getElementById("calendar").innerHTML = "";
+  window.location.hash = "";
 }
 
-async function loadCalendar(token) {
+function parseTokenFromUrl() {
+  const hash = window.location.hash.substring(1);
+  const params = new URLSearchParams(hash);
+  accessToken = params.get("access_token");
+
+  if (accessToken) {
+    loadCalendar();
+  }
+}
+
+async function loadCalendar() {
   const response = await fetch(
     "https://www.googleapis.com/calendar/v3/calendars/primary/events",
     {
-      headers: { Authorization: "Bearer " + token }
+      headers: { Authorization: "Bearer " + accessToken }
     }
   );
 
@@ -121,18 +83,15 @@ function renderEvents(events) {
   container.innerHTML = "";
 
   events.forEach(e => {
-    const iconName = getSmartIcon(e.summary || "");
-
     const div = document.createElement("div");
     div.className = "event";
     div.innerHTML = `
-      <img class="icon" src="https://api.iconify.design/mdi/${iconName}.svg">
+      <img class="icon" src="https://api.iconify.design/mdi/calendar.svg">
       <div>
         <strong>${e.summary}</strong><br>
         ${e.start?.dateTime || e.start?.date || ""}
       </div>
     `;
-
     container.appendChild(div);
   });
 }
@@ -140,12 +99,10 @@ function renderEvents(events) {
 async function exportPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.setFontSize(18);
-  doc.text("AgendaPicto Weekoverzicht", 20, 15);
+  doc.text("AgendaPicto Weekoverzicht", 20, 20);
 
-  let y = 30;
+  let y = 40;
   document.querySelectorAll(".event").forEach(ev => {
-    doc.setFontSize(12);
     doc.text(ev.innerText, 20, y);
     y += 10;
   });
@@ -153,30 +110,8 @@ async function exportPDF() {
   doc.save("AgendaPicto.pdf");
 }
 
-/* === GRATIS LOKALE AI === */
+parseTokenFromUrl();
 
-const AI_DATABASE = {
-  school: ["school","les","toets","examen","huiswerk"],
-  sport: ["voetbal","training","wedstrijd","sport"],
-  dokter: ["dokter","tandarts","ziekenhuis"],
-  verjaardag: ["verjaardag","feest"],
-  werk: ["werk","meeting","vergadering"],
-  eten: ["eten","restaurant","diner"]
-};
-
-function getSmartIcon(text) {
-  const normalized = text.toLowerCase();
-
-  for (const category in AI_DATABASE) {
-    for (const keyword of AI_DATABASE[category]) {
-      if (normalized.includes(keyword)) {
-        return "calendar";
-      }
-    }
-  }
-
-  return "calendar";
-}
 </script>
 
 </body>
