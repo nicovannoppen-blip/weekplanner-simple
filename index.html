@@ -1,249 +1,256 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>AgendaPicto</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AgendaPicto</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f1f3f4;
-      margin: 0;
-      padding: 20px;
-    }
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f1f3f4;
+  margin:0;
+  padding:15px;
+}
 
-    h1 {
-      text-align: center;
-    }
+h1{text-align:center;}
 
-    .topbar {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+.topbar{
+  text-align:center;
+  margin-bottom:20px;
+}
 
-    button {
-      background: #4285f4;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
+button{
+  background:#4285f4;
+  color:white;
+  border:none;
+  padding:10px 18px;
+  border-radius:8px;
+  cursor:pointer;
+  margin:5px;
+}
 
-    button:hover {
-      background: #3367d6;
-    }
+.weekCard{
+  background:white;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  max-width:800px;
+  margin:auto;
+}
 
-    .weekCard {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      max-width: 700px;
-      margin: auto;
-    }
+.dayTitle{
+  font-weight:bold;
+  font-size:18px;
+  margin-top:25px;
+  padding-bottom:6px;
+  border-bottom:1px solid #eee;
+}
 
-    .dayTitle {
-      font-weight: bold;
-      font-size: 18px;
-      margin-top: 20px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 6px;
-    }
+.event{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 0;
+  border-left:6px solid transparent;
+  padding-left:10px;
+}
 
-    .event {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 0;
-    }
+.icon{font-size:24px;}
 
-    .icon {
-      font-size: 24px;
-    }
+.time{
+  margin-left:auto;
+  font-size:13px;
+  color:#666;
+}
 
-    .time {
-      font-size: 13px;
-      color: #666;
-      margin-left: auto;
-    }
+.kids .icon{font-size:42px;}
+.kids .event span{font-size:22px;}
 
-    .kids .icon { font-size: 40px; }
-    .kids .event span { font-size: 22px; }
-
-  </style>
+@media (max-width:600px){
+  .weekCard{padding:15px;}
+  .icon{font-size:30px;}
+}
+</style>
 </head>
 
 <body>
 
-  <div id="app"></div>
+<div id="app"></div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
-      authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
-      projectId: "weekplanner-pro-b16d8",
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
+  authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
+  projectId: "weekplanner-pro-b16d8",
+};
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 
-    provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
+const appDiv = document.getElementById("app");
 
-    const appDiv = document.getElementById("app");
+let accessToken = null;
 
-    let accessToken = null;
+showLogin();
 
-    appDiv.innerHTML = `
-      <div style="text-align:center;margin-top:100px;">
-        <h1>AgendaPicto</h1>
-        <button id="loginBtn">Inloggen met Google</button>
-      </div>
-    `;
+function showLogin(){
+  appDiv.innerHTML = `
+    <div style="text-align:center;margin-top:100px;">
+      <h1>AgendaPicto</h1>
+      <button id="loginBtn">Inloggen met Google</button>
+    </div>
+  `;
 
-    document.getElementById("loginBtn").onclick = async () => {
-      const result = await signInWithPopup(auth, provider);
-      const credential = GoogleAuthProvider.credentialFromResult(result);
+  document.getElementById("loginBtn").onclick = login;
+}
 
-      if (!credential || !credential.accessToken) {
-        alert("Geen Google access token ontvangen");
-        return;
-      }
+async function login(){
+  const result = await signInWithPopup(auth, provider);
+  const credential = GoogleAuthProvider.credentialFromResult(result);
 
-      accessToken = credential.accessToken;
-      loadWeek(result.user.displayName);
-    };
+  if(!credential?.accessToken){
+    alert("Geen Google access token");
+    return;
+  }
 
-    async function loadWeek(name) {
+  accessToken = credential.accessToken;
+  loadWeek(result.user.displayName);
+}
 
-      const calendarRes = await fetch(
-        "https://www.googleapis.com/calendar/v3/users/me/calendarList",
-        { headers: { Authorization: "Bearer " + accessToken } }
-      );
+onAuthStateChanged(auth, async (user)=>{
+  if(user){
+    // force refresh login zodat we accessToken krijgen
+    const result = await signInWithPopup(auth, provider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    accessToken = credential.accessToken;
+    loadWeek(user.displayName);
+  }
+});
 
-      const calendarData = await calendarRes.json();
+async function loadWeek(name){
 
-      if (!calendarData.items) {
-        console.error(calendarData);
-        alert("Calendar API error");
-        return;
-      }
+  const calRes = await fetch(
+    "https://www.googleapis.com/calendar/v3/users/me/calendarList",
+    { headers:{ Authorization:"Bearer "+accessToken }}
+  );
 
-      const today = new Date();
-      const nextWeek = new Date();
-      nextWeek.setDate(today.getDate() + 7);
+  const calData = await calRes.json();
+  if(!calData.items){ alert("Calendar API error"); return;}
 
-      const timeMin = today.toISOString();
-      const timeMax = nextWeek.toISOString();
+  const today = new Date();
+  const nextWeek = new Date();
+  nextWeek.setDate(today.getDate()+7);
 
-      let allEvents = [];
+  const timeMin = today.toISOString();
+  const timeMax = nextWeek.toISOString();
 
-      for (let cal of calendarData.items) {
-        const eventsRes = await fetch(
-          `https://www.googleapis.com/calendar/v3/calendars/${cal.id}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`,
-          { headers: { Authorization: "Bearer " + accessToken } }
-        );
+  let allEvents = [];
 
-        const eventsData = await eventsRes.json();
+  for(let cal of calData.items){
 
-        if (eventsData.items) {
-          allEvents = allEvents.concat(eventsData.items);
-        }
-      }
+    const evRes = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/${cal.id}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`,
+      { headers:{ Authorization:"Bearer "+accessToken }}
+    );
 
-      allEvents.sort((a,b) =>
-        new Date(a.start.dateTime || a.start.date) -
-        new Date(b.start.dateTime || b.start.date)
-      );
+    const evData = await evRes.json();
 
-      renderWeek(name, allEvents);
+    if(evData.items){
+      evData.items.forEach(e=>{
+        e.calendarColor = cal.backgroundColor; // Google kleur
+        allEvents.push(e);
+      });
     }
+  }
 
-    function renderWeek(name, events) {
+  allEvents.sort((a,b)=>
+    new Date(a.start.dateTime||a.start.date) -
+    new Date(b.start.dateTime||b.start.date)
+  );
 
-      appDiv.innerHTML = `
-        <div class="topbar">
-          <h1>Welkom ${name}</h1>
-          <button onclick="toggleKidsMode()">Kindermodus</button>
+  renderWeek(name, allEvents);
+}
+
+function renderWeek(name, events){
+
+  appDiv.innerHTML = `
+    <div class="topbar">
+      <h1>Welkom ${name}</h1>
+      <button onclick="toggleKids()">Kindermodus</button>
+      <button onclick="logout()">Uitloggen</button>
+    </div>
+    <div class="weekCard" id="weekCard"></div>
+  `;
+
+  const weekCard = document.getElementById("weekCard");
+
+  if(events.length===0){
+    weekCard.innerHTML="<p>Geen activiteiten komende 7 dagen</p>";
+    return;
+  }
+
+  const grouped={};
+
+  events.forEach(e=>{
+    const date=e.start.dateTime?e.start.dateTime.split("T")[0]:e.start.date;
+    if(!grouped[date]) grouped[date]=[];
+    grouped[date].push(e);
+  });
+
+  Object.keys(grouped).forEach(date=>{
+
+    const dayName = new Date(date).toLocaleDateString("nl-BE",{
+      weekday:"long",
+      day:"numeric",
+      month:"long"
+    });
+
+    let html=`<div class="dayTitle">${dayName}</div>`;
+
+    grouped[date].forEach(e=>{
+
+      const time=e.start.dateTime?
+        new Date(e.start.dateTime).toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"})
+        :"Hele dag";
+
+      html+=`
+        <div class="event" style="border-left-color:${e.calendarColor}">
+          <span class="icon">${getIcon(e.summary)}</span>
+          <span>${e.summary}</span>
+          <span class="time">${time}</span>
         </div>
-        <div class="weekCard" id="weekCard"></div>
       `;
+    });
 
-      const weekCard = document.getElementById("weekCard");
+    weekCard.innerHTML+=html;
+  });
+}
 
-      if (events.length === 0) {
-        weekCard.innerHTML = "<p>Geen activiteiten komende 7 dagen</p>";
-        return;
-      }
+function getIcon(text){
+  text=text.toLowerCase();
+  if(text.includes("school"))return "🏫";
+  if(text.includes("voetbal"))return "⚽";
+  if(text.includes("dokter"))return "🩺";
+  if(text.includes("feest"))return "🎉";
+  if(text.includes("verjaardag"))return "🎂";
+  if(text.includes("werk"))return "💼";
+  if(text.includes("zwem"))return "🏊";
+  if(text.includes("tandarts"))return "😁";
+  if(text.includes("kapper"))return "✂️";
+  if(text.includes("vergadering"))return "📋";
+  return "📌";
+}
 
-      const grouped = {};
-
-      events.forEach(e => {
-        const date = e.start.dateTime
-          ? e.start.dateTime.split("T")[0]
-          : e.start.date;
-
-        if (!grouped[date]) grouped[date] = [];
-        grouped[date].push(e);
-      });
-
-      Object.keys(grouped).forEach(date => {
-
-        const dayName = new Date(date).toLocaleDateString("nl-BE", {
-          weekday: "long",
-          day: "numeric",
-          month: "long"
-        });
-
-        let html = `<div class="dayTitle">${dayName}</div>`;
-
-        grouped[date].forEach(e => {
-
-          const time = e.start.dateTime
-            ? new Date(e.start.dateTime).toLocaleTimeString("nl-BE", { hour: "2-digit", minute: "2-digit" })
-            : "Hele dag";
-
-          html += `
-            <div class="event">
-              <span class="icon">${getIcon(e.summary)}</span>
-              <span>${e.summary}</span>
-              <span class="time">${time}</span>
-            </div>
-          `;
-        });
-
-        weekCard.innerHTML += html;
-      });
-    }
-
-    function getIcon(text) {
-      text = text.toLowerCase();
-
-      if (text.includes("school")) return "🏫";
-      if (text.includes("voetbal")) return "⚽";
-      if (text.includes("dokter")) return "🩺";
-      if (text.includes("feest")) return "🎉";
-      if (text.includes("verjaardag")) return "🎂";
-      if (text.includes("werk")) return "💼";
-      if (text.includes("zwem")) return "🏊";
-      if (text.includes("tandarts")) return "😁";
-      if (text.includes("kapper")) return "✂️";
-      if (text.includes("vergadering")) return "📋";
-
-      return "📌";
-    }
-
-    window.toggleKidsMode = function() {
-      document.body.classList.toggle("kids");
-    };
-
-  </script>
+window.toggleKids=()=>document.body.classList.toggle("kids");
+window.logout=()=>{ auth.signOut(); showLogin(); };
+</script>
 
 </body>
 </html>
