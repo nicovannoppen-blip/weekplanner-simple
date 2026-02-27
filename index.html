@@ -115,10 +115,7 @@ async function renderEvents(events) {
   container.innerHTML = "";
 
   for (const e of events) {
-
-    const iconResponse = await fetch(`/api/ai-picto?text=${encodeURIComponent(e.summary)}`);
-    const iconData = await iconResponse.json();
-    const iconName = iconData.icon || "algemeen";
+    const iconName = getSmartIcon(e.summary);
 
     const div = document.createElement("div");
     div.className = "event";
@@ -148,6 +145,72 @@ async function exportPDF() {
   });
 
   doc.save("AgendaPicto.pdf");
+}
+  // === GRATIS LOKALE AI ENGINE ===
+
+const AI_DATABASE = {
+  school: {
+    keywords: ["school","les","toets","examen","huiswerk","taak"],
+    weight: 3
+  },
+  sport: {
+    keywords: ["voetbal","training","wedstrijd","sport","zwemmen","turnen"],
+    weight: 3
+  },
+  dokter: {
+    keywords: ["dokter","tandarts","ziekenhuis","consultatie","controle"],
+    weight: 3
+  },
+  verjaardag: {
+    keywords: ["verjaardag","feest","party","cadeau"],
+    weight: 3
+  },
+  werk: {
+    keywords: ["werk","meeting","vergadering","kantoor","shift"],
+    weight: 3
+  },
+  eten: {
+    keywords: ["eten","restaurant","diner","lunch","avondeten"],
+    weight: 2
+  }
+};
+
+function normalizeText(text) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function fuzzyMatch(word, text) {
+  return text.includes(word);
+}
+
+function getSmartIcon(text) {
+  const normalized = normalizeText(text);
+  let scores = {};
+
+  for (const category in AI_DATABASE) {
+    scores[category] = 0;
+
+    AI_DATABASE[category].keywords.forEach(keyword => {
+      if (fuzzyMatch(keyword, normalized)) {
+        scores[category] += AI_DATABASE[category].weight;
+      }
+    });
+  }
+
+  let bestMatch = "algemeen";
+  let highestScore = 0;
+
+  for (const category in scores) {
+    if (scores[category] > highestScore) {
+      highestScore = scores[category];
+      bestMatch = category;
+    }
+  }
+
+  return bestMatch;
 }
 </script>
 
