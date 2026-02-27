@@ -1,204 +1,249 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Weekplanner</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>AgendaPicto</title>
 
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f4f6f8;
+      background: #f1f3f4;
+      margin: 0;
+      padding: 20px;
     }
 
-    header {
-      background: #2d6cdf;
-      color: white;
-      padding: 15px;
+    h1 {
       text-align: center;
-      font-size: 22px;
-      font-weight: bold;
     }
 
-    .container {
-      padding: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
-
-    .card {
-      padding: 20px;
-      border-radius: 15px;
-      color: white;
-      font-weight: bold;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-      min-height: 150px;
+    .topbar {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
     button {
-      padding: 10px 15px;
-      border-radius: 8px;
+      background: #4285f4;
+      color: white;
       border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
       cursor: pointer;
-      margin: 5px;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #3367d6;
+    }
+
+    .weekCard {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .dayTitle {
       font-weight: bold;
+      font-size: 18px;
+      margin-top: 20px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 6px;
     }
 
-    .login-screen {
-      height: 100vh;
+    .event {
       display: flex;
-      justify-content: center;
       align-items: center;
-      flex-direction: column;
+      gap: 12px;
+      padding: 8px 0;
     }
 
-    @media print {
-      button {
-        display: none !important;
-      }
-      body {
-        background: white;
-      }
+    .icon {
+      font-size: 24px;
     }
+
+    .time {
+      font-size: 13px;
+      color: #666;
+      margin-left: auto;
+    }
+
+    .kids .icon { font-size: 40px; }
+    .kids .event span { font-size: 22px; }
+
   </style>
 </head>
 
 <body>
 
-<div id="app"></div>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup }
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  <div id="app"></div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
-  authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
-  projectId: "weekplanner-pro-b16d8",
-};
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
+      projectId: "weekplanner-pro-b16d8",
+    };
 
-provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-const appDiv = document.getElementById("app");
+    provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 
-let accessToken = null;
+    const appDiv = document.getElementById("app");
 
-appDiv.innerHTML = `
-  <div style="text-align:center;margin-top:100px;">
-    <h1>Weekplanner</h1>
-    <button id="loginBtn">Inloggen met Google</button>
-  </div>
-`;
+    let accessToken = null;
 
-document.getElementById("loginBtn").onclick = async () => {
+    appDiv.innerHTML = `
+      <div style="text-align:center;margin-top:100px;">
+        <h1>AgendaPicto</h1>
+        <button id="loginBtn">Inloggen met Google</button>
+      </div>
+    `;
 
-  const result = await signInWithPopup(auth, provider);
-  const user = result.user;
+    document.getElementById("loginBtn").onclick = async () => {
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
 
-  const tokenResponse = await user.getIdTokenResult();
-  console.log("Firebase token:", tokenResponse.token);
+      if (!credential || !credential.accessToken) {
+        alert("Geen Google access token ontvangen");
+        return;
+      }
 
-  const credential = GoogleAuthProvider.credentialFromResult(result);
+      accessToken = credential.accessToken;
+      loadWeek(result.user.displayName);
+    };
 
-  if (!credential || !credential.accessToken) {
-    alert("Geen Google access token ontvangen!");
-    console.error("Credential:", credential);
-    return;
-  }
+    async function loadWeek(name) {
 
-  accessToken = credential.accessToken;
+      const calendarRes = await fetch(
+        "https://www.googleapis.com/calendar/v3/users/me/calendarList",
+        { headers: { Authorization: "Bearer " + accessToken } }
+      );
 
-  console.log("Google Access Token:", accessToken);
+      const calendarData = await calendarRes.json();
 
-  loadCalendars(user.displayName);
-};
+      if (!calendarData.items) {
+        console.error(calendarData);
+        alert("Calendar API error");
+        return;
+      }
 
-async function loadCalendars(name) {
-  const res = await fetch(
-    "https://www.googleapis.com/calendar/v3/users/me/calendarList",
-    {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
+      const today = new Date();
+      const nextWeek = new Date();
+      nextWeek.setDate(today.getDate() + 7);
+
+      const timeMin = today.toISOString();
+      const timeMax = nextWeek.toISOString();
+
+      let allEvents = [];
+
+      for (let cal of calendarData.items) {
+        const eventsRes = await fetch(
+          `https://www.googleapis.com/calendar/v3/calendars/${cal.id}/events?timeMin=${timeMin}&timeMax=${timeMax}&singleEvents=true&orderBy=startTime`,
+          { headers: { Authorization: "Bearer " + accessToken } }
+        );
+
+        const eventsData = await eventsRes.json();
+
+        if (eventsData.items) {
+          allEvents = allEvents.concat(eventsData.items);
+        }
+      }
+
+      allEvents.sort((a,b) =>
+        new Date(a.start.dateTime || a.start.date) -
+        new Date(b.start.dateTime || b.start.date)
+      );
+
+      renderWeek(name, allEvents);
     }
-  );
 
-  const data = await res.json();
-  if (!data.items) {
-  console.error("API ERROR:", data);
-  alert("Calendar API error – kijk in console");
-  return;
-}
+    function renderWeek(name, events) {
 
-renderCalendars(name, data.items);
-}
+      appDiv.innerHTML = `
+        <div class="topbar">
+          <h1>Welkom ${name}</h1>
+          <button onclick="toggleKidsMode()">Kindermodus</button>
+        </div>
+        <div class="weekCard" id="weekCard"></div>
+      `;
 
-async function loadEvents(calendarId) {
-  const today = new Date().toISOString();
+      const weekCard = document.getElementById("weekCard");
 
-  const res = await fetch(
-    `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?timeMin=${today}&singleEvents=true&orderBy=startTime`,
-    {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
-    }
-  );
+      if (events.length === 0) {
+        weekCard.innerHTML = "<p>Geen activiteiten komende 7 dagen</p>";
+        return;
+      }
 
-  return await res.json();
-}
+      const grouped = {};
 
-function getIcon(text) {
-  text = text.toLowerCase();
-  if (text.includes("school")) return "🏫";
-  if (text.includes("voetbal")) return "⚽";
-  if (text.includes("dokter")) return "🩺";
-  if (text.includes("feest")) return "🎉";
-  return "📌";
-}
+      events.forEach(e => {
+        const date = e.start.dateTime
+          ? e.start.dateTime.split("T")[0]
+          : e.start.date;
 
-async function renderCalendars(name, calendars) {
-  appDiv.innerHTML = `
-    <h2 style="text-align:center;">Welkom ${name}</h2>
-    <div id="container" style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;"></div>
-  `;
+        if (!grouped[date]) grouped[date] = [];
+        grouped[date].push(e);
+      });
 
-  const container = document.getElementById("container");
+      Object.keys(grouped).forEach(date => {
 
-  for (let cal of calendars) {
-    const eventsData = await loadEvents(cal.id);
+        const dayName = new Date(date).toLocaleDateString("nl-BE", {
+          weekday: "long",
+          day: "numeric",
+          month: "long"
+        });
 
-    const card = document.createElement("div");
-    card.style.background = "#f2f2f2";
-    card.style.padding = "20px";
-    card.style.width = "250px";
-    card.style.borderRadius = "10px";
+        let html = `<div class="dayTitle">${dayName}</div>`;
 
-    let html = `<h3>${cal.summary}</h3>`;
+        grouped[date].forEach(e => {
 
-    if (!eventsData.items || eventsData.items.length === 0) {
-      html += "<p>Geen komende activiteiten</p>";
-    } else {
-      eventsData.items.forEach(e => {
-        html += `<div>${getIcon(e.summary)} ${e.summary}</div>`;
+          const time = e.start.dateTime
+            ? new Date(e.start.dateTime).toLocaleTimeString("nl-BE", { hour: "2-digit", minute: "2-digit" })
+            : "Hele dag";
+
+          html += `
+            <div class="event">
+              <span class="icon">${getIcon(e.summary)}</span>
+              <span>${e.summary}</span>
+              <span class="time">${time}</span>
+            </div>
+          `;
+        });
+
+        weekCard.innerHTML += html;
       });
     }
 
-    card.innerHTML = html;
-    container.appendChild(card);
-  }
-}
-</script>
+    function getIcon(text) {
+      text = text.toLowerCase();
 
-  
+      if (text.includes("school")) return "🏫";
+      if (text.includes("voetbal")) return "⚽";
+      if (text.includes("dokter")) return "🩺";
+      if (text.includes("feest")) return "🎉";
+      if (text.includes("verjaardag")) return "🎂";
+      if (text.includes("werk")) return "💼";
+      if (text.includes("zwem")) return "🏊";
+      if (text.includes("tandarts")) return "😁";
+      if (text.includes("kapper")) return "✂️";
+      if (text.includes("vergadering")) return "📋";
+
+      return "📌";
+    }
+
+    window.toggleKidsMode = function() {
+      document.body.classList.toggle("kids");
+    };
+
+  </script>
+
 </body>
 </html>
