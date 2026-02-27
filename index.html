@@ -9,12 +9,7 @@ body { font-family: Arial; margin:0; background:#f1f3f4;}
 header { background:#4285F4; color:white; padding:15px;}
 button { padding:8px 14px; margin:5px; border:none; background:#4285F4; color:white; border-radius:4px; cursor:pointer;}
 #calendar { padding:15px;}
-.event { background:white; padding:10px; margin-bottom:8px; border-radius:6px; display:flex; gap:10px; align-items:center;}
-.icon { width:48px; height:48px;}
 </style>
-
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 </head>
 <body>
@@ -28,45 +23,54 @@ AgendaPicto
 
 <div id="calendar"></div>
 
-<script>
-// 🔥 FIREBASE CONFIG
+<script type="module">
+
+// ✅ MODERNE FIREBASE IMPORTS
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
   authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
   projectId: "weekplanner-pro-b16d8"
 };
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-// 🔥 GOOGLE PROVIDER
-const provider = new firebase.auth.GoogleAuthProvider();
+// ✅ INITIALISEER
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 
-// 🔥 LOGIN (redirect, geen popup)
-document.getElementById("loginBtn").onclick = () => {
-  auth.signInWithRedirect(provider);
-};
-
-// 🔥 LOGOUT
-document.getElementById("logoutBtn").onclick = () => {
-  auth.signOut();
-};
-
-// 🔥 RESULT NA REDIRECT
-auth.getRedirectResult().then(result => {
-  if (result.credential) {
-    console.log("Ingelogd!");
-  }
-}).catch(error => {
-  console.error(error);
+// 🔥 LOGIN
+document.getElementById("loginBtn").addEventListener("click", () => {
+  signInWithRedirect(auth, provider);
 });
 
-// 🔥 STATE LISTENER
-auth.onAuthStateChanged(async user => {
+// 🔥 LOGOUT
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  signOut(auth);
+});
+
+// 🔥 REDIRECT RESULT
+getRedirectResult(auth).catch(error => {
+  console.error("Redirect error:", error);
+});
+
+// 🔥 AUTH STATE
+onAuthStateChanged(auth, async (user) => {
   if (user) {
-    document.getElementById("userInfo").innerText = "Welkom " + user.displayName;
-    const token = (await user.getIdTokenResult()).token;
+    document.getElementById("userInfo").innerText =
+      "Welkom " + user.displayName;
+
+    const token = await user.getIdToken();
     loadCalendar(token);
   } else {
     document.getElementById("userInfo").innerText = "";
@@ -78,7 +82,9 @@ auth.onAuthStateChanged(async user => {
 async function loadCalendar(token) {
   const res = await fetch(
     "https://www.googleapis.com/calendar/v3/calendars/primary/events",
-    { headers:{ Authorization:"Bearer "+token } }
+    {
+      headers: { Authorization: "Bearer " + token }
+    }
   );
 
   const data = await res.json();
@@ -91,17 +97,19 @@ function renderEvents(events) {
 
   events.forEach(e=>{
     const div = document.createElement("div");
-    div.className="event";
+    div.style.background="white";
+    div.style.padding="10px";
+    div.style.marginBottom="8px";
+    div.style.borderRadius="6px";
+
     div.innerHTML = `
-      <img class="icon" src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png">
-      <div>
-        <strong>${e.summary}</strong><br>
-        ${e.start?.dateTime || e.start?.date}
-      </div>
+      <strong>${e.summary}</strong><br>
+      ${e.start?.dateTime || e.start?.date}
     `;
     container.appendChild(div);
   });
 }
+
 </script>
 
 </body>
