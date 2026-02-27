@@ -10,8 +10,8 @@ header { background:#4285F4; color:white; padding:15px;}
 button { padding:8px 14px; margin:5px; border:none; background:#4285F4; color:white; border-radius:4px; cursor:pointer;}
 #calendar { padding:15px;}
 </style>
-
 </head>
+
 <body>
 
 <header>
@@ -25,7 +25,6 @@ AgendaPicto
 
 <script type="module">
 
-// ✅ MODERNE FIREBASE IMPORTS
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -36,35 +35,29 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyDxhqddHdXDEWw3SfDnYKOeKW9_ejse1_c",
   authDomain: "weekplanner-pro-b16d8.firebaseapp.com",
   projectId: "weekplanner-pro-b16d8"
 };
 
-// ✅ INITIALISEER
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/calendar.readonly");
 
-// 🔥 LOGIN
 document.getElementById("loginBtn").addEventListener("click", () => {
   signInWithRedirect(auth, provider);
 });
 
-// 🔥 LOGOUT
 document.getElementById("logoutBtn").addEventListener("click", () => {
   signOut(auth);
 });
 
-// 🔥 REDIRECT RESULT
 getRedirectResult(auth).catch(error => {
-  console.error("Redirect error:", error);
+  console.error(error);
 });
 
-// 🔥 AUTH STATE
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     document.getElementById("userInfo").innerText =
@@ -78,13 +71,10 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// 🔥 GOOGLE CALENDAR
 async function loadCalendar(token) {
   const res = await fetch(
     "https://www.googleapis.com/calendar/v3/calendars/primary/events",
-    {
-      headers: { Authorization: "Bearer " + token }
-    }
+    { headers: { Authorization: "Bearer " + token } }
   );
 
   const data = await res.json();
@@ -95,12 +85,12 @@ function renderEvents(events) {
   const container = document.getElementById("calendar");
   container.innerHTML = "";
 
-  events.forEach(e=>{
+  events.forEach(e => {
     const div = document.createElement("div");
-    div.style.background="white";
-    div.style.padding="10px";
-    div.style.marginBottom="8px";
-    div.style.borderRadius="6px";
+    div.style.background = "white";
+    div.style.padding = "10px";
+    div.style.marginBottom = "8px";
+    div.style.borderRadius = "6px";
 
     div.innerHTML = `
       <strong>${e.summary}</strong><br>
