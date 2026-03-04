@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>KUST ZE</title>
+<title>Agenda Vannoppekes</title>
   <h1>TEST VERSIE 12345678</h1>
   
 
@@ -33,7 +33,6 @@ AgendaPicto KUST ZE
 <script>
 
 const CLIENT_ID = "259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com";
-
 let accessToken = null;
 
 function login() {
@@ -44,12 +43,9 @@ function login() {
     redirect_uri: window.location.origin,
     response_type: "token",
     scope: "https://www.googleapis.com/auth/calendar.readonly",
-    include_granted_scopes: "true",
-    state: "pass-through value"
   };
 
-  const queryString = new URLSearchParams(params).toString();
-  window.location = oauth2Endpoint + "?" + queryString;
+  window.location = oauth2Endpoint + "?" + new URLSearchParams(params).toString();
 }
 
 function logout() {
@@ -62,64 +58,127 @@ function parseTokenFromUrl() {
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
   accessToken = params.get("access_token");
-
-  if (accessToken) {
-    loadCalendar();
-  }
+  if (accessToken) loadCalendar();
 }
 
 async function loadCalendar() {
-  const now = new Date().toISOString();
+  const today = new Date();
+  const firstDay = new Date(today);
+  firstDay.setDate(today.getDate() - (today.getDay() + 6) % 7);
+  firstDay.setHours(0,0,0,0);
+
+  const lastDay = new Date(firstDay);
+  lastDay.setDate(firstDay.getDate() + 7);
 
   const response = await fetch(
     `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
-    `timeMin=${now}&` +
-    `singleEvents=true&` +
-    `orderBy=startTime`,
-    {
-      headers: { Authorization: "Bearer " + accessToken }
-    }
+    `timeMin=${firstDay.toISOString()}&` +
+    `timeMax=${lastDay.toISOString()}&` +
+    `singleEvents=true&orderBy=startTime`,
+    { headers: { Authorization: "Bearer " + accessToken } }
   );
 
   const data = await response.json();
-  renderEvents(data.items || []);
+  renderWeek(data.items || []);
 }
 
-function renderEvents(events) {
+function renderWeek(events) {
   const container = document.getElementById("calendar");
   container.innerHTML = "";
 
-  events.forEach(e => {
-    const div = document.createElement("div");
-    div.className = "event";
-    div.innerHTML = `
-      <img class="icon" src="https://api.iconify.design/mdi/calendar.svg">
-      <div>
-        <strong>${e.summary}</strong><br>
-        ${e.start?.dateTime || e.start?.date || ""}
+  container.style.display = "grid";
+  container.style.gridTemplateColumns = "repeat(7, 1fr)";
+  container.style.gap = "10px";
+
+  const days = ["Ma","Di","Wo","Do","Vr","Za","Zo"];
+  const columns = [];
+
+  for (let i=0;i<7;i++) {
+    const col = document.createElement("div");
+    col.innerHTML = `<h3>${days[i]}</h3>`;
+    col.style.background = "#e8eaed";
+    col.style.padding = "10px";
+    col.style.borderRadius = "8px";
+    container.appendChild(col);
+    columns.push(col);
+  }
+
+  events.forEach(event => {
+    const date = new Date(event.start.dateTime || event.start.date);
+    let dayIndex = (date.getDay() + 6) % 7;
+
+    const category = detectCategory(event.summary);
+    const color = getCategoryColor(category);
+    const icon = getCategoryIcon(category);
+
+    const block = document.createElement("div");
+    block.style.background = color;
+    block.style.padding = "8px";
+    block.style.marginBottom = "8px";
+    block.style.borderRadius = "6px";
+    block.style.color = "white";
+    block.style.fontSize = "14px";
+
+    block.innerHTML = `
+      <div style="display:flex;align-items:center;gap:6px;">
+        <img src="https://api.iconify.design/mdi/${icon}.svg?color=white" width="20">
+        <strong>${event.summary}</strong>
       </div>
+      <small>${formatTime(date)}</small>
     `;
-    container.appendChild(div);
+
+    columns[dayIndex].appendChild(block);
   });
 }
 
-async function exportPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.text("AgendaPicto Weekoverzicht", 20, 20);
+function formatTime(date) {
+  return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
 
-  let y = 40;
-  document.querySelectorAll(".event").forEach(ev => {
-    doc.text(ev.innerText, 20, y);
-    y += 10;
-  });
+const AI_CATEGORIES = {
+  school: ["school","les","toets","examen","huiswerk"],
+  sport: ["voetbal","training","wedstrijd","sport"],
+  dokter: ["dokter","tandarts","ziekenhuis"],
+  werk: ["werk","meeting","vergadering","shift"],
+  verjaardag: ["verjaardag","feest"],
+};
 
-  doc.save("AgendaPicto.pdf");
+function detectCategory(text) {
+  const lower = text.toLowerCase();
+  for (const cat in AI_CATEGORIES) {
+    if (AI_CATEGORIES[cat].some(word => lower.includes(word))) {
+      return cat;
+    }
+  }
+  return "algemeen";
+}
+
+function getCategoryColor(cat) {
+  const colors = {
+    school: "#fbbc05",
+    sport: "#34a853",
+    dokter: "#ea4335",
+    werk: "#4285f4",
+    verjaardag: "#9c27b0",
+    algemeen: "#5f6368"
+  };
+  return colors[cat] || colors.algemeen;
+}
+
+function getCategoryIcon(cat) {
+  const icons = {
+    school: "school",
+    sport: "soccer",
+    dokter: "medical-bag",
+    werk: "briefcase",
+    verjaardag: "cake-variant",
+    algemeen: "calendar"
+  };
+  return icons[cat] || "calendar";
 }
 
 parseTokenFromUrl();
 
 </script>
-
 </body>
 </html>
