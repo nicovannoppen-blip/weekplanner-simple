@@ -2,30 +2,104 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Agenda Vannoppekes</title>
-  <h1>TEST VERSIE 12345678</h1>
-  
+<title>AgendaPicto PRO</title>
 
 <style>
-body { font-family: Arial; margin:0; background:#f1f3f4; }
-header { background:#4285F4; color:white; padding:15px; font-size:20px; }
-button { padding:8px 14px; margin:5px; border:none; background:#4285F4; color:white; border-radius:4px; cursor:pointer; }
-#calendar { padding:15px; }
-.event { background:white; padding:10px; margin-bottom:8px; border-radius:6px; display:flex; align-items:center; gap:10px; }
-.icon { width:40px; height:40px; }
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f1f3f4;
+}
+
+header {
+  background: #4285F4;
+  color: white;
+  padding: 15px;
+  font-size: 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+button {
+  padding: 8px 14px;
+  margin: 5px;
+  border: none;
+  background: white;
+  color: #4285F4;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#calendar {
+  padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.day-column {
+  background: #e8eaed;
+  padding: 10px;
+  border-radius: 8px;
+  min-height: 300px;
+}
+
+.day-column h3 {
+  margin-top: 0;
+}
+
+.event-block {
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+}
+
+.event-header {
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.event-header img {
+  width:18px;
+  height:18px;
+}
+
+/* PRINT A4 */
+@media print {
+  body {
+    background: white;
+  }
+
+  header button {
+    display:none;
+  }
+
+  #calendar {
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .event-block {
+    page-break-inside: avoid;
+  }
+}
+
 </style>
-
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 </head>
 <body>
 
 <header>
-AgendaPicto KUST ZE
-<button onclick="login()">Login</button>
-<button onclick="logout()">Logout</button>
-<button onclick="exportPDF()">Export PDF</button>
+  <div><strong>AgendaPicto PRO</strong></div>
+  <div>
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Logout</button>
+    <button onclick="window.print()">Print A4</button>
+  </div>
 </header>
 
 <div id="calendar"></div>
@@ -35,6 +109,7 @@ AgendaPicto KUST ZE
 const CLIENT_ID = "259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com";
 let accessToken = null;
 
+/* LOGIN */
 function login() {
   const oauth2Endpoint = "https://accounts.google.com/o/oauth2/v2/auth";
 
@@ -54,51 +129,76 @@ function logout() {
   window.location.hash = "";
 }
 
+/* TOKEN PARSEN */
 function parseTokenFromUrl() {
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
   accessToken = params.get("access_token");
-  if (accessToken) loadCalendar();
+
+  if (accessToken) loadAllCalendars();
 }
 
-async function loadCalendar() {
+/* LAAD ALLE AGENDA'S */
+async function loadAllCalendars() {
+
   const today = new Date();
-  const firstDay = new Date(today);
-  firstDay.setDate(today.getDate() - (today.getDay() + 6) % 7);
-  firstDay.setHours(0,0,0,0);
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (today.getDay() + 6) % 7);
+  monday.setHours(0,0,0,0);
 
-  const lastDay = new Date(firstDay);
-  lastDay.setDate(firstDay.getDate() + 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 7);
 
-  const response = await fetch(
-    `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
-    `timeMin=${firstDay.toISOString()}&` +
-    `timeMax=${lastDay.toISOString()}&` +
-    `singleEvents=true&orderBy=startTime`,
+  const calendarRes = await fetch(
+    "https://www.googleapis.com/calendar/v3/users/me/calendarList",
     { headers: { Authorization: "Bearer " + accessToken } }
   );
 
-  const data = await response.json();
-  renderWeek(data.items || []);
+  const calendarData = await calendarRes.json();
+  const calendars = calendarData.items;
+
+  let allEvents = [];
+
+  for (const cal of calendars) {
+    const res = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?` +
+      `timeMin=${monday.toISOString()}&` +
+      `timeMax=${sunday.toISOString()}&` +
+      `singleEvents=true&orderBy=startTime`,
+      { headers: { Authorization: "Bearer " + accessToken } }
+    );
+
+    const data = await res.json();
+
+    if (data.items) {
+      data.items.forEach(e => {
+        e.calendarColor = cal.backgroundColor || "#5f6368";
+        e.calendarName = cal.summary;
+        allEvents.push(e);
+      });
+    }
+  }
+
+  renderWeek(allEvents, monday);
 }
 
-function renderWeek(events) {
+/* WEEK RENDER */
+function renderWeek(events, monday) {
+
   const container = document.getElementById("calendar");
   container.innerHTML = "";
 
-  container.style.display = "grid";
-  container.style.gridTemplateColumns = "repeat(7, 1fr)";
-  container.style.gap = "10px";
-
-  const days = ["Ma","Di","Wo","Do","Vr","Za","Zo"];
+  const dayNames = ["Ma","Di","Wo","Do","Vr","Za","Zo"];
   const columns = [];
 
   for (let i=0;i<7;i++) {
     const col = document.createElement("div");
-    col.innerHTML = `<h3>${days[i]}</h3>`;
-    col.style.background = "#e8eaed";
-    col.style.padding = "10px";
-    col.style.borderRadius = "8px";
+    col.className = "day-column";
+
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + i);
+
+    col.innerHTML = `<h3>${dayNames[i]} ${date.getDate()}/${date.getMonth()+1}</h3>`;
     container.appendChild(col);
     columns.push(col);
   }
@@ -107,78 +207,47 @@ function renderWeek(events) {
     const date = new Date(event.start.dateTime || event.start.date);
     let dayIndex = (date.getDay() + 6) % 7;
 
-    const category = detectCategory(event.summary);
-    const color = getCategoryColor(category);
-    const icon = getCategoryIcon(category);
-
     const block = document.createElement("div");
-    block.style.background = color;
-    block.style.padding = "8px";
-    block.style.marginBottom = "8px";
-    block.style.borderRadius = "6px";
-    block.style.color = "white";
-    block.style.fontSize = "14px";
+    block.className = "event-block";
+    block.style.background = event.calendarColor;
+
+    const icon = getSmartIcon(event.summary);
 
     block.innerHTML = `
-      <div style="display:flex;align-items:center;gap:6px;">
-        <img src="https://api.iconify.design/mdi/${icon}.svg?color=white" width="20">
+      <div class="event-header">
+        <img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
         <strong>${event.summary}</strong>
       </div>
-      <small>${formatTime(date)}</small>
+      <small>${formatTime(date)} • ${event.calendarName}</small>
     `;
 
     columns[dayIndex].appendChild(block);
   });
 }
 
+/* TIJD FORMAT */
 function formatTime(date) {
+  if (!date.getHours()) return "Hele dag";
   return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 }
 
-const AI_CATEGORIES = {
-  school: ["school","les","toets","examen","huiswerk"],
-  sport: ["voetbal","training","wedstrijd","sport"],
-  dokter: ["dokter","tandarts","ziekenhuis"],
-  werk: ["werk","meeting","vergadering","shift"],
-  verjaardag: ["verjaardag","feest"],
-};
+/* SLIMME PICTO AI */
+function getSmartIcon(text) {
+  const t = text.toLowerCase();
 
-function detectCategory(text) {
-  const lower = text.toLowerCase();
-  for (const cat in AI_CATEGORIES) {
-    if (AI_CATEGORIES[cat].some(word => lower.includes(word))) {
-      return cat;
-    }
-  }
-  return "algemeen";
-}
+  if (t.includes("voetbal") || t.includes("sport")) return "soccer";
+  if (t.includes("dokter") || t.includes("tandarts")) return "medical-bag";
+  if (t.includes("school") || t.includes("les")) return "school";
+  if (t.includes("verjaardag") || t.includes("feest")) return "cake-variant";
+  if (t.includes("werk") || t.includes("meeting")) return "briefcase";
+  if (t.includes("eten") || t.includes("restaurant")) return "silverware-fork-knife";
 
-function getCategoryColor(cat) {
-  const colors = {
-    school: "#fbbc05",
-    sport: "#34a853",
-    dokter: "#ea4335",
-    werk: "#4285f4",
-    verjaardag: "#9c27b0",
-    algemeen: "#5f6368"
-  };
-  return colors[cat] || colors.algemeen;
-}
-
-function getCategoryIcon(cat) {
-  const icons = {
-    school: "school",
-    sport: "soccer",
-    dokter: "medical-bag",
-    werk: "briefcase",
-    verjaardag: "cake-variant",
-    algemeen: "calendar"
-  };
-  return icons[cat] || "calendar";
+  return "calendar";
 }
 
 parseTokenFromUrl();
 
 </script>
+
 </body>
 </html>
