@@ -316,3 +316,6 @@ function toggleKidMode(){
 }
 
 parseToken();
+window.onload = () => {
+  parseToken();
+};
