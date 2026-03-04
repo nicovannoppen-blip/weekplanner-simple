@@ -153,14 +153,6 @@ function parseToken() {
   if (accessToken) init();
 }
 
-async function init() {
-  currentMonday = getMonday(new Date());
-  await loadCalendars();
-  await loadEvents();
-  renderFilters();
-  renderWeek();
-}
-
 /* DATUM */
 function getMonday(d) {
   const date = new Date(d);
@@ -260,32 +252,39 @@ function renderWeek() {
     columns.push(col);
   }
 
-  allEvents
+  /* 🔥 BELANGRIJK: eerst globaal sorteren op tijd */
+  const sortedEvents = allEvents
     .filter(e => selected.includes(e.calendarName))
-    .forEach(event => {
-
-      const date = new Date(event.start.dateTime || event.start.date);
-      const dayIndex = (date.getDay()+6)%7;
-
-      const block = document.createElement("div");
-      block.className = "event-block";
-      block.style.background = event.calendarColor;
-
-      const icon = getIcon(event.summary);
-
-      block.innerHTML = `
-        <div class="event-header">
-          <img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
-          <strong>${event.summary}</strong>
-        </div>
-        <small>${formatTime(date)} • ${event.calendarName}</small>
-      `;
-
-      columns[dayIndex].appendChild(block);
+    .sort((a,b) => {
+      const dateA = new Date(a.start.dateTime || a.start.date);
+      const dateB = new Date(b.start.dateTime || b.start.date);
+      return dateA - dateB;
     });
+
+  sortedEvents.forEach(event => {
+
+    const date = new Date(event.start.dateTime || event.start.date);
+    const dayIndex = (date.getDay()+6)%7;
+
+    const block = document.createElement("div");
+    block.className = "event-block";
+    block.style.background = event.calendarColor;
+
+    const icon = getIcon(event.summary);
+
+    block.innerHTML = `
+      <div class="event-header">
+        <img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
+        <strong>${event.summary}</strong>
+      </div>
+      <small>${formatTime(date)} • ${event.calendarName}</small>
+    `;
+
+    columns[dayIndex].appendChild(block);
+  });
 }
 
-/* ICON AI */
+/* ICONS */
 function getIcon(text) {
   const t = text.toLowerCase();
 
@@ -306,7 +305,6 @@ function getIcon(text) {
   return "calendar";
 }
 
-/* HULP */
 function formatTime(date) {
   if (!date.getHours()) return "Hele dag";
   return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
