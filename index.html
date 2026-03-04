@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AgendaPicto PRO+</title>
+<title>AgendaPicto PRO 3.0</title>
 
 <style>
 body {
@@ -45,76 +45,86 @@ button {
 }
 
 .day-column {
-  background: #e8eaed;
-  padding: 10px;
+  background: white;
   border-radius: 8px;
-  min-height: 250px;
+  display:flex;
+  flex-direction:column;
 }
 
-.day-column h3 {
-  margin-top:0;
+.day-header {
+  padding:10px;
+  font-weight:bold;
+  background:#e8eaed;
+  border-radius:8px 8px 0 0;
+}
+
+.timeline {
+  position: relative;
+  height: 960px; /* 16 uur */
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #eee 0px,
+      #eee 1px,
+      transparent 1px,
+      transparent 60px
+    );
+}
+
+.hour-label {
+  position:absolute;
+  left:2px;
+  font-size:10px;
+  color:#888;
 }
 
 .event-block {
-  padding: 8px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  color: white;
-  font-size: 13px;
+  position:absolute;
+  color:white;
+  border-radius:6px;
+  padding:4px;
+  font-size:12px;
+  overflow:hidden;
+  cursor:grab;
 }
 
 .event-header {
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:4px;
 }
 
 .event-header img {
-  width:18px;
-  height:18px;
+  width:16px;
+  height:16px;
 }
 
-/* Kinder modus */
 .kid-mode .event-block {
-  font-size:18px;
-  padding:14px;
+  font-size:16px;
 }
 
 .kid-mode .event-header img {
-  width:36px;
-  height:36px;
+  width:28px;
+  height:28px;
 }
 
-/* Print */
-@media print {
-  header, #controls button {
-    display:none;
-  }
-  body {
-    background:white;
-  }
-}
 </style>
 </head>
 <body>
 
 <header>
-  <div><strong>AgendaPicto PRO+</strong></div>
+  <div><strong>AgendaPicto PRO 3.0</strong></div>
   <div>
     <button onclick="login()">Login</button>
     <button onclick="logout()">Logout</button>
-    <button onclick="previousWeek()">← Vorige week</button>
-    <button onclick="nextWeek()">Volgende week →</button>
+    <button onclick="previousWeek()">←</button>
+    <button onclick="nextWeek()">→</button>
     <button onclick="toggleKidMode()">Kinder-modus</button>
-    <button onclick="window.print()">Print</button>
-    <button onclick="savePDF()">Opslaan als PDF</button>
   </div>
 </header>
 
 <div id="controls"></div>
 <div id="calendar"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 
@@ -126,23 +136,25 @@ let allEvents = [];
 let allCalendars = [];
 let kidMode = false;
 
+const START_HOUR = 6;
+const END_HOUR = 22;
+const PX_PER_HOUR = 60;
+
 /* LOGIN */
 function login() {
   const oauth2Endpoint = "https://accounts.google.com/o/oauth2/v2/auth";
-
   const params = {
     client_id: CLIENT_ID,
     redirect_uri: window.location.origin,
     response_type: "token",
     scope: "https://www.googleapis.com/auth/calendar.readonly",
   };
-
-  window.location = oauth2Endpoint + "?" + new URLSearchParams(params).toString();
+  window.location = oauth2Endpoint + "?" + new URLSearchParams(params);
 }
 
 function logout() {
   accessToken = null;
-  location.hash = "";
+  location.hash="";
   location.reload();
 }
 
@@ -151,73 +163,78 @@ function parseToken() {
   const params = new URLSearchParams(hash);
   accessToken = params.get("access_token");
   if (accessToken) {
-  window.history.replaceState({}, document.title, "/");
-  init();
+    window.history.replaceState({}, document.title, "/");
+    init();
   }
 }
 
-/* DATUM */
+/* INIT */
+async function init() {
+  currentMonday = getMonday(new Date());
+  await loadCalendars();
+  renderFilters();
+  await loadEvents();
+  renderWeek();
+}
+
+/* DATE */
 function getMonday(d) {
   const date = new Date(d);
-  date.setDate(d.getDate() - (d.getDay() + 6) % 7);
+  date.setDate(d.getDate() - (d.getDay()+6)%7);
   date.setHours(0,0,0,0);
   return date;
 }
 
 function nextWeek() {
-  currentMonday.setDate(currentMonday.getDate() + 7);
+  currentMonday.setDate(currentMonday.getDate()+7);
   loadEvents().then(renderWeek);
 }
 
 function previousWeek() {
-  currentMonday.setDate(currentMonday.getDate() - 7);
+  currentMonday.setDate(currentMonday.getDate()-7);
   loadEvents().then(renderWeek);
 }
 
-/* GOOGLE DATA */
+/* GOOGLE */
 async function loadCalendars() {
   const res = await fetch(
     "https://www.googleapis.com/calendar/v3/users/me/calendarList",
-    { headers: { Authorization: "Bearer " + accessToken } }
+    { headers:{Authorization:"Bearer "+accessToken}}
   );
   const data = await res.json();
   allCalendars = data.items;
 }
 
 async function loadEvents() {
-
   const end = new Date(currentMonday);
-  end.setDate(currentMonday.getDate() + 7);
+  end.setDate(end.getDate()+7);
 
   allEvents = [];
 
   for (const cal of allCalendars) {
     const res = await fetch(
-      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?` +
-      `timeMin=${currentMonday.toISOString()}&` +
-      `timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`,
-      { headers: { Authorization: "Bearer " + accessToken } }
+      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
+      `timeMin=${currentMonday.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`,
+      { headers:{Authorization:"Bearer "+accessToken}}
     );
-
     const data = await res.json();
     if (data.items) {
-      data.items.forEach(e => {
-        e.calendarName = cal.summary;
+      data.items.forEach(e=>{
         e.calendarColor = cal.backgroundColor || "#5f6368";
+        e.calendarName = cal.summary;
         allEvents.push(e);
       });
     }
   }
 }
 
-/* FILTERS */
+/* FILTER */
 function renderFilters() {
-  const container = document.getElementById("controls");
-  container.innerHTML = "<strong>Filter agenda's:</strong><br>";
-
-  allCalendars.forEach(cal => {
-    const id = "chk_" + cal.id.replace(/[^a-zA-Z0-9]/g,"");
-    container.innerHTML += `
+  const c = document.getElementById("controls");
+  c.innerHTML="<strong>Filter:</strong><br>";
+  allCalendars.forEach(cal=>{
+    const id="chk_"+cal.id.replace(/[^a-zA-Z0-9]/g,"");
+    c.innerHTML+=`
       <label>
         <input type="checkbox" id="${id}" checked onchange="renderWeek()">
         ${cal.summary}
@@ -227,125 +244,132 @@ function renderFilters() {
 }
 
 function getSelectedCalendars() {
-  return allCalendars.filter(cal => {
-    const id = "chk_" + cal.id.replace(/[^a-zA-Z0-9]/g,"");
+  return allCalendars.filter(cal=>{
+    const id="chk_"+cal.id.replace(/[^a-zA-Z0-9]/g,"");
     return document.getElementById(id)?.checked;
-  }).map(c => c.summary);
+  }).map(c=>c.summary);
 }
 
 /* RENDER */
 function renderWeek() {
-
-  const selected = getSelectedCalendars();
   const container = document.getElementById("calendar");
-  container.innerHTML = "";
+  container.innerHTML="";
+  const selected = getSelectedCalendars();
+  const days=["Ma","Di","Wo","Do","Vr","Za","Zo"];
 
-  const days = ["Ma","Di","Wo","Do","Vr","Za","Zo"];
-  const columns = [];
+  for(let i=0;i<7;i++){
+    const dayDate = new Date(currentMonday);
+    dayDate.setDate(dayDate.getDate()+i);
 
-  for (let i=0;i<7;i++) {
     const col = document.createElement("div");
-    col.className = "day-column";
+    col.className="day-column";
 
-    const d = new Date(currentMonday);
-    d.setDate(currentMonday.getDate()+i);
+    const header=document.createElement("div");
+    header.className="day-header";
+    header.innerText=`${days[i]} ${dayDate.getDate()}/${dayDate.getMonth()+1}`;
 
-    col.innerHTML = `<h3>${days[i]} ${d.getDate()}/${d.getMonth()+1}</h3>`;
+    const timeline=document.createElement("div");
+    timeline.className="timeline";
+
+    for(let h=START_HOUR;h<=END_HOUR;h++){
+      const label=document.createElement("div");
+      label.className="hour-label";
+      label.style.top=((h-START_HOUR)*PX_PER_HOUR)+"px";
+      label.innerText=h+":00";
+      timeline.appendChild(label);
+    }
+
+    const dayEvents = allEvents
+      .filter(e=>selected.includes(e.calendarName))
+      .filter(e=>{
+        const d=new Date(e.start.dateTime||e.start.date);
+        return d.toDateString()===dayDate.toDateString();
+      })
+      .map(e=>{
+        const start=new Date(e.start.dateTime||e.start.date);
+        const end=new Date(e.end?.dateTime||e.end?.date||start);
+        return {...e,startDate:start,endDate:end};
+      });
+
+    layoutEvents(dayEvents,timeline);
+
+    col.appendChild(header);
+    col.appendChild(timeline);
     container.appendChild(col);
-    columns.push(col);
   }
+}
 
-  /* 🔥 BELANGRIJK: eerst globaal sorteren op tijd */
-  const sortedEvents = allEvents
-    .filter(e => selected.includes(e.calendarName))
-    .sort((a,b) => {
-      const dateA = new Date(a.start.dateTime || a.start.date);
-      const dateB = new Date(b.start.dateTime || b.start.date);
-      return dateA - dateB;
-    });
+/* OVERLAP LAYOUT */
+function layoutEvents(events,timeline){
+  events.sort((a,b)=>a.startDate-b.startDate);
 
-  sortedEvents.forEach(event => {
+  events.forEach((event,index)=>{
+    const top=((event.startDate.getHours()-START_HOUR)*PX_PER_HOUR)
+              +(event.startDate.getMinutes()/60*PX_PER_HOUR);
+    const height=((event.endDate-event.startDate)/3600000)*PX_PER_HOUR;
 
-    const date = new Date(event.start.dateTime || event.start.date);
-    const dayIndex = (date.getDay()+6)%7;
+    const block=document.createElement("div");
+    block.className="event-block";
+    block.style.top=top+"px";
+    block.style.height=height+"px";
+    block.style.background=event.calendarColor;
+    block.style.left="0%";
+    block.style.width="100%";
 
-    const block = document.createElement("div");
-    block.className = "event-block";
-    block.style.background = event.calendarColor;
-
-    const icon = getIcon(event.summary);
-
-    block.innerHTML = `
+    block.innerHTML=`
       <div class="event-header">
-        <img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
+        <img src="https://api.iconify.design/mdi/${getIcon(event)}.svg?color=white">
         <strong>${event.summary}</strong>
       </div>
-      <small>${formatTime(date)} • ${event.calendarName}</small>
     `;
 
-    columns[dayIndex].appendChild(block);
+    makeDraggable(block);
+
+    timeline.appendChild(block);
   });
 }
 
-/* ICONS */
-function getIcon(text) {
-  const t = text.toLowerCase();
+/* DRAG VISUAL ONLY */
+function makeDraggable(block){
+  block.draggable=true;
 
-  if (t.includes("voetbal")) return "soccer";
-  if (t.includes("zwem")) return "swim";
-  if (t.includes("dokter")) return "medical-bag";
-  if (t.includes("tandarts")) return "tooth";
-  if (t.includes("school")) return "school";
-  if (t.includes("verjaardag")) return "cake-variant";
-  if (t.includes("feest")) return "party-popper";
-  if (t.includes("werk")) return "briefcase";
-  if (t.includes("eten")) return "silverware-fork-knife";
-  if (t.includes("film")) return "movie-open";
-  if (t.includes("muziek")) return "music";
-  if (t.includes("auto")) return "car";
-  if (t.includes("fiets")) return "bike";
+  block.addEventListener("dragstart",e=>{
+    block.dataset.startTop=block.style.top;
+  });
+
+  block.addEventListener("dragend",e=>{
+    const rect=block.parentElement.getBoundingClientRect();
+    const y=e.clientY-rect.top;
+    block.style.top=Math.max(0,y)+"px";
+  });
+}
+
+/* ICON SYSTEM */
+function getIcon(event){
+  const text=(event.summary||"").toLowerCase();
+  const location=(event.location||"").toLowerCase();
+
+  if(text.includes("bus")) return "bus";
+  if(text.includes("slapen")) return "sleep";
+  if(text.includes("rijden")) return "car";
+  if(text.includes("beugel")) return "tooth";
+
+  if(location.includes("kapelstraat 73")) return "hospital-box";
+  if(location.includes("puthofveld 4")) return "nurse";
+
+  if(text.includes("rita oppas thuis")) return "home";
+  if(text.includes("rita oppas bij haar")) return "home-heart";
 
   return "calendar";
 }
 
-function formatTime(date) {
-  if (!date.getHours()) return "Hele dag";
-  return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-}
-
-/* KINDER MODUS */
-function toggleKidMode() {
-  kidMode = !kidMode;
+function toggleKidMode(){
+  kidMode=!kidMode;
   document.body.classList.toggle("kid-mode");
 }
 
-/* PDF */
-async function savePDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("landscape");
-  doc.setFontSize(14);
-  doc.text("AgendaPicto Weekoverzicht", 10, 10);
-
-  let y = 20;
-  document.querySelectorAll(".day-column").forEach(col => {
-    doc.text(col.innerText, 10, y);
-    y += 10;
-  });
-
-  doc.save("AgendaPicto.pdf");
-}
-
-  async function init() {
-  currentMonday = getMonday(new Date());
-  await loadCalendars();
-  renderFilters();
-  await loadEvents();
-  renderWeek();
-}
-  
 parseToken();
 
 </script>
-
 </body>
 </html>
