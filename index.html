@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>KUST ZE</title>
-  <h1>TEST VERSIE 1234567</h1>
+  <h1>TEST VERSIE 12345678</h1>
   
 
 <style>
@@ -69,12 +69,21 @@ function parseTokenFromUrl() {
 }
 
 async function loadCalendar() {
+  const now = new Date().toISOString();
+
   const response = await fetch(
-    "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+    `https://www.googleapis.com/calendar/v3/calendars/primary/events?` +
+    `timeMin=${now}&` +
+    `singleEvents=true&` +
+    `orderBy=startTime`,
     {
       headers: { Authorization: "Bearer " + accessToken }
     }
   );
+
+  const data = await response.json();
+  renderEvents(data.items || []);
+}
 
   const data = await response.json();
   renderEvents(data.items || []);
