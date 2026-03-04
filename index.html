@@ -85,10 +85,6 @@ async function loadCalendar() {
   renderEvents(data.items || []);
 }
 
-  const data = await response.json();
-  renderEvents(data.items || []);
-}
-
 function renderEvents(events) {
   const container = document.getElementById("calendar");
   container.innerHTML = "";
