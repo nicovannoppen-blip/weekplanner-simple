@@ -332,6 +332,14 @@ async function savePDF() {
   doc.save("AgendaPicto.pdf");
 }
 
+  async function init() {
+  currentMonday = getMonday(new Date());
+  await loadCalendars();
+  renderFilters();
+  await loadEvents();
+  renderWeek();
+}
+  
 parseToken();
 
 </script>
