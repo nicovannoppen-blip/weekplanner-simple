@@ -4,6 +4,7 @@ const START_HOUR=7;
 const END_HOUR=21;
 const PX_PER_HOUR=60;
 
+
 let accessToken=null;
 let currentDate=new Date();
 let viewMode="week";
