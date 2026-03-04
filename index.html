@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AgendaPicto PRO</title>
+<title>AgendaPicto PRO+</title>
 
 <style>
 body {
@@ -15,22 +15,26 @@ header {
   background: #4285F4;
   color: white;
   padding: 15px;
-  font-size: 20px;
   display:flex;
-  justify-content:space-between;
-  align-items:center;
   flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
 }
 
 button {
   padding: 8px 14px;
-  margin: 5px;
+  margin: 4px;
   border: none;
   background: white;
   color: #4285F4;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+}
+
+#controls {
+  padding:10px;
+  background:white;
 }
 
 #calendar {
@@ -44,11 +48,11 @@ button {
   background: #e8eaed;
   padding: 10px;
   border-radius: 8px;
-  min-height: 300px;
+  min-height: 250px;
 }
 
 .day-column h3 {
-  margin-top: 0;
+  margin-top:0;
 }
 
 .event-block {
@@ -56,7 +60,7 @@ button {
   margin-bottom: 8px;
   border-radius: 6px;
   color: white;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .event-header {
@@ -70,44 +74,57 @@ button {
   height:18px;
 }
 
-/* PRINT A4 */
-@media print {
-  body {
-    background: white;
-  }
-
-  header button {
-    display:none;
-  }
-
-  #calendar {
-    grid-template-columns: repeat(7, 1fr);
-  }
-
-  .event-block {
-    page-break-inside: avoid;
-  }
+/* Kinder modus */
+.kid-mode .event-block {
+  font-size:18px;
+  padding:14px;
 }
 
+.kid-mode .event-header img {
+  width:36px;
+  height:36px;
+}
+
+/* Print */
+@media print {
+  header, #controls button {
+    display:none;
+  }
+  body {
+    background:white;
+  }
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div><strong>AgendaPicto PRO</strong></div>
+  <div><strong>AgendaPicto PRO+</strong></div>
   <div>
     <button onclick="login()">Login</button>
     <button onclick="logout()">Logout</button>
-    <button onclick="window.print()">Print A4</button>
+    <button onclick="previousWeek()">← Vorige week</button>
+    <button onclick="nextWeek()">Volgende week →</button>
+    <button onclick="toggleKidMode()">Kinder-modus</button>
+    <button onclick="window.print()">Print</button>
+    <button onclick="savePDF()">Opslaan als PDF</button>
   </div>
 </header>
 
+<div id="controls"></div>
 <div id="calendar"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 
 const CLIENT_ID = "259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com";
+
 let accessToken = null;
+let currentMonday = null;
+let allEvents = [];
+let allCalendars = [];
+let kidMode = false;
 
 /* LOGIN */
 function login() {
@@ -125,127 +142,199 @@ function login() {
 
 function logout() {
   accessToken = null;
-  document.getElementById("calendar").innerHTML = "";
-  window.location.hash = "";
+  location.hash = "";
+  location.reload();
 }
 
-/* TOKEN PARSEN */
-function parseTokenFromUrl() {
+function parseToken() {
   const hash = window.location.hash.substring(1);
   const params = new URLSearchParams(hash);
   accessToken = params.get("access_token");
-
-  if (accessToken) loadAllCalendars();
+  if (accessToken) init();
 }
 
-/* LAAD ALLE AGENDA'S */
-async function loadAllCalendars() {
+async function init() {
+  currentMonday = getMonday(new Date());
+  await loadCalendars();
+  await loadEvents();
+  renderFilters();
+  renderWeek();
+}
 
-  const today = new Date();
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - (today.getDay() + 6) % 7);
-  monday.setHours(0,0,0,0);
+/* DATUM */
+function getMonday(d) {
+  const date = new Date(d);
+  date.setDate(d.getDate() - (d.getDay() + 6) % 7);
+  date.setHours(0,0,0,0);
+  return date;
+}
 
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 7);
+function nextWeek() {
+  currentMonday.setDate(currentMonday.getDate() + 7);
+  loadEvents().then(renderWeek);
+}
 
-  const calendarRes = await fetch(
+function previousWeek() {
+  currentMonday.setDate(currentMonday.getDate() - 7);
+  loadEvents().then(renderWeek);
+}
+
+/* GOOGLE DATA */
+async function loadCalendars() {
+  const res = await fetch(
     "https://www.googleapis.com/calendar/v3/users/me/calendarList",
     { headers: { Authorization: "Bearer " + accessToken } }
   );
+  const data = await res.json();
+  allCalendars = data.items;
+}
 
-  const calendarData = await calendarRes.json();
-  const calendars = calendarData.items;
+async function loadEvents() {
 
-  let allEvents = [];
+  const end = new Date(currentMonday);
+  end.setDate(currentMonday.getDate() + 7);
 
-  for (const cal of calendars) {
+  allEvents = [];
+
+  for (const cal of allCalendars) {
     const res = await fetch(
       `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?` +
-      `timeMin=${monday.toISOString()}&` +
-      `timeMax=${sunday.toISOString()}&` +
-      `singleEvents=true&orderBy=startTime`,
+      `timeMin=${currentMonday.toISOString()}&` +
+      `timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`,
       { headers: { Authorization: "Bearer " + accessToken } }
     );
 
     const data = await res.json();
-
     if (data.items) {
       data.items.forEach(e => {
-        e.calendarColor = cal.backgroundColor || "#5f6368";
         e.calendarName = cal.summary;
+        e.calendarColor = cal.backgroundColor || "#5f6368";
         allEvents.push(e);
       });
     }
   }
-
-  renderWeek(allEvents, monday);
 }
 
-/* WEEK RENDER */
-function renderWeek(events, monday) {
+/* FILTERS */
+function renderFilters() {
+  const container = document.getElementById("controls");
+  container.innerHTML = "<strong>Filter agenda's:</strong><br>";
 
+  allCalendars.forEach(cal => {
+    const id = "chk_" + cal.id.replace(/[^a-zA-Z0-9]/g,"");
+    container.innerHTML += `
+      <label>
+        <input type="checkbox" id="${id}" checked onchange="renderWeek()">
+        ${cal.summary}
+      </label>
+    `;
+  });
+}
+
+function getSelectedCalendars() {
+  return allCalendars.filter(cal => {
+    const id = "chk_" + cal.id.replace(/[^a-zA-Z0-9]/g,"");
+    return document.getElementById(id)?.checked;
+  }).map(c => c.summary);
+}
+
+/* RENDER */
+function renderWeek() {
+
+  const selected = getSelectedCalendars();
   const container = document.getElementById("calendar");
   container.innerHTML = "";
 
-  const dayNames = ["Ma","Di","Wo","Do","Vr","Za","Zo"];
+  const days = ["Ma","Di","Wo","Do","Vr","Za","Zo"];
   const columns = [];
 
   for (let i=0;i<7;i++) {
     const col = document.createElement("div");
     col.className = "day-column";
 
-    const date = new Date(monday);
-    date.setDate(monday.getDate() + i);
+    const d = new Date(currentMonday);
+    d.setDate(currentMonday.getDate()+i);
 
-    col.innerHTML = `<h3>${dayNames[i]} ${date.getDate()}/${date.getMonth()+1}</h3>`;
+    col.innerHTML = `<h3>${days[i]} ${d.getDate()}/${d.getMonth()+1}</h3>`;
     container.appendChild(col);
     columns.push(col);
   }
 
-  events.forEach(event => {
-    const date = new Date(event.start.dateTime || event.start.date);
-    let dayIndex = (date.getDay() + 6) % 7;
+  allEvents
+    .filter(e => selected.includes(e.calendarName))
+    .forEach(event => {
 
-    const block = document.createElement("div");
-    block.className = "event-block";
-    block.style.background = event.calendarColor;
+      const date = new Date(event.start.dateTime || event.start.date);
+      const dayIndex = (date.getDay()+6)%7;
 
-    const icon = getSmartIcon(event.summary);
+      const block = document.createElement("div");
+      block.className = "event-block";
+      block.style.background = event.calendarColor;
 
-    block.innerHTML = `
-      <div class="event-header">
-        <img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
-        <strong>${event.summary}</strong>
-      </div>
-      <small>${formatTime(date)} • ${event.calendarName}</small>
-    `;
+      const icon = getIcon(event.summary);
 
-    columns[dayIndex].appendChild(block);
-  });
+      block.innerHTML = `
+        <div class="event-header">
+          <img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
+          <strong>${event.summary}</strong>
+        </div>
+        <small>${formatTime(date)} • ${event.calendarName}</small>
+      `;
+
+      columns[dayIndex].appendChild(block);
+    });
 }
 
-/* TIJD FORMAT */
+/* ICON AI */
+function getIcon(text) {
+  const t = text.toLowerCase();
+
+  if (t.includes("voetbal")) return "soccer";
+  if (t.includes("zwem")) return "swim";
+  if (t.includes("dokter")) return "medical-bag";
+  if (t.includes("tandarts")) return "tooth";
+  if (t.includes("school")) return "school";
+  if (t.includes("verjaardag")) return "cake-variant";
+  if (t.includes("feest")) return "party-popper";
+  if (t.includes("werk")) return "briefcase";
+  if (t.includes("eten")) return "silverware-fork-knife";
+  if (t.includes("film")) return "movie-open";
+  if (t.includes("muziek")) return "music";
+  if (t.includes("auto")) return "car";
+  if (t.includes("fiets")) return "bike";
+
+  return "calendar";
+}
+
+/* HULP */
 function formatTime(date) {
   if (!date.getHours()) return "Hele dag";
   return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 }
 
-/* SLIMME PICTO AI */
-function getSmartIcon(text) {
-  const t = text.toLowerCase();
-
-  if (t.includes("voetbal") || t.includes("sport")) return "soccer";
-  if (t.includes("dokter") || t.includes("tandarts")) return "medical-bag";
-  if (t.includes("school") || t.includes("les")) return "school";
-  if (t.includes("verjaardag") || t.includes("feest")) return "cake-variant";
-  if (t.includes("werk") || t.includes("meeting")) return "briefcase";
-  if (t.includes("eten") || t.includes("restaurant")) return "silverware-fork-knife";
-
-  return "calendar";
+/* KINDER MODUS */
+function toggleKidMode() {
+  kidMode = !kidMode;
+  document.body.classList.toggle("kid-mode");
 }
 
-parseTokenFromUrl();
+/* PDF */
+async function savePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+  doc.setFontSize(14);
+  doc.text("AgendaPicto Weekoverzicht", 10, 10);
+
+  let y = 20;
+  document.querySelectorAll(".day-column").forEach(col => {
+    doc.text(col.innerText, 10, y);
+    y += 10;
+  });
+
+  doc.save("AgendaPicto.pdf");
+}
+
+parseToken();
 
 </script>
 
