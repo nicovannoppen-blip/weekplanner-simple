@@ -315,7 +315,6 @@ function toggleKidMode(){
   document.body.classList.toggle("kid-mode");
 }
 
-parseToken();
 window.onload = () => {
   parseToken();
 };
