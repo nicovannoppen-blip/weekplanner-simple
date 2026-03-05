@@ -5,8 +5,6 @@
 <meta charset="UTF-8">
 <title>Familie Agenda</title>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
 <style>
 
 body{
@@ -16,11 +14,11 @@ background:#eef1f5;
 }
 
 header{
-background:#4285F4;
+background:#4a80d6;
 color:white;
-padding:12px;
+padding:10px;
 display:flex;
-gap:10px;
+gap:8px;
 flex-wrap:wrap;
 align-items:center;
 }
@@ -34,10 +32,7 @@ cursor:pointer;
 
 #filters{
 background:white;
-padding:10px;
-display:flex;
-flex-wrap:wrap;
-gap:10px;
+padding:8px;
 }
 
 #calendar{
@@ -53,7 +48,7 @@ gap:10px;
 .day{
 background:white;
 border-radius:6px;
-padding:8px;
+padding:6px;
 }
 
 .dayTitle{
@@ -63,21 +58,21 @@ margin-bottom:6px;
 
 .timeline{
 position:relative;
-height:920px;
+height:640px;
 border-left:2px solid #ddd;
 }
 
 .hour{
 position:absolute;
-left:-40px;
+left:-35px;
 font-size:11px;
-color:#777;
+color:#666;
 }
 
 .event{
 position:absolute;
-left:10px;
-right:10px;
+left:6px;
+right:6px;
 border-radius:6px;
 padding:3px;
 font-size:12px;
@@ -88,8 +83,8 @@ color:white;
 }
 
 .icon{
-width:18px;
-height:18px;
+width:16px;
+height:16px;
 }
 
 </style>
@@ -106,9 +101,6 @@ height:18px;
 
 <button onclick="prevWeek()">◀</button>
 <button onclick="nextWeek()">▶</button>
-
-<button onclick="setWeek()">Week</button>
-<button onclick="setDay()">Dag</button>
 
 <button onclick="selectAll()">Alles</button>
 <button onclick="selectNone()">Geen</button>
@@ -127,8 +119,11 @@ let token=null
 let calendars=[]
 let events=[]
 
-let view="week"
 let currentDate=new Date()
+
+const START_HOUR=7
+const END_HOUR=23
+const PIXELS_PER_HOUR=40
 
 const HIDDEN=[
 "Weeknummers",
@@ -213,31 +208,6 @@ ${name}
 
 }
 
-async function loadEvents(){
-
-events=[]
-
-for(const cal of calendars){
-
-const res=await fetch(
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?maxResults=2500`,
-{
-headers:{Authorization:"Bearer "+token}
-}
-)
-
-const data=await res.json()
-
-data.items.forEach(e=>{
-events.push({...e,calendarId:cal.id,calendarName:cal.summary})
-})
-
-}
-
-render()
-
-}
-
 function getSelectedCalendars(){
 
 return [...document.querySelectorAll("#filters input:checked")]
@@ -245,47 +215,54 @@ return [...document.querySelectorAll("#filters input:checked")]
 
 }
 
-function getIcon(e){
+async function loadEvents(){
 
-const text=(e.summary||"").toLowerCase()
-const loc=(e.location||"").toLowerCase()
+events=[]
 
-if(text.includes("bus"))
-return "https://api.iconify.design/mdi/bus.svg"
+const start=new Date(currentDate)
+start.setDate(start.getDate()-start.getDay()+1)
 
-if(text.includes("slapen"))
-return "https://api.iconify.design/mdi/sleep.svg"
+const end=new Date(start)
+end.setDate(start.getDate()+7)
 
-if(text.includes("rijden"))
-return "https://api.iconify.design/mdi/car.svg"
+for(const cal of calendars){
 
-if(loc.includes("orelia puthof"))
-return "https://api.iconify.design/mdi/nurse.svg"
+const res=await fetch(
 
-if(text.includes("rita oppas thuis") || text.includes("oppas door loriana"))
-return "https://api.iconify.design/mdi/home-heart.svg"
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?
+timeMin=${start.toISOString()}&
+timeMax=${end.toISOString()}&
+singleEvents=true&
+orderBy=startTime&
+maxResults=2500`,
 
-if(text.includes("rita oppas bij haar"))
-return "https://api.iconify.design/mdi/home-export-outline.svg"
+{
+headers:{Authorization:"Bearer "+token}
+})
 
-return "https://api.iconify.design/mdi/calendar.svg"
+const data=await res.json()
+
+if(data.items){
+
+data.items.forEach(e=>{
+events.push({...e,calendarId:cal.id,calendarName:cal.summary})
+})
+
+}
+
+}
+
+render()
 
 }
 
 function render(){
 
-if(view==="week") renderWeek()
-else renderDay()
-
-}
-
-function renderWeek(){
-
 const cal=document.getElementById("calendar")
+
 cal.innerHTML=""
 
 const start=new Date(currentDate)
-
 start.setDate(start.getDate()-start.getDay()+1)
 
 const week=document.createElement("div")
@@ -304,15 +281,6 @@ cal.appendChild(week)
 
 }
 
-function renderDay(){
-
-const cal=document.getElementById("calendar")
-cal.innerHTML=""
-
-cal.appendChild(createDay(currentDate))
-
-}
-
 function createDay(date){
 
 const selected=getSelectedCalendars()
@@ -327,11 +295,11 @@ div.innerHTML=`<div class="dayTitle">${date.toLocaleDateString()}</div>`
 const timeline=document.createElement("div")
 timeline.className="timeline"
 
-for(let h=0;h<=23;h++){
+for(let h=START_HOUR;h<=END_HOUR;h++){
 
 const label=document.createElement("div")
 label.className="hour"
-label.style.top=(h*40)+"px"
+label.style.top=((h-START_HOUR)*PIXELS_PER_HOUR)+"px"
 label.innerText=h+":00"
 
 timeline.appendChild(label)
@@ -362,8 +330,12 @@ dayEvents.forEach(e=>{
 const start=new Date(e.start?.dateTime||e.start?.date)
 const end=new Date(e.end?.dateTime||e.end?.date)
 
-const top=start.getHours()*40+(start.getMinutes()/60*40)
-const height=(end-start)/3600000*40
+if(start.getHours()<START_HOUR && end.getHours()<START_HOUR) return
+
+const top=((start.getHours()-START_HOUR)*PIXELS_PER_HOUR)
++(start.getMinutes()/60*PIXELS_PER_HOUR)
+
+const height=(end-start)/3600000*PIXELS_PER_HOUR
 
 const ev=document.createElement("div")
 ev.className="event"
@@ -388,6 +360,33 @@ return div
 
 }
 
+function getIcon(e){
+
+const text=(e.summary||"").toLowerCase()
+const loc=(e.location||"").toLowerCase()
+
+if(text.includes("bus"))
+return "https://api.iconify.design/mdi/bus.svg"
+
+if(text.includes("slapen"))
+return "https://api.iconify.design/mdi/sleep.svg"
+
+if(text.includes("rijden"))
+return "https://api.iconify.design/mdi/car.svg"
+
+if(loc.includes("orelia puthof"))
+return "https://api.iconify.design/mdi/nurse.svg"
+
+if(text.includes("rita oppas thuis")||text.includes("oppas door loriana"))
+return "https://api.iconify.design/mdi/home-heart.svg"
+
+if(text.includes("rita oppas bij haar"))
+return "https://api.iconify.design/mdi/home-export-outline.svg"
+
+return "https://api.iconify.design/mdi/calendar.svg"
+
+}
+
 function colorFromCalendar(name){
 
 let hash=0
@@ -402,28 +401,25 @@ return "#"+("00000".substring(0,6-c.length)+c)
 }
 
 function prevWeek(){
+
 currentDate.setDate(currentDate.getDate()-7)
-render()
+
+loadEvents()
+
 }
 
 function nextWeek(){
+
 currentDate.setDate(currentDate.getDate()+7)
-render()
-}
 
-function setWeek(){
-view="week"
-render()
-}
+loadEvents()
 
-function setDay(){
-view="day"
-render()
 }
 
 function selectAll(){
 
 document.querySelectorAll("#filters input").forEach(c=>c.checked=true)
+
 render()
 
 }
@@ -431,6 +427,7 @@ render()
 function selectNone(){
 
 document.querySelectorAll("#filters input").forEach(c=>c.checked=false)
+
 render()
 
 }
