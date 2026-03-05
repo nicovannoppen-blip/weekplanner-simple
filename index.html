@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AgendaPicto PRO MAX</title>
+<title>AgendaPicto EXTREME</title>
 
 <style>
 
 body{
 font-family:Arial;
 margin:0;
-background:#f1f3f4;
+background:#eef2f5;
 }
 
 header{
@@ -44,24 +44,24 @@ padding:10px;
 
 .day{
 background:white;
-border-radius:6px;
+border-radius:8px;
 position:relative;
 height:1020px;
 overflow:hidden;
 }
 
 .dayTitle{
-background:#eee;
-padding:5px;
-font-weight:bold;
+background:#f5f5f5;
+padding:6px;
 text-align:center;
+font-weight:bold;
 }
 
 .timeline{
 position:absolute;
+top:30px;
 left:0;
 right:0;
-top:26px;
 bottom:0;
 }
 
@@ -69,35 +69,38 @@ bottom:0;
 height:60px;
 border-top:1px solid #eee;
 font-size:10px;
-padding-left:3px;
+padding-left:4px;
+color:#999;
 }
 
 .event{
 position:absolute;
-border-radius:6px;
+border-radius:8px;
 color:white;
-padding:4px;
+padding:6px;
 font-size:12px;
 cursor:grab;
+text-align:center;
 display:flex;
-gap:4px;
+flex-direction:column;
 align-items:center;
-overflow:hidden;
+justify-content:center;
 }
 
 .event img{
-width:16px;
-height:16px;
+width:24px;
+height:24px;
+margin-bottom:3px;
 }
 
 .kid .event{
-font-size:18px;
-padding:10px;
+font-size:20px;
+padding:12px;
 }
 
 .kid .event img{
-width:36px;
-height:36px;
+width:48px;
+height:48px;
 }
 
 @media print{
@@ -116,7 +119,7 @@ background:white;
 
 <header>
 
-<b>AgendaPicto PRO MAX</b>
+<b>AgendaPicto EXTREME</b>
 
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
@@ -133,21 +136,17 @@ background:white;
 <button onclick="selectNone()">Alles uit</button>
 
 <button onclick="window.print()">Print</button>
-<button onclick="savePDF()">PDF</button>
 
 </header>
 
 <div id="filters"></div>
-
 <div id="calendar"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
 
 const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
 
-let accessToken=null
+let token=null
 let calendars=[]
 let events=[]
 let monday=null
@@ -155,7 +154,7 @@ let view="week"
 
 function login(){
 
-const oauth="https://accounts.google.com/o/oauth2/v2/auth"
+const url="https://accounts.google.com/o/oauth2/v2/auth"
 
 const params={
 client_id:CLIENT_ID,
@@ -164,7 +163,7 @@ response_type:"token",
 scope:"https://www.googleapis.com/auth/calendar.readonly"
 }
 
-window.location=oauth+"?"+new URLSearchParams(params)
+window.location=url+"?"+new URLSearchParams(params)
 
 }
 
@@ -177,9 +176,10 @@ function parseToken(){
 
 const hash=window.location.hash.substring(1)
 const params=new URLSearchParams(hash)
-accessToken=params.get("access_token")
 
-if(accessToken) init()
+token=params.get("access_token")
+
+if(token) init()
 
 }
 
@@ -188,6 +188,7 @@ async function init(){
 monday=getMonday(new Date())
 
 await loadCalendars()
+
 renderFilters()
 
 await loadEvents()
@@ -199,7 +200,9 @@ render()
 function getMonday(d){
 
 d=new Date(d)
+
 d.setDate(d.getDate()-(d.getDay()+6)%7)
+
 d.setHours(0,0,0,0)
 
 return d
@@ -230,10 +233,11 @@ async function loadCalendars(){
 
 const r=await fetch(
 "https://www.googleapis.com/calendar/v3/users/me/calendarList",
-{headers:{Authorization:"Bearer "+accessToken}}
+{headers:{Authorization:"Bearer "+token}}
 )
 
 const data=await r.json()
+
 calendars=data.items
 
 }
@@ -248,11 +252,8 @@ end.setDate(monday.getDate()+7)
 for(const cal of calendars){
 
 const r=await fetch(
-
 `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${monday.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`,
-
-{headers:{Authorization:"Bearer "+accessToken}}
-
+{headers:{Authorization:"Bearer "+token}}
 )
 
 const data=await r.json()
@@ -275,7 +276,7 @@ function renderFilters(){
 
 const f=document.getElementById("filters")
 
-f.innerHTML="<b>Agenda filters</b><br>"
+f.innerHTML="<b>Agenda's</b><br>"
 
 calendars.forEach(cal=>{
 
@@ -317,6 +318,7 @@ render()
 function render(){
 
 const cal=document.getElementById("calendar")
+
 cal.innerHTML=""
 
 const days=view==="week"?7:1
@@ -349,6 +351,7 @@ timeline.appendChild(hour)
 }
 
 day.appendChild(timeline)
+
 cal.appendChild(day)
 
 renderEvents(day,i)
@@ -367,9 +370,7 @@ if(!selected.includes(e.calendar)) return false
 const d=new Date(e.start.dateTime||e.start.date)
 return (d.getDay()+6)%7===index
 })
-.sort((a,b)=>{
-return new Date(a.start.dateTime||a.start.date)-new Date(b.start.dateTime||b.start.date)
-})
+.sort((a,b)=>new Date(a.start.dateTime||a.start.date)-new Date(b.start.dateTime||b.start.date))
 
 const lanes=[]
 
@@ -388,10 +389,10 @@ lanes[lane]=endMin
 
 const dayStart=6*60
 const dayEnd=23*60
-const dayDuration=dayEnd-dayStart
+const duration=dayEnd-dayStart
 
-const top=(startMin-dayStart)/dayDuration*100
-const height=(endMin-startMin)/dayDuration*100
+const top=(startMin-dayStart)/duration*100
+const height=(endMin-startMin)/duration*100
 const width=100/(lanes.length+1)
 
 const div=document.createElement("div")
@@ -401,11 +402,13 @@ div.style.top=top+"%"
 div.style.height=height+"%"
 div.style.left=(lane*width)+"%"
 div.style.width=width+"%"
-div.style.background=e.color
+div.style.background=colorAI(e)
+
+const icon=getIcon(e)
 
 div.innerHTML=`
-<img src="https://api.iconify.design/mdi/${icon(e)}.svg?color=white">
-${e.summary}
+<img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
+<div>${e.summary}</div>
 `
 
 enableDrag(div)
@@ -426,7 +429,22 @@ e.dataTransfer.setData("text/plain","drag")
 
 }
 
-function icon(e){
+function colorAI(e){
+
+const t=(e.summary||"").toLowerCase()
+
+if(t.includes("school")) return "#34A853"
+if(t.includes("voetbal")) return "#EA4335"
+if(t.includes("zwem")) return "#00ACC1"
+if(t.includes("dokter")) return "#DB4437"
+if(t.includes("eten")) return "#FBBC05"
+if(t.includes("slapen")) return "#5C6BC0"
+
+return e.color
+
+}
+
+function getIcon(e){
 
 const t=(e.summary||"").toLowerCase()
 const l=(e.location||"").toLowerCase()
@@ -440,15 +458,15 @@ if(t.includes("school")) return "school"
 if(t.includes("verjaardag")) return "cake"
 if(t.includes("feest")) return "party-popper"
 if(t.includes("dokter")) return "medical-bag"
-if(t.includes("beugel")) return "tooth"
-if(t.includes("eten")) return "silverware-fork-knife"
+if(t.includes("tandarts")) return "tooth"
+if(t.includes("beugel")) return "tooth-outline"
+if(t.includes("eten")) return "silverware"
 if(t.includes("film")) return "movie-open"
 if(t.includes("muziek")) return "music"
-
 if(t.includes("oppas")) return "home-heart"
 
 if(l.includes("kapelstraat 73")) return "medical-cross"
-if(l.includes("orelia")) return "nurse"
+if(l.includes("puthofveld")) return "nurse"
 
 return "calendar"
 
@@ -456,25 +474,6 @@ return "calendar"
 
 function toggleKid(){
 document.body.classList.toggle("kid")
-}
-
-async function savePDF(){
-
-const {jsPDF}=window.jspdf
-
-const doc=new jsPDF("landscape")
-
-doc.text("AgendaPicto Weekoverzicht",10,10)
-
-let y=20
-
-document.querySelectorAll(".day").forEach(d=>{
-doc.text(d.innerText,10,y)
-y+=10
-})
-
-doc.save("agenda.pdf")
-
 }
 
 parseToken()
