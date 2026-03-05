@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <title>Familie Agenda</title>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <style>
 
 body{
@@ -13,90 +15,86 @@ background:#f2f2f2;
 }
 
 header{
-background:#ffffff;
+background:#4285F4;
+color:white;
 padding:10px;
 display:flex;
 flex-wrap:wrap;
 gap:10px;
 align-items:center;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
-position:sticky;
-top:0;
-z-index:10;
 }
 
 button{
 padding:8px 12px;
 border:none;
-background:#1976d2;
-color:white;
 border-radius:6px;
+background:white;
 cursor:pointer;
 }
 
-button:hover{
-background:#0d47a1;
-}
-
 #filters{
+background:#fff;
+padding:10px;
 display:flex;
-gap:10px;
+gap:12px;
 flex-wrap:wrap;
-}
-
-.dayColumn{
-flex:1;
-background:white;
-margin:4px;
-border-radius:8px;
-padding:6px;
-min-width:200px;
-}
-
-.dayHeader{
-font-weight:bold;
-text-align:center;
-padding:6px;
 border-bottom:1px solid #ddd;
 }
 
 .week{
 display:flex;
+height:1200px;
 }
 
-.timeline{
+.day{
+flex:1;
+background:white;
+margin:5px;
+border-radius:8px;
 position:relative;
 }
 
+.dayHeader{
+text-align:center;
+font-weight:bold;
+padding:6px;
+border-bottom:1px solid #ddd;
+}
+
+.hour{
+position:absolute;
+left:0;
+right:0;
+border-top:1px solid #eee;
+font-size:10px;
+color:#999;
+}
+
 .event{
-display:flex;
-align-items:center;
-gap:6px;
-margin:2px 0;
-padding:4px;
+position:absolute;
+left:5%;
+width:90%;
 border-radius:6px;
+color:white;
+padding:4px;
 font-size:12px;
-cursor:grab;
+display:flex;
+gap:6px;
+align-items:center;
 }
 
 .icon{
-font-size:18px;
+font-size:16px;
 }
 
 .large .icon{
-font-size:40px;
+font-size:36px;
 display:block;
-text-align:center;
 }
 
 .large .event{
 flex-direction:column;
-font-size:11px;
-}
-
-.timeLabel{
-font-size:10px;
-color:#777;
+text-align:center;
 }
 
 </style>
@@ -105,6 +103,9 @@ color:#777;
 <body>
 
 <header>
+
+<button onclick="login()">Login</button>
+<button onclick="logout()">Logout</button>
 
 <button onclick="prevWeek()">◀ week</button>
 <button onclick="today()">vandaag</button>
@@ -119,65 +120,257 @@ color:#777;
 
 <button onclick="window.print()">print / pdf</button>
 
-<div id="filters"></div>
-
 </header>
+
+<div id="filters"></div>
 
 <div id="agenda"></div>
 
 <script>
 
-const ICS_SOURCES = [
+const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
 
-{
-name:"Gezin",
-url:"ICS_URL_GEZIJIN",
-color:"#33b679"
-},
+let token=null
+let calendars=[]
+let events=[]
 
-{
-name:"Nico",
-url:"ICS_URL_NICO",
-color:"#039be5"
-},
+let currentMonday=getMonday(new Date())
+let dayMode=false
+let bigIcons=false
 
-{
-name:"Elke",
-url:"ICS_URL_ELKE",
-color:"#8e24aa"
-},
-
-{
-name:"Niel",
-url:"ICS_URL_NIEL",
-color:"#ef6c00"
-},
-
-{
-name:"Rita",
-url:"ICS_URL_RITA",
-color:"#d81b60"
-},
-
-{
-name:"feestdagen",
-url:"ICS_URL_FEESTDAGEN",
-color:"#795548"
-}
-
-]
-
-const HIDDEN_CALENDARS = [
+const HIDDEN=[
 "Weeknummers",
 "Agenda",
 "Borgloon Weather",
 "agenda website"
 ]
 
-let events=[]
-let currentWeekStart=getMonday(new Date())
-let dayMode=false
-let bigIcons=false
+function login(){
+
+const url="https://accounts.google.com/o/oauth2/v2/auth"
+
+const params={
+client_id:CLIENT_ID,
+redirect_uri:window.location.origin,
+response_type:"token",
+scope:"https://www.googleapis.com/auth/calendar.readonly"
+}
+
+window.location=url+"?"+new URLSearchParams(params)
+
+}
+
+function logout(){
+
+token=null
+events=[]
+render()
+
+}
+
+function parseToken(){
+
+const hash=location.hash.substring(1)
+const params=new URLSearchParams(hash)
+
+token=params.get("access_token")
+
+if(token) init()
+
+}
+
+async function init(){
+
+await loadCalendars()
+
+await loadEvents()
+
+render()
+
+}
+
+async function loadCalendars(){
+
+let r=await fetch(
+"https://www.googleapis.com/calendar/v3/users/me/calendarList",
+{headers:{Authorization:"Bearer "+token}}
+)
+
+let data=await r.json()
+
+calendars=data.items.filter(c=>!HIDDEN.includes(c.summary))
+
+buildFilters()
+
+}
+
+function buildFilters(){
+
+let f=document.getElementById("filters")
+f.innerHTML=""
+
+calendars.forEach(c=>{
+
+let label=document.createElement("label")
+
+label.innerHTML=
+`<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
+
+f.appendChild(label)
+
+})
+
+}
+
+function rename(name){
+
+if(name.includes("Belgie Feestdagen"))
+return "feestdagen"
+
+return name
+
+}
+
+async function loadEvents(){
+
+events=[]
+
+for(let cal of calendars){
+
+let r=await fetch(
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events`,
+{
+headers:{Authorization:"Bearer "+token}
+}
+)
+
+let data=await r.json()
+
+data.items.forEach(e=>{
+
+if(!e.start?.dateTime) return
+
+events.push({
+
+title:e.summary,
+start:new Date(e.start.dateTime),
+end:new Date(e.end.dateTime),
+color:cal.backgroundColor||"#4285F4",
+location:e.location||"",
+calendar:cal.id
+
+})
+
+})
+
+}
+
+}
+
+function render(){
+
+let agenda=document.getElementById("agenda")
+agenda.innerHTML=""
+
+let week=document.createElement("div")
+week.className="week"
+
+let days=dayMode?1:7
+
+for(let i=0;i<days;i++){
+
+let d=new Date(currentMonday)
+d.setDate(d.getDate()+i)
+
+let col=document.createElement("div")
+col.className="day"
+
+let head=document.createElement("div")
+head.className="dayHeader"
+head.innerText=d.toLocaleDateString("nl-BE",{weekday:"long"})+" "+
+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
+
+col.appendChild(head)
+
+for(let h=7;h<=23;h++){
+
+let line=document.createElement("div")
+line.className="hour"
+line.style.top=((h-7)*60)+"px"
+line.innerText=h+":00"
+
+col.appendChild(line)
+
+}
+
+events
+.filter(e=>sameDay(e.start,d))
+.sort((a,b)=>a.start-b.start)
+.forEach(e=>{
+
+let start=(e.start.getHours()-7)*60+e.start.getMinutes()
+let dur=(e.end-e.start)/60000
+
+let div=document.createElement("div")
+div.className="event"
+div.style.top=start+"px"
+div.style.height=dur+"px"
+div.style.background=e.color
+
+div.innerHTML=
+`<div class="icon">${icon(e)}</div>
+<div>${time(e.start)} ${e.title}</div>`
+
+col.appendChild(div)
+
+})
+
+week.appendChild(col)
+
+}
+
+agenda.appendChild(week)
+
+if(bigIcons) agenda.classList.add("large")
+else agenda.classList.remove("large")
+
+}
+
+function icon(e){
+
+let t=e.title.toLowerCase()
+let l=e.location.toLowerCase()
+
+if(l.includes("orelia puthof")) return "👩‍⚕️"
+
+if(t.includes("bus")) return "🚌"
+
+if(t.includes("rijden")) return "🚗"
+
+if(t.includes("slapen")) return "😴"
+
+if(t.includes("rita oppas thuis") || t.includes("oppas door loriana")) return "🏠"
+
+if(t.includes("rita oppas bij haar")) return "🧳"
+
+return "📌"
+
+}
+
+function sameDay(a,b){
+
+return a.getFullYear()==b.getFullYear() &&
+a.getMonth()==b.getMonth() &&
+a.getDate()==b.getDate()
+
+}
+
+function time(d){
+
+return d.getHours().toString().padStart(2,"0")+":"+
+d.getMinutes().toString().padStart(2,"0")
+
+}
 
 function getMonday(d){
 
@@ -191,204 +384,23 @@ return new Date(d.setDate(diff))
 
 }
 
-function formatDate(d){
-
-return d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
-
-}
-
-function formatDay(d){
-
-return d.toLocaleDateString("nl-BE",{weekday:"long"})
-
-}
-
-function parseICS(text,color,source){
-
-let lines=text.split("\n")
-
-let e=null
-
-lines.forEach(l=>{
-
-if(l.startsWith("BEGIN:VEVENT")) e={}
-
-if(l.startsWith("SUMMARY")) e.title=l.split(":")[1]
-
-if(l.startsWith("DTSTART")){
-
-let t=l.split(":")[1]
-
-e.start=new Date(
-t.substring(0,4),
-t.substring(4,6)-1,
-t.substring(6,8),
-t.substring(9,11)||0,
-t.substring(11,13)||0
-)
-
-}
-
-if(l.startsWith("LOCATION")) e.location=l.split(":")[1]
-
-if(l.startsWith("END:VEVENT")){
-
-e.color=color
-e.source=source
-
-if(!HIDDEN_CALENDARS.includes(source))
-events.push(e)
-
-}
-
-})
-
-}
-
-async function load(){
-
-events=[]
-
-for(let c of ICS_SOURCES){
-
-let r=await fetch(c.url)
-
-let t=await r.text()
-
-parseICS(t,c.color,c.name)
-
-}
-
-render()
-
-}
-
-function render(){
-
-let agenda=document.getElementById("agenda")
-
-agenda.innerHTML=""
-
-let week=document.createElement("div")
-
-week.className="week"
-
-let days=dayMode?1:7
-
-for(let i=0;i<days;i++){
-
-let date=new Date(currentWeekStart)
-
-date.setDate(date.getDate()+i)
-
-let col=document.createElement("div")
-col.className="dayColumn"
-
-let header=document.createElement("div")
-header.className="dayHeader"
-header.innerText=formatDay(date)+" "+formatDate(date)
-
-col.appendChild(header)
-
-let dayEvents=events.filter(e=>
-sameDay(e.start,date)
-)
-
-dayEvents.sort((a,b)=>a.start-b.start)
-
-dayEvents.forEach(ev=>{
-
-let div=document.createElement("div")
-
-div.className="event"
-
-div.style.background=ev.color
-
-let icon=getIcon(ev)
-
-div.innerHTML=
-"<div class='icon'>"+icon+"</div>"+
-"<div>"+time(ev.start)+" "+ev.title+"</div>"
-
-col.appendChild(div)
-
-})
-
-week.appendChild(col)
-
-}
-
-agenda.appendChild(week)
-
-if(bigIcons)
-agenda.classList.add("large")
-else
-agenda.classList.remove("large")
-
-}
-
-function sameDay(a,b){
-
-return a.getFullYear()==b.getFullYear()
-&& a.getMonth()==b.getMonth()
-&& a.getDate()==b.getDate()
-
-}
-
-function time(d){
-
-return d.getHours().toString().padStart(2,"0")+":"+
-d.getMinutes().toString().padStart(2,"0")
-
-}
-
-function getIcon(ev){
-
-let t=ev.title.toLowerCase()
-let loc=(ev.location||"").toLowerCase()
-
-if(loc.includes("orelia puthof"))
-return "👩‍⚕️"
-
-if(t.includes("rita oppas thuis") || t.includes("oppas door loriana"))
-return "🏠"
-
-if(t.includes("rita oppas bij haar"))
-return "🧳"
-
-if(t.includes("school"))
-return "🎒"
-
-if(t.includes("zwem"))
-return "🏊"
-
-if(t.includes("voetbal"))
-return "⚽"
-
-if(t.includes("dokter"))
-return "🩺"
-
-return "📌"
-
-}
-
 function prevWeek(){
 
-currentWeekStart.setDate(currentWeekStart.getDate()-7)
+currentMonday.setDate(currentMonday.getDate()-7)
 render()
 
 }
 
 function nextWeek(){
 
-currentWeekStart.setDate(currentWeekStart.getDate()+7)
+currentMonday.setDate(currentMonday.getDate()+7)
 render()
 
 }
 
 function today(){
 
-currentWeekStart=getMonday(new Date())
+currentMonday=getMonday(new Date())
 render()
 
 }
@@ -425,7 +437,7 @@ render()
 
 }
 
-load()
+parseToken()
 
 </script>
 
