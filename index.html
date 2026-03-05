@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
-<title>AgendaPicto</title>
+<title>Familie Agenda</title>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -11,7 +12,7 @@
 body{
 font-family:Arial;
 margin:0;
-background:#f2f4f7;
+background:#eef1f5;
 }
 
 header{
@@ -20,39 +21,44 @@ color:white;
 padding:12px;
 display:flex;
 gap:10px;
-align-items:center;
 flex-wrap:wrap;
+align-items:center;
 }
 
 button{
-padding:6px 10px;
 border:none;
+padding:6px 10px;
 border-radius:4px;
-background:white;
 cursor:pointer;
 }
 
 #filters{
-padding:10px;
 background:white;
+padding:10px;
 display:flex;
-gap:10px;
 flex-wrap:wrap;
+gap:10px;
 }
 
 #calendar{
 padding:10px;
 }
 
-.day{
-background:white;
-margin-bottom:15px;
-border-radius:6px;
-padding:10px;
+.week{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:10px;
 }
 
-.day h2{
-margin-top:0;
+.day{
+background:white;
+border-radius:6px;
+padding:8px;
+}
+
+.dayTitle{
+font-weight:bold;
+margin-bottom:6px;
 }
 
 .timeline{
@@ -63,26 +69,27 @@ border-left:2px solid #ddd;
 
 .hour{
 position:absolute;
-left:-50px;
-font-size:12px;
-color:#666;
+left:-40px;
+font-size:11px;
+color:#777;
 }
 
 .event{
 position:absolute;
-left:60px;
+left:10px;
 right:10px;
 border-radius:6px;
-padding:4px;
-font-size:13px;
+padding:3px;
+font-size:12px;
 display:flex;
+gap:4px;
 align-items:center;
-gap:5px;
+color:white;
 }
 
 .icon{
-width:20px;
-height:20px;
+width:18px;
+height:18px;
 }
 
 </style>
@@ -92,7 +99,7 @@ height:20px;
 
 <header>
 
-<b>AgendaPicto</b>
+<b>Familie Agenda</b>
 
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
@@ -100,8 +107,8 @@ height:20px;
 <button onclick="prevWeek()">◀</button>
 <button onclick="nextWeek()">▶</button>
 
-<button onclick="viewWeek()">Week</button>
-<button onclick="viewDay()">Dag</button>
+<button onclick="setWeek()">Week</button>
+<button onclick="setDay()">Dag</button>
 
 <button onclick="selectAll()">Alles</button>
 <button onclick="selectNone()">Geen</button>
@@ -109,20 +116,21 @@ height:20px;
 </header>
 
 <div id="filters"></div>
+
 <div id="calendar"></div>
 
 <script>
 
 const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
 
-let accessToken=null
+let token=null
 let calendars=[]
 let events=[]
 
+let view="week"
 let currentDate=new Date()
-let viewMode="week"
 
-const HIDDEN_CALENDARS=[
+const HIDDEN=[
 "Weeknummers",
 "Agenda",
 "Borgloon Weather",
@@ -146,7 +154,7 @@ window.location=url+"?"+new URLSearchParams(params)
 
 function logout(){
 
-accessToken=null
+token=null
 events=[]
 document.getElementById("calendar").innerHTML=""
 
@@ -158,13 +166,9 @@ const hash=window.location.hash.substring(1)
 
 const params=new URLSearchParams(hash)
 
-accessToken=params.get("access_token")
+token=params.get("access_token")
 
-if(accessToken){
-
-loadCalendars()
-
-}
+if(token) loadCalendars()
 
 }
 
@@ -172,12 +176,12 @@ async function loadCalendars(){
 
 const res=await fetch(
 "https://www.googleapis.com/calendar/v3/users/me/calendarList",
-{headers:{Authorization:"Bearer "+accessToken}}
+{headers:{Authorization:"Bearer "+token}}
 )
 
 const data=await res.json()
 
-calendars=data.items.filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
+calendars=data.items.filter(c=>!HIDDEN.includes(c.summary))
 
 renderFilters()
 
@@ -187,19 +191,18 @@ loadEvents()
 
 function renderFilters(){
 
-const div=document.getElementById("filters")
+const f=document.getElementById("filters")
 
-div.innerHTML=""
+f.innerHTML=""
 
 calendars.forEach(c=>{
 
 let name=c.summary
 
-if(name.includes("Feestdagen")){
+if(name.includes("Feestdagen"))
 name="feestdagen"
-}
 
-div.innerHTML+=`
+f.innerHTML+=`
 <label>
 <input type="checkbox" checked value="${c.id}">
 ${name}
@@ -217,26 +220,28 @@ events=[]
 for(const cal of calendars){
 
 const res=await fetch(
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events`,
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?maxResults=2500`,
 {
-headers:{Authorization:"Bearer "+accessToken}
+headers:{Authorization:"Bearer "+token}
 }
 )
 
 const data=await res.json()
 
 data.items.forEach(e=>{
-
-events.push({
-...e,
-calendar:cal.summary
-})
-
+events.push({...e,calendarId:cal.id,calendarName:cal.summary})
 })
 
 }
 
 render()
+
+}
+
+function getSelectedCalendars(){
+
+return [...document.querySelectorAll("#filters input:checked")]
+.map(c=>c.value)
 
 }
 
@@ -269,111 +274,104 @@ return "https://api.iconify.design/mdi/calendar.svg"
 
 function render(){
 
-if(viewMode==="week"){
-renderWeek()
-}else{
-renderDay()
-}
+if(view==="week") renderWeek()
+else renderDay()
 
 }
 
 function renderWeek(){
 
+const cal=document.getElementById("calendar")
+cal.innerHTML=""
+
 const start=new Date(currentDate)
 
 start.setDate(start.getDate()-start.getDay()+1)
 
-const container=document.getElementById("calendar")
-
-container.innerHTML=""
+const week=document.createElement("div")
+week.className="week"
 
 for(let i=0;i<7;i++){
 
-const day=new Date(start)
+const d=new Date(start)
+d.setDate(start.getDate()+i)
 
-day.setDate(start.getDate()+i)
-
-renderSingleDay(container,day)
+week.appendChild(createDay(d))
 
 }
+
+cal.appendChild(week)
 
 }
 
 function renderDay(){
 
-const container=document.getElementById("calendar")
+const cal=document.getElementById("calendar")
+cal.innerHTML=""
 
-container.innerHTML=""
-
-renderSingleDay(container,currentDate)
+cal.appendChild(createDay(currentDate))
 
 }
 
-function renderSingleDay(container,day){
+function createDay(date){
 
-const dayStr=day.toISOString().split("T")[0]
+const selected=getSelectedCalendars()
+
+const dayStr=date.toISOString().split("T")[0]
 
 const div=document.createElement("div")
-
 div.className="day"
 
-div.innerHTML=`<h2>${day.toLocaleDateString()}</h2>`
+div.innerHTML=`<div class="dayTitle">${date.toLocaleDateString()}</div>`
 
 const timeline=document.createElement("div")
-
 timeline.className="timeline"
 
 for(let h=0;h<=23;h++){
 
 const label=document.createElement("div")
-
 label.className="hour"
-
 label.style.top=(h*40)+"px"
-
 label.innerText=h+":00"
 
 timeline.appendChild(label)
 
 }
 
-const filteredEvents=events
+const dayEvents=events
 .filter(e=>{
 
-const date=(e.start?.dateTime||e.start?.date||"").substring(0,10)
+if(!selected.includes(e.calendarId)) return false
 
-return date===dayStr
+const dateStr=(e.start?.dateTime||e.start?.date||"").substring(0,10)
+
+return dateStr===dayStr
 
 })
 .sort((a,b)=>{
 
 const ta=new Date(a.start?.dateTime||a.start?.date)
-
 const tb=new Date(b.start?.dateTime||b.start?.date)
 
 return ta-tb
 
 })
 
-filteredEvents.forEach(e=>{
+dayEvents.forEach(e=>{
 
 const start=new Date(e.start?.dateTime||e.start?.date)
-
 const end=new Date(e.end?.dateTime||e.end?.date)
 
-const top=(start.getHours()*40)+(start.getMinutes()/60*40)
-
-const height=((end-start)/3600000)*40
+const top=start.getHours()*40+(start.getMinutes()/60*40)
+const height=(end-start)/3600000*40
 
 const ev=document.createElement("div")
-
 ev.className="event"
 
 ev.style.top=top+"px"
-
 ev.style.height=height+"px"
 
-ev.style.background="#"+Math.floor(Math.random()*16777215).toString(16)
+ev.style.background=colorFromCalendar(e.calendarName)
 
 ev.innerHTML=`
 <img class="icon" src="${getIcon(e)}">
@@ -386,40 +384,46 @@ timeline.appendChild(ev)
 
 div.appendChild(timeline)
 
-container.appendChild(div)
+return div
+
+}
+
+function colorFromCalendar(name){
+
+let hash=0
+
+for(let i=0;i<name.length;i++)
+hash=name.charCodeAt(i)+((hash<<5)-hash)
+
+const c=(hash & 0x00FFFFFF).toString(16).toUpperCase()
+
+return "#"+("00000".substring(0,6-c.length)+c)
 
 }
 
 function prevWeek(){
-
 currentDate.setDate(currentDate.getDate()-7)
-
 render()
-
 }
 
 function nextWeek(){
-
 currentDate.setDate(currentDate.getDate()+7)
-
-render()
-
-}
-
-function viewWeek(){
-viewMode="week"
 render()
 }
 
-function viewDay(){
-viewMode="day"
+function setWeek(){
+view="week"
+render()
+}
+
+function setDay(){
+view="day"
 render()
 }
 
 function selectAll(){
 
 document.querySelectorAll("#filters input").forEach(c=>c.checked=true)
-
 render()
 
 }
@@ -427,7 +431,6 @@ render()
 function selectNone(){
 
 document.querySelectorAll("#filters input").forEach(c=>c.checked=false)
-
 render()
 
 }
