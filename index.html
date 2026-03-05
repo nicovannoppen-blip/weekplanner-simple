@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Familie Agenda PRO E</title>
+<title>Familie Agenda PRO F</title>
 
 <style>
 
@@ -37,7 +37,7 @@ padding:8px;
 #calendar{
 display:grid;
 grid-template-columns:repeat(7,1fr);
-height:900px;
+height:920px;
 }
 
 .day{
@@ -50,7 +50,6 @@ position:relative;
 background:#e8eaed;
 padding:6px;
 font-weight:bold;
-font-size:14px;
 border-bottom:1px solid #ddd;
 }
 
@@ -89,21 +88,21 @@ margin-right:4px;
 
 /* GROTE PICTO MODUS */
 
-.bigIcons .event{
-font-size:11px;
-text-align:center;
-}
-
-.bigIcons .icon{
-width:42px;
+.big .icon{
+width:40px;
 display:block;
 margin:auto;
 }
 
-.bigIcons .event span{
-display:block;
-font-size:10px;
-margin-top:2px;
+.big .event{
+font-size:11px;
+text-align:center;
+}
+
+/* DAGWEERGAVE */
+
+.dayView #calendar{
+grid-template-columns:1fr;
 }
 
 /* PRINT */
@@ -112,6 +111,7 @@ margin-top:2px;
 header,#filters{
 display:none;
 }
+
 }
 
 </style>
@@ -129,10 +129,12 @@ display:none;
 <button onclick="prevWeek()">◀</button>
 <button onclick="nextWeek()">▶</button>
 
+<button onclick="toggleDayView()">Dag</button>
+
 <button onclick="selectAll()">Alles</button>
 <button onclick="selectNone()">Geen</button>
 
-<button onclick="toggleIcons()">Grote picto’s</button>
+<button onclick="toggleBig()">Grote pictos</button>
 
 <button onclick="window.print()">Print</button>
 
@@ -145,8 +147,8 @@ display:none;
 
 const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
 
-const START_HOUR=7
-const END_HOUR=23
+const START=7
+const END=23
 
 let token=null
 let calendars=[]
@@ -164,8 +166,6 @@ const HIDDEN=[
 
 function login(){
 
-const url="https://accounts.google.com/o/oauth2/v2/auth"
-
 const params={
 client_id:CLIENT_ID,
 redirect_uri:location.origin,
@@ -173,14 +173,13 @@ response_type:"token",
 scope:"https://www.googleapis.com/auth/calendar.readonly"
 }
 
-location=url+"?"+new URLSearchParams(params)
+location="https://accounts.google.com/o/oauth2/v2/auth?"+new URLSearchParams(params)
 
 }
 
 function logout(){
 
 localStorage.removeItem("agenda_token")
-location.hash=""
 location.reload()
 
 }
@@ -260,7 +259,7 @@ const data=await res.json()
 if(data.items){
 
 data.items.forEach(e=>{
-e.calendarName=cal.summary
+e.calendar=cal.summary
 e.color=cal.backgroundColor||"#666"
 events.push(e)
 })
@@ -293,7 +292,7 @@ ${c.summary}
 
 }
 
-function selectedCalendars(){
+function selected(){
 
 return calendars.filter(c=>{
 const id="f_"+c.id.replace(/\W/g,"")
@@ -303,24 +302,16 @@ return document.getElementById(id)?.checked
 }
 
 function selectAll(){
-
-document.querySelectorAll("#filters input")
-.forEach(c=>c.checked=true)
-
+document.querySelectorAll("#filters input").forEach(i=>i.checked=true)
 render()
-
 }
 
 function selectNone(){
-
-document.querySelectorAll("#filters input")
-.forEach(c=>c.checked=false)
-
+document.querySelectorAll("#filters input").forEach(i=>i.checked=false)
 render()
-
 }
 
-/* NAVIGATION */
+/* NAVIGATIE */
 
 function nextWeek(){
 monday.setDate(monday.getDate()+7)
@@ -339,10 +330,7 @@ function render(){
 const cal=document.getElementById("calendar")
 cal.innerHTML=""
 
-const days=[
-"Zondag","Maandag","Dinsdag","Woensdag",
-"Donderdag","Vrijdag","Zaterdag"
-]
+const days=["Zondag","Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag"]
 
 for(let i=0;i<7;i++){
 
@@ -353,15 +341,14 @@ const day=document.createElement("div")
 day.className="day"
 
 day.innerHTML=`
-<div class="dayHeader">
-${days[d.getDay()]} ${pad(d.getDate())}/${pad(d.getMonth()+1)}
-</div>
+<div class="dayHeader">${days[d.getDay()]} ${pad(d.getDate())}/${pad(d.getMonth()+1)}</div>
 <div class="timeline"></div>
 `
 
 cal.appendChild(day)
 
 drawHours(day)
+
 drawEvents(day,d)
 
 }
@@ -374,9 +361,9 @@ function drawHours(day){
 
 const timeline=day.querySelector(".timeline")
 
-for(let h=START_HOUR;h<=END_HOUR;h++){
+for(let h=START;h<=END;h++){
 
-const pos=(h-START_HOUR)/(END_HOUR-START_HOUR)*100
+const pos=(h-START)/(END-START)*100
 
 const line=document.createElement("div")
 line.className="hour"
@@ -395,10 +382,10 @@ function drawEvents(day,date){
 
 const timeline=day.querySelector(".timeline")
 
-const selected=selectedCalendars()
+const sel=selected()
 
 const dayEvents=events
-.filter(e=>selected.includes(e.calendarName))
+.filter(e=>sel.includes(e.calendar))
 .filter(e=>{
 const d=new Date(e.start.dateTime||e.start.date)
 return d.toDateString()==date.toDateString()
@@ -415,8 +402,8 @@ const end=new Date(e.end?.dateTime||e.end?.date||start)
 const startMin=start.getHours()*60+start.getMinutes()
 const endMin=end.getHours()*60+end.getMinutes()
 
-const top=(startMin-START_HOUR*60)/((END_HOUR-START_HOUR)*60)*100
-const height=(endMin-startMin)/((END_HOUR-START_HOUR)*60)*100
+const top=(startMin-START*60)/((END-START)*60)*100
+const height=(endMin-startMin)/((END-START)*60)*100
 
 let col=0
 while(columns[col] && columns[col]>startMin) col++
@@ -438,7 +425,7 @@ div.draggable=true
 
 div.innerHTML=`
 <img class="icon" src="${getIcon(e)}">
-<span>${e.summary}</span>
+${e.summary}
 `
 
 enableDrag(div)
@@ -453,17 +440,13 @@ timeline.appendChild(div)
 
 function enableDrag(el){
 
-el.addEventListener("dragstart",e=>{
-e.dataTransfer.setData("text","move")
-})
-
 el.addEventListener("dragend",e=>{
 el.style.top=e.pageY-200+"px"
 })
 
 }
 
-/* ICON ENGINE */
+/* ICON AI */
 
 function getIcon(e){
 
@@ -471,18 +454,9 @@ const t=(e.summary||"").toLowerCase()
 const loc=(e.location||"").toLowerCase()
 
 if(t.includes("bus")) return "https://api.iconify.design/mdi/bus.svg"
-
 if(t.includes("slapen")) return "https://api.iconify.design/mdi/sleep.svg"
-
 if(t.includes("rijden")) return "https://api.iconify.design/mdi/car.svg"
-
 if(t.includes("beugel")) return "https://api.iconify.design/mdi/tooth-outline.svg"
-
-if(t.includes("school")) return "https://api.iconify.design/mdi/school.svg"
-
-if(t.includes("voetbal")) return "https://api.iconify.design/mdi/soccer.svg"
-
-if(t.includes("zwem")) return "https://api.iconify.design/mdi/swim.svg"
 
 if(t.includes("rita oppas thuis")||t.includes("oppas door loriana"))
 return "https://api.iconify.design/mdi/home-heart.svg"
@@ -493,14 +467,22 @@ return "https://api.iconify.design/mdi/home-export-outline.svg"
 if(loc.includes("orelia puthof"))
 return "https://api.iconify.design/mdi/nurse.svg"
 
+if(t.includes("voetbal")) return "https://api.iconify.design/mdi/soccer.svg"
+if(t.includes("zwem")) return "https://api.iconify.design/mdi/swim.svg"
+if(t.includes("school")) return "https://api.iconify.design/mdi/school.svg"
+
 return "https://api.iconify.design/mdi/calendar.svg"
 
 }
 
 /* UI */
 
-function toggleIcons(){
-document.body.classList.toggle("bigIcons")
+function toggleBig(){
+document.body.classList.toggle("big")
+}
+
+function toggleDayView(){
+document.body.classList.toggle("dayView")
 }
 
 /* DATE */
