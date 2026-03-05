@@ -1,8 +1,0 @@
-{
-  "name": "AgendaPicto",
-  "short_name": "AgendaPicto",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#f1f3f4",
-  "theme_color": "#4285f4"
-}
