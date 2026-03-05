@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AgendaPicto</title>
+<title>AgendaPicto PRO</title>
 
 <style>
 
@@ -15,7 +15,7 @@ background:#f1f3f4;
 header{
 background:#4285F4;
 color:white;
-padding:15px;
+padding:10px;
 display:flex;
 flex-wrap:wrap;
 gap:6px;
@@ -23,63 +23,84 @@ align-items:center;
 }
 
 button{
-padding:6px 10px;
 border:none;
+padding:6px 10px;
 border-radius:4px;
 cursor:pointer;
 }
 
-#controls{
+#filters{
 background:white;
 padding:10px;
 }
 
 #calendar{
-padding:10px;
 display:grid;
 grid-template-columns:repeat(7,1fr);
-gap:10px;
+gap:8px;
+padding:10px;
 }
 
 .day{
 background:white;
 border-radius:6px;
-padding:8px;
-min-height:200px;
+position:relative;
+height:960px;
 }
 
-.day h3{
-margin-top:0;
+.dayTitle{
+background:#eee;
+padding:4px;
+font-weight:bold;
+text-align:center;
+}
+
+.timeline{
+position:absolute;
+left:0;
+right:0;
+top:20px;
+bottom:0;
+}
+
+.hour{
+height:60px;
+border-top:1px solid #eee;
+font-size:10px;
+padding-left:4px;
 }
 
 .event{
+position:absolute;
+left:2px;
+right:2px;
 border-radius:6px;
-padding:6px;
-margin-bottom:6px;
 color:white;
-font-size:13px;
+padding:4px;
+font-size:12px;
+cursor:grab;
 display:flex;
+gap:4px;
 align-items:center;
-gap:6px;
 }
 
 .event img{
-width:18px;
-height:18px;
+width:16px;
+height:16px;
 }
 
 .kid .event{
 font-size:18px;
-padding:12px;
+padding:10px;
 }
 
 .kid .event img{
-width:40px;
-height:40px;
+width:36px;
+height:36px;
 }
 
 @media print{
-header,#controls{
+header,#filters{
 display:none;
 }
 body{
@@ -94,28 +115,28 @@ background:white;
 
 <header>
 
-<b>AgendaPicto</b>
+<b>AgendaPicto PRO</b>
 
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
 
-<button onclick="previousWeek()">←</button>
+<button onclick="prevWeek()">←</button>
 <button onclick="nextWeek()">→</button>
 
-<button onclick="setWeek()">Week</button>
-<button onclick="setDay()">Dag</button>
+<button onclick="weekView()">Week</button>
+<button onclick="dayView()">Dag</button>
 
 <button onclick="toggleKid()">Kinder modus</button>
 
 <button onclick="selectAll()">Alles aan</button>
-<button onclick="deselectAll()">Alles uit</button>
+<button onclick="selectNone()">Alles uit</button>
 
 <button onclick="window.print()">Print</button>
 <button onclick="savePDF()">PDF</button>
 
 </header>
 
-<div id="controls"></div>
+<div id="filters"></div>
 
 <div id="calendar"></div>
 
@@ -123,7 +144,7 @@ background:white;
 
 <script>
 
-const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com";
+const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
 
 let accessToken=null
 let calendars=[]
@@ -147,18 +168,14 @@ window.location=oauth+"?"+new URLSearchParams(params)
 }
 
 function logout(){
-
-accessToken=null
 location.hash=""
 location.reload()
-
 }
 
 function parseToken(){
 
 const hash=window.location.hash.substring(1)
 const params=new URLSearchParams(hash)
-
 accessToken=params.get("access_token")
 
 if(accessToken) init()
@@ -170,7 +187,6 @@ async function init(){
 monday=getMonday(new Date())
 
 await loadCalendars()
-
 renderFilters()
 
 await loadEvents()
@@ -192,35 +208,23 @@ return d
 }
 
 function nextWeek(){
-
 monday.setDate(monday.getDate()+7)
-
 loadEvents().then(render)
-
 }
 
-function previousWeek(){
-
+function prevWeek(){
 monday.setDate(monday.getDate()-7)
-
 loadEvents().then(render)
-
 }
 
-function setWeek(){
-
+function weekView(){
 view="week"
-
 render()
-
 }
 
-function setDay(){
-
+function dayView(){
 view="day"
-
 render()
-
 }
 
 async function loadCalendars(){
@@ -231,7 +235,6 @@ const r=await fetch(
 )
 
 const data=await r.json()
-
 calendars=data.items
 
 }
@@ -241,7 +244,6 @@ async function loadEvents(){
 events=[]
 
 let end=new Date(monday)
-
 end.setDate(monday.getDate()+7)
 
 for(const cal of calendars){
@@ -275,21 +277,19 @@ events.push(e)
 
 function renderFilters(){
 
-const c=document.getElementById("controls")
+const f=document.getElementById("filters")
 
-c.innerHTML="<b>Agenda filters</b><br>"
+f.innerHTML="<b>Agenda filters</b><br>"
 
 calendars.forEach(cal=>{
 
 const id="f"+cal.id.replace(/[^a-z0-9]/gi,"")
 
-c.innerHTML+=`
-
+f.innerHTML+=`
 <label>
 <input type="checkbox" id="${id}" checked onchange="render()">
 ${cal.summary}
 </label>
-
 `
 
 })
@@ -309,19 +309,13 @@ return document.getElementById(id)?.checked
 }
 
 function selectAll(){
-
-document.querySelectorAll("#controls input").forEach(i=>i.checked=true)
-
+document.querySelectorAll("#filters input").forEach(i=>i.checked=true)
 render()
-
 }
 
-function deselectAll(){
-
-document.querySelectorAll("#controls input").forEach(i=>i.checked=false)
-
+function selectNone(){
+document.querySelectorAll("#filters input").forEach(i=>i.checked=false)
 render()
-
 }
 
 function render(){
@@ -330,115 +324,116 @@ const cal=document.getElementById("calendar")
 
 cal.innerHTML=""
 
-if(view==="week"){
+const days=view==="week"?7:1
 
-cal.style.gridTemplateColumns="repeat(7,1fr)"
+cal.style.gridTemplateColumns=view==="week"?"repeat(7,1fr)":"1fr"
 
-}else{
+const names=["Ma","Di","Wo","Do","Vr","Za","Zo"]
 
-cal.style.gridTemplateColumns="1fr"
-
-}
-
-const days=["Ma","Di","Wo","Do","Vr","Za","Zo"]
-
-const cols=[]
-
-const count=view==="week"?7:1
-
-for(let i=0;i<count;i++){
+for(let i=0;i<days;i++){
 
 let d=new Date(monday)
-
 d.setDate(monday.getDate()+i)
 
-const col=document.createElement("div")
+const day=document.createElement("div")
+day.className="day"
 
-col.className="day"
+day.innerHTML=`<div class="dayTitle">${names[i]} ${d.getDate()}/${d.getMonth()+1}</div>`
 
-col.innerHTML=`<h3>${days[i]} ${d.getDate()}/${d.getMonth()+1}</h3>`
+const timeline=document.createElement("div")
+timeline.className="timeline"
 
-cal.appendChild(col)
+for(let h=6;h<22;h++){
 
-cols.push(col)
+const hour=document.createElement("div")
+hour.className="hour"
+hour.innerText=h+":00"
+
+timeline.appendChild(hour)
 
 }
+
+day.appendChild(timeline)
+cal.appendChild(day)
+
+renderEvents(day,i)
+
+}
+
+}
+
+function renderEvents(day,index){
 
 const selected=selectedCalendars()
 
-events
-.filter(e=>selected.includes(e.calendar))
-.sort((a,b)=>new Date(a.start.dateTime||a.start.date)-new Date(b.start.dateTime||b.start.date))
-.forEach(e=>{
+const dayEvents=events.filter(e=>{
 
-const date=new Date(e.start.dateTime||e.start.date)
+if(!selected.includes(e.calendar)) return false
 
-const index=(date.getDay()+6)%7
+const d=new Date(e.start.dateTime||e.start.date)
 
-if(view==="day" && index!==0) return
+return (d.getDay()+6)%7===index
+
+})
+
+dayEvents.forEach(e=>{
+
+const start=new Date(e.start.dateTime||e.start.date)
+const end=new Date(e.end?.dateTime||e.start.dateTime||e.start.date)
+
+const startMin=start.getHours()*60+start.getMinutes()
+const endMin=end.getHours()*60+end.getMinutes()
+
+const top=(startMin-360)/960*100
+const height=(endMin-startMin)/960*100
 
 const div=document.createElement("div")
-
 div.className="event"
 
+div.style.top=top+"%"
+div.style.height=height+"%"
 div.style.background=e.color
 
-const icon=getIcon(e)
+div.draggable=true
 
 div.innerHTML=`
-
-<img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
-<div>
-<b>${e.summary}</b><br>
-${formatTime(date)} • ${e.calendar}
-</div>
-
+<img src="https://api.iconify.design/mdi/${icon(e)}.svg?color=white">
+${e.summary}
 `
 
-cols[index].appendChild(div)
+enableDrag(div)
+
+day.appendChild(div)
 
 })
 
 }
 
-function formatTime(d){
+function enableDrag(el){
 
-if(!d.getHours()) return "Hele dag"
-
-return d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})
+el.addEventListener("dragstart",e=>{
+e.dataTransfer.setData("text/plain","drag")
+})
 
 }
 
-function getIcon(e){
+function icon(e){
 
 const t=(e.summary||"").toLowerCase()
-
 const l=(e.location||"").toLowerCase()
 
 if(t.includes("bus")) return "bus"
-
 if(t.includes("slapen")) return "sleep"
-
 if(t.includes("rijden")) return "car"
-
 if(t.includes("voetbal")) return "soccer"
-
 if(t.includes("zwem")) return "swim"
-
-if(t.includes("verjaardag")) return "cake"
-
 if(t.includes("school")) return "school"
-
-if(t.includes("eten")) return "silverware"
-
+if(t.includes("verjaardag")) return "cake"
 if(t.includes("dokter")) return "medical-bag"
-
 if(t.includes("beugel")) return "tooth"
-
 if(t.includes("oppas")) return "home-heart"
 
-if(l.includes("kapelstraat 73")) return "plus-circle"
-
+if(l.includes("kapelstraat 73")) return "medical-cross"
 if(l.includes("puthofveld")) return "nurse"
 
 return "calendar"
@@ -446,9 +441,7 @@ return "calendar"
 }
 
 function toggleKid(){
-
 document.body.classList.toggle("kid")
-
 }
 
 async function savePDF(){
@@ -462,11 +455,8 @@ doc.text("AgendaPicto",10,10)
 let y=20
 
 document.querySelectorAll(".day").forEach(d=>{
-
 doc.text(d.innerText,10,y)
-
 y+=10
-
 })
 
 doc.save("agenda.pdf")
