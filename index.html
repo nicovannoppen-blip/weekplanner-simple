@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Familie Agenda PRO D</title>
+<title>Familie Agenda PRO E</title>
 
 <style>
 
@@ -13,25 +13,25 @@ background:#f1f3f4;
 }
 
 header{
-background:#4a7bd8;
+background:#4285F4;
 color:white;
 padding:10px;
 display:flex;
 flex-wrap:wrap;
-gap:8px;
+gap:6px;
 align-items:center;
 }
 
 button{
-padding:6px 10px;
 border:none;
+padding:6px 10px;
 border-radius:4px;
 cursor:pointer;
 }
 
 #filters{
-padding:10px;
 background:white;
+padding:8px;
 }
 
 #calendar{
@@ -41,21 +41,22 @@ height:900px;
 }
 
 .day{
-border-right:1px solid #ddd;
 background:#fafafa;
+border-right:1px solid #ddd;
 position:relative;
 }
 
 .dayHeader{
-background:#eee;
+background:#e8eaed;
 padding:6px;
 font-weight:bold;
+font-size:14px;
 border-bottom:1px solid #ddd;
 }
 
 .timeline{
 position:absolute;
-top:28px;
+top:30px;
 bottom:0;
 left:0;
 right:0;
@@ -74,17 +75,38 @@ color:#777;
 position:absolute;
 border-radius:6px;
 color:white;
-padding:3px;
 font-size:12px;
-cursor:move;
+padding:4px;
 overflow:hidden;
+cursor:move;
 }
 
 .icon{
-width:14px;
+width:16px;
 vertical-align:middle;
 margin-right:4px;
 }
+
+/* GROTE PICTO MODUS */
+
+.bigIcons .event{
+font-size:11px;
+text-align:center;
+}
+
+.bigIcons .icon{
+width:42px;
+display:block;
+margin:auto;
+}
+
+.bigIcons .event span{
+display:block;
+font-size:10px;
+margin-top:2px;
+}
+
+/* PRINT */
 
 @media print{
 header,#filters{
@@ -107,11 +129,10 @@ display:none;
 <button onclick="prevWeek()">◀</button>
 <button onclick="nextWeek()">▶</button>
 
-<button onclick="weekView()">Week</button>
-<button onclick="dayView()">Dag</button>
-
 <button onclick="selectAll()">Alles</button>
 <button onclick="selectNone()">Geen</button>
+
+<button onclick="toggleIcons()">Grote picto’s</button>
 
 <button onclick="window.print()">Print</button>
 
@@ -124,14 +145,13 @@ display:none;
 
 const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
 
+const START_HOUR=7
+const END_HOUR=23
+
 let token=null
 let calendars=[]
 let events=[]
 let monday=null
-let mode="week"
-
-const START_HOUR=7
-const END_HOUR=23
 
 const HIDDEN=[
 "Weeknummers",
@@ -148,7 +168,7 @@ const url="https://accounts.google.com/o/oauth2/v2/auth"
 
 const params={
 client_id:CLIENT_ID,
-redirect_uri:window.location.origin,
+redirect_uri:location.origin,
 response_type:"token",
 scope:"https://www.googleapis.com/auth/calendar.readonly"
 }
@@ -158,15 +178,26 @@ location=url+"?"+new URLSearchParams(params)
 }
 
 function logout(){
+
+localStorage.removeItem("agenda_token")
 location.hash=""
 location.reload()
+
 }
 
 function parseToken(){
 
 const hash=location.hash.substring(1)
 const p=new URLSearchParams(hash)
-token=p.get("access_token")
+
+const urlToken=p.get("access_token")
+
+if(urlToken){
+token=urlToken
+localStorage.setItem("agenda_token",token)
+}else{
+token=localStorage.getItem("agenda_token")
+}
 
 if(token)init()
 
@@ -179,6 +210,7 @@ async function init(){
 monday=getMonday(new Date())
 
 await loadCalendars()
+
 renderFilters()
 
 await loadEvents()
@@ -291,31 +323,13 @@ render()
 /* NAVIGATION */
 
 function nextWeek(){
-
 monday.setDate(monday.getDate()+7)
-
 loadEvents().then(render)
-
 }
 
 function prevWeek(){
-
 monday.setDate(monday.getDate()-7)
-
 loadEvents().then(render)
-
-}
-
-/* VIEW */
-
-function weekView(){
-mode="week"
-render()
-}
-
-function dayView(){
-mode="day"
-render()
 }
 
 /* RENDER */
@@ -325,9 +339,12 @@ function render(){
 const cal=document.getElementById("calendar")
 cal.innerHTML=""
 
-let days=(mode=="week")?7:1
+const days=[
+"Zondag","Maandag","Dinsdag","Woensdag",
+"Donderdag","Vrijdag","Zaterdag"
+]
 
-for(let i=0;i<days;i++){
+for(let i=0;i<7;i++){
 
 let d=new Date(monday)
 d.setDate(monday.getDate()+i)
@@ -336,14 +353,15 @@ const day=document.createElement("div")
 day.className="day"
 
 day.innerHTML=`
-<div class="dayHeader">${d.toLocaleDateString()}</div>
+<div class="dayHeader">
+${days[d.getDay()]} ${pad(d.getDate())}/${pad(d.getMonth()+1)}
+</div>
 <div class="timeline"></div>
 `
 
 cal.appendChild(day)
 
 drawHours(day)
-
 drawEvents(day,d)
 
 }
@@ -401,9 +419,7 @@ const top=(startMin-START_HOUR*60)/((END_HOUR-START_HOUR)*60)*100
 const height=(endMin-startMin)/((END_HOUR-START_HOUR)*60)*100
 
 let col=0
-
 while(columns[col] && columns[col]>startMin) col++
-
 columns[col]=endMin
 
 const width=90/(col+1)
@@ -422,7 +438,7 @@ div.draggable=true
 
 div.innerHTML=`
 <img class="icon" src="${getIcon(e)}">
-${e.summary}
+<span>${e.summary}</span>
 `
 
 enableDrag(div)
@@ -447,7 +463,7 @@ el.style.top=e.pageY-200+"px"
 
 }
 
-/* ICONS */
+/* ICON ENGINE */
 
 function getIcon(e){
 
@@ -462,6 +478,12 @@ if(t.includes("rijden")) return "https://api.iconify.design/mdi/car.svg"
 
 if(t.includes("beugel")) return "https://api.iconify.design/mdi/tooth-outline.svg"
 
+if(t.includes("school")) return "https://api.iconify.design/mdi/school.svg"
+
+if(t.includes("voetbal")) return "https://api.iconify.design/mdi/soccer.svg"
+
+if(t.includes("zwem")) return "https://api.iconify.design/mdi/swim.svg"
+
 if(t.includes("rita oppas thuis")||t.includes("oppas door loriana"))
 return "https://api.iconify.design/mdi/home-heart.svg"
 
@@ -475,17 +497,28 @@ return "https://api.iconify.design/mdi/calendar.svg"
 
 }
 
+/* UI */
+
+function toggleIcons(){
+document.body.classList.toggle("bigIcons")
+}
+
 /* DATE */
 
 function getMonday(d){
 
 const date=new Date(d)
-
 const day=date.getDay()||7
-if(day!==1) date.setHours(-24*(day-1))
+
+if(day!==1)
+date.setHours(-24*(day-1))
 
 return date
 
+}
+
+function pad(n){
+return n<10?"0"+n:n
 }
 
 parseToken()
