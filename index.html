@@ -1,25 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta charset="UTF-8">
-<title>Familie Agenda</title>
+<title>AgendaPicto EXTREME</title>
 
 <style>
 
 body{
 font-family:Arial;
 margin:0;
-background:#eef1f5;
+background:#eef2f5;
 }
 
 header{
-background:#4a80d6;
+background:#4285F4;
 color:white;
 padding:10px;
 display:flex;
-gap:8px;
 flex-wrap:wrap;
+gap:6px;
 align-items:center;
 }
 
@@ -28,63 +27,89 @@ border:none;
 padding:6px 10px;
 border-radius:4px;
 cursor:pointer;
+font-weight:bold;
 }
 
 #filters{
 background:white;
-padding:8px;
-}
-
-#calendar{
 padding:10px;
 }
 
-.week{
+#calendar{
 display:grid;
 grid-template-columns:repeat(7,1fr);
-gap:10px;
+gap:8px;
+padding:10px;
 }
 
 .day{
 background:white;
-border-radius:6px;
-padding:6px;
+border-radius:8px;
+position:relative;
+height:1020px;
+overflow:hidden;
 }
 
 .dayTitle{
+background:#f5f5f5;
+padding:6px;
+text-align:center;
 font-weight:bold;
-margin-bottom:6px;
 }
 
 .timeline{
-position:relative;
-height:640px;
-border-left:2px solid #ddd;
+position:absolute;
+top:30px;
+left:0;
+right:0;
+bottom:0;
 }
 
 .hour{
-position:absolute;
-left:-35px;
-font-size:11px;
-color:#666;
+height:60px;
+border-top:1px solid #eee;
+font-size:10px;
+padding-left:4px;
+color:#999;
 }
 
 .event{
 position:absolute;
-left:6px;
-right:6px;
-border-radius:6px;
-padding:3px;
-font-size:12px;
-display:flex;
-gap:4px;
-align-items:center;
+border-radius:8px;
 color:white;
+padding:6px;
+font-size:12px;
+cursor:grab;
+text-align:center;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
 }
 
-.icon{
-width:16px;
-height:16px;
+.event img{
+width:24px;
+height:24px;
+margin-bottom:3px;
+}
+
+.kid .event{
+font-size:20px;
+padding:12px;
+}
+
+.kid .event img{
+width:48px;
+height:48px;
+}
+
+@media print{
+header,#filters{
+display:none;
+}
+body{
+background:white;
+}
 }
 
 </style>
@@ -94,21 +119,27 @@ height:16px;
 
 <header>
 
-<b>Familie Agenda</b>
+<b>AgendaPicto EXTREME</b>
 
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
 
-<button onclick="prevWeek()">◀</button>
-<button onclick="nextWeek()">▶</button>
+<button onclick="prevWeek()">←</button>
+<button onclick="nextWeek()">→</button>
 
-<button onclick="selectAll()">Alles</button>
-<button onclick="selectNone()">Geen</button>
+<button onclick="setWeek()">Week</button>
+<button onclick="setDay()">Dag</button>
+
+<button onclick="toggleKid()">Kinder-modus</button>
+
+<button onclick="selectAll()">Alles aan</button>
+<button onclick="selectNone()">Alles uit</button>
+
+<button onclick="window.print()">Print</button>
 
 </header>
 
 <div id="filters"></div>
-
 <div id="calendar"></div>
 
 <script>
@@ -118,19 +149,8 @@ const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleuserco
 let token=null
 let calendars=[]
 let events=[]
-
-let currentDate=new Date()
-
-const START_HOUR=7
-const END_HOUR=23
-const PIXELS_PER_HOUR=40
-
-const HIDDEN=[
-"Weeknummers",
-"Agenda",
-"Borgloon Weather",
-"agenda website"
-]
+let monday=null
+let view="week"
 
 function login(){
 
@@ -148,70 +168,77 @@ window.location=url+"?"+new URLSearchParams(params)
 }
 
 function logout(){
-
-token=null
-events=[]
-document.getElementById("calendar").innerHTML=""
-
+location.hash=""
+location.reload()
 }
 
 function parseToken(){
 
 const hash=window.location.hash.substring(1)
-
 const params=new URLSearchParams(hash)
 
 token=params.get("access_token")
 
-if(token) loadCalendars()
+if(token) init()
 
+}
+
+async function init(){
+
+monday=getMonday(new Date())
+
+await loadCalendars()
+
+renderFilters()
+
+await loadEvents()
+
+render()
+
+}
+
+function getMonday(d){
+
+d=new Date(d)
+
+d.setDate(d.getDate()-(d.getDay()+6)%7)
+
+d.setHours(0,0,0,0)
+
+return d
+
+}
+
+function nextWeek(){
+monday.setDate(monday.getDate()+7)
+loadEvents().then(render)
+}
+
+function prevWeek(){
+monday.setDate(monday.getDate()-7)
+loadEvents().then(render)
+}
+
+function setWeek(){
+view="week"
+render()
+}
+
+function setDay(){
+view="day"
+render()
 }
 
 async function loadCalendars(){
 
-const res=await fetch(
+const r=await fetch(
 "https://www.googleapis.com/calendar/v3/users/me/calendarList",
 {headers:{Authorization:"Bearer "+token}}
 )
 
-const data=await res.json()
+const data=await r.json()
 
-calendars=data.items.filter(c=>!HIDDEN.includes(c.summary))
-
-renderFilters()
-
-loadEvents()
-
-}
-
-function renderFilters(){
-
-const f=document.getElementById("filters")
-
-f.innerHTML=""
-
-calendars.forEach(c=>{
-
-let name=c.summary
-
-if(name.includes("Feestdagen"))
-name="feestdagen"
-
-f.innerHTML+=`
-<label>
-<input type="checkbox" checked value="${c.id}">
-${name}
-</label>
-`
-
-})
-
-}
-
-function getSelectedCalendars(){
-
-return [...document.querySelectorAll("#filters input:checked")]
-.map(c=>c.value)
+calendars=data.items
 
 }
 
@@ -219,41 +246,73 @@ async function loadEvents(){
 
 events=[]
 
-const start=new Date(currentDate)
-start.setDate(start.getDate()-start.getDay()+1)
-
-const end=new Date(start)
-end.setDate(start.getDate()+7)
+let end=new Date(monday)
+end.setDate(monday.getDate()+7)
 
 for(const cal of calendars){
 
-const res=await fetch(
+const r=await fetch(
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${monday.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`,
+{headers:{Authorization:"Bearer "+token}}
+)
 
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?
-timeMin=${start.toISOString()}&
-timeMax=${end.toISOString()}&
-singleEvents=true&
-orderBy=startTime&
-maxResults=2500`,
-
-{
-headers:{Authorization:"Bearer "+token}
-})
-
-const data=await res.json()
+const data=await r.json()
 
 if(data.items){
 
 data.items.forEach(e=>{
-events.push({...e,calendarId:cal.id,calendarName:cal.summary})
+e.calendar=cal.summary
+e.color=cal.backgroundColor||"#5f6368"
+events.push(e)
 })
 
 }
 
 }
 
-render()
+}
 
+function renderFilters(){
+
+const f=document.getElementById("filters")
+
+f.innerHTML="<b>Agenda's</b><br>"
+
+calendars.forEach(cal=>{
+
+const id="f"+cal.id.replace(/[^a-z0-9]/gi,"")
+
+f.innerHTML+=`
+<label>
+<input type="checkbox" id="${id}" checked onchange="render()">
+${cal.summary}
+</label>
+`
+
+})
+
+}
+
+function selectedCalendars(){
+
+return calendars.filter(cal=>{
+
+const id="f"+cal.id.replace(/[^a-z0-9]/gi,"")
+
+return document.getElementById(id)?.checked
+
+}).map(c=>c.summary)
+
+}
+
+function selectAll(){
+document.querySelectorAll("#filters input").forEach(i=>i.checked=true)
+render()
+}
+
+function selectNone(){
+document.querySelectorAll("#filters input").forEach(i=>i.checked=false)
+render()
 }
 
 function render(){
@@ -262,174 +321,159 @@ const cal=document.getElementById("calendar")
 
 cal.innerHTML=""
 
-const start=new Date(currentDate)
-start.setDate(start.getDate()-start.getDay()+1)
+const days=view==="week"?7:1
 
-const week=document.createElement("div")
-week.className="week"
+cal.style.gridTemplateColumns=view==="week"?"repeat(7,1fr)":"1fr"
 
-for(let i=0;i<7;i++){
+const names=["Ma","Di","Wo","Do","Vr","Za","Zo"]
 
-const d=new Date(start)
-d.setDate(start.getDate()+i)
+for(let i=0;i<days;i++){
 
-week.appendChild(createDay(d))
+let d=new Date(monday)
+d.setDate(monday.getDate()+i)
 
-}
+const day=document.createElement("div")
+day.className="day"
 
-cal.appendChild(week)
-
-}
-
-function createDay(date){
-
-const selected=getSelectedCalendars()
-
-const dayStr=date.toISOString().split("T")[0]
-
-const div=document.createElement("div")
-div.className="day"
-
-div.innerHTML=`<div class="dayTitle">${date.toLocaleDateString()}</div>`
+day.innerHTML=`<div class="dayTitle">${names[i]} ${d.getDate()}/${d.getMonth()+1}</div>`
 
 const timeline=document.createElement("div")
 timeline.className="timeline"
 
-for(let h=START_HOUR;h<=END_HOUR;h++){
+for(let h=6;h<=23;h++){
 
-const label=document.createElement("div")
-label.className="hour"
-label.style.top=((h-START_HOUR)*PIXELS_PER_HOUR)+"px"
-label.innerText=h+":00"
+const hour=document.createElement("div")
+hour.className="hour"
+hour.innerText=h+":00"
 
-timeline.appendChild(label)
+timeline.appendChild(hour)
 
 }
 
+day.appendChild(timeline)
+
+cal.appendChild(day)
+
+renderEvents(day,i)
+
+}
+
+}
+
+function renderEvents(day,index){
+
+const selected=selectedCalendars()
+
 const dayEvents=events
 .filter(e=>{
-
-if(!selected.includes(e.calendarId)) return false
-
-const dateStr=(e.start?.dateTime||e.start?.date||"").substring(0,10)
-
-return dateStr===dayStr
-
+if(!selected.includes(e.calendar)) return false
+const d=new Date(e.start.dateTime||e.start.date)
+return (d.getDay()+6)%7===index
 })
-.sort((a,b)=>{
+.sort((a,b)=>new Date(a.start.dateTime||a.start.date)-new Date(b.start.dateTime||b.start.date))
 
-const ta=new Date(a.start?.dateTime||a.start?.date)
-const tb=new Date(b.start?.dateTime||b.start?.date)
-
-return ta-tb
-
-})
+const lanes=[]
 
 dayEvents.forEach(e=>{
 
-const start=new Date(e.start?.dateTime||e.start?.date)
-const end=new Date(e.end?.dateTime||e.end?.date)
+const start=new Date(e.start.dateTime||e.start.date)
+const end=new Date(e.end?.dateTime||e.start.dateTime||e.start.date)
 
-if(start.getHours()<START_HOUR && end.getHours()<START_HOUR) return
+const startMin=start.getHours()*60+start.getMinutes()
+const endMin=end.getHours()*60+end.getMinutes()
 
-const top=((start.getHours()-START_HOUR)*PIXELS_PER_HOUR)
-+(start.getMinutes()/60*PIXELS_PER_HOUR)
+let lane=0
+while(lanes[lane] && lanes[lane]>startMin) lane++
 
-const height=(end-start)/3600000*PIXELS_PER_HOUR
+lanes[lane]=endMin
 
-const ev=document.createElement("div")
-ev.className="event"
+const dayStart=6*60
+const dayEnd=23*60
+const duration=dayEnd-dayStart
 
-ev.style.top=top+"px"
-ev.style.height=height+"px"
+const top=(startMin-dayStart)/duration*100
+const height=(endMin-startMin)/duration*100
+const width=100/(lanes.length+1)
 
-ev.style.background=colorFromCalendar(e.calendarName)
+const div=document.createElement("div")
+div.className="event"
 
-ev.innerHTML=`
-<img class="icon" src="${getIcon(e)}">
-${e.summary}
+div.style.top=top+"%"
+div.style.height=height+"%"
+div.style.left=(lane*width)+"%"
+div.style.width=width+"%"
+div.style.background=colorAI(e)
+
+const icon=getIcon(e)
+
+div.innerHTML=`
+<img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
+<div>${e.summary}</div>
 `
 
-timeline.appendChild(ev)
+enableDrag(div)
+
+day.appendChild(div)
 
 })
 
-div.appendChild(timeline)
+}
 
-return div
+function enableDrag(el){
+
+el.draggable=true
+
+el.addEventListener("dragstart",e=>{
+e.dataTransfer.setData("text/plain","drag")
+})
+
+}
+
+function colorAI(e){
+
+const t=(e.summary||"").toLowerCase()
+
+if(t.includes("school")) return "#34A853"
+if(t.includes("voetbal")) return "#EA4335"
+if(t.includes("zwem")) return "#00ACC1"
+if(t.includes("dokter")) return "#DB4437"
+if(t.includes("eten")) return "#FBBC05"
+if(t.includes("slapen")) return "#5C6BC0"
+
+return e.color
 
 }
 
 function getIcon(e){
 
-const text=(e.summary||"").toLowerCase()
-const loc=(e.location||"").toLowerCase()
+const t=(e.summary||"").toLowerCase()
+const l=(e.location||"").toLowerCase()
 
-if(text.includes("bus"))
-return "https://api.iconify.design/mdi/bus.svg"
+if(t.includes("bus")) return "bus"
+if(t.includes("slapen")) return "sleep"
+if(t.includes("rijden")) return "car"
+if(t.includes("voetbal")) return "soccer"
+if(t.includes("zwem")) return "swim"
+if(t.includes("school")) return "school"
+if(t.includes("verjaardag")) return "cake"
+if(t.includes("feest")) return "party-popper"
+if(t.includes("dokter")) return "medical-bag"
+if(t.includes("tandarts")) return "tooth"
+if(t.includes("beugel")) return "tooth-outline"
+if(t.includes("eten")) return "silverware"
+if(t.includes("film")) return "movie-open"
+if(t.includes("muziek")) return "music"
+if(t.includes("oppas")) return "home-heart"
 
-if(text.includes("slapen"))
-return "https://api.iconify.design/mdi/sleep.svg"
+if(l.includes("kapelstraat 73")) return "medical-cross"
+if(l.includes("puthofveld")) return "nurse"
 
-if(text.includes("rijden"))
-return "https://api.iconify.design/mdi/car.svg"
-
-if(loc.includes("orelia puthof"))
-return "https://api.iconify.design/mdi/nurse.svg"
-
-if(text.includes("rita oppas thuis")||text.includes("oppas door loriana"))
-return "https://api.iconify.design/mdi/home-heart.svg"
-
-if(text.includes("rita oppas bij haar"))
-return "https://api.iconify.design/mdi/home-export-outline.svg"
-
-return "https://api.iconify.design/mdi/calendar.svg"
-
-}
-
-function colorFromCalendar(name){
-
-let hash=0
-
-for(let i=0;i<name.length;i++)
-hash=name.charCodeAt(i)+((hash<<5)-hash)
-
-const c=(hash & 0x00FFFFFF).toString(16).toUpperCase()
-
-return "#"+("00000".substring(0,6-c.length)+c)
+return "calendar"
 
 }
 
-function prevWeek(){
-
-currentDate.setDate(currentDate.getDate()-7)
-
-loadEvents()
-
-}
-
-function nextWeek(){
-
-currentDate.setDate(currentDate.getDate()+7)
-
-loadEvents()
-
-}
-
-function selectAll(){
-
-document.querySelectorAll("#filters input").forEach(c=>c.checked=true)
-
-render()
-
-}
-
-function selectNone(){
-
-document.querySelectorAll("#filters input").forEach(c=>c.checked=false)
-
-render()
-
+function toggleKid(){
+document.body.classList.toggle("kid")
 }
 
 parseToken()
