@@ -46,7 +46,7 @@ padding:10px;
 background:white;
 border-radius:6px;
 position:relative;
-height:960px;
+height:1020px;
 overflow:hidden;
 }
 
@@ -338,7 +338,7 @@ day.innerHTML=`<div class="dayTitle">${names[i]} ${d.getDate()}/${d.getMonth()+1
 const timeline=document.createElement("div")
 timeline.className="timeline"
 
-for(let h=6;h<22;h++){
+for(let h=6;h<=23;h++){
 
 const hour=document.createElement("div")
 hour.className="hour"
@@ -386,8 +386,12 @@ while(lanes[lane] && lanes[lane]>startMin) lane++
 
 lanes[lane]=endMin
 
-const top=(startMin-360)/960*100
-const height=(endMin-startMin)/960*100
+const dayStart=6*60
+const dayEnd=23*60
+const dayDuration=dayEnd-dayStart
+
+const top=(startMin-dayStart)/dayDuration*100
+const height=(endMin-startMin)/dayDuration*100
 const width=100/(lanes.length+1)
 
 const div=document.createElement("div")
