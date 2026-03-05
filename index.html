@@ -43,7 +43,7 @@ border-bottom:1px solid #ddd;
 
 .week{
 display:flex;
-height:1200px;
+height:1000px;
 }
 
 .day{
@@ -123,7 +123,6 @@ text-align:center;
 </header>
 
 <div id="filters"></div>
-
 <div id="agenda"></div>
 
 <script>
@@ -182,9 +181,7 @@ if(token) init()
 async function init(){
 
 await loadCalendars()
-
 await loadEvents()
-
 render()
 
 }
@@ -216,6 +213,10 @@ let label=document.createElement("label")
 label.innerHTML=
 `<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
 
+let cb=label.querySelector("input")
+
+cb.addEventListener("change",render)
+
 f.appendChild(label)
 
 })
@@ -238,7 +239,7 @@ events=[]
 for(let cal of calendars){
 
 let r=await fetch(
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events`,
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?maxResults=2500`,
 {
 headers:{Authorization:"Bearer "+token}
 }
@@ -267,10 +268,23 @@ calendar:cal.id
 
 }
 
+function activeCalendars(){
+
+let list=[]
+
+document.querySelectorAll("#filters input:checked")
+.forEach(cb=>list.push(cb.value))
+
+return list
+
+}
+
 function render(){
 
 let agenda=document.getElementById("agenda")
 agenda.innerHTML=""
+
+let active=activeCalendars()
 
 let week=document.createElement("div")
 week.className="week"
@@ -287,7 +301,10 @@ col.className="day"
 
 let head=document.createElement("div")
 head.className="dayHeader"
-head.innerText=d.toLocaleDateString("nl-BE",{weekday:"long"})+" "+
+
+head.innerText=
+d.toLocaleDateString("nl-BE",{weekday:"long"})+
+" "+
 d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
 
 col.appendChild(head)
@@ -304,6 +321,7 @@ col.appendChild(line)
 }
 
 events
+.filter(e=>active.includes(e.calendar))
 .filter(e=>sameDay(e.start,d))
 .sort((a,b)=>a.start-b.start)
 .forEach(e=>{
