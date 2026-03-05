@@ -11,7 +11,7 @@
 body{
 font-family:Arial;
 margin:0;
-background:#f2f2f2;
+background:#f3f3f3;
 }
 
 header{
@@ -21,7 +21,6 @@ padding:10px;
 display:flex;
 flex-wrap:wrap;
 gap:10px;
-align-items:center;
 }
 
 button{
@@ -33,23 +32,23 @@ cursor:pointer;
 }
 
 #filters{
-background:#fff;
+background:white;
 padding:10px;
 display:flex;
-gap:12px;
+gap:15px;
 flex-wrap:wrap;
 border-bottom:1px solid #ddd;
 }
 
 .week{
 display:flex;
-height:1000px;
+height:960px;
 }
 
 .day{
 flex:1;
 background:white;
-margin:5px;
+margin:4px;
 border-radius:8px;
 position:relative;
 }
@@ -67,13 +66,13 @@ left:0;
 right:0;
 border-top:1px solid #eee;
 font-size:10px;
-color:#999;
+color:#888;
 }
 
 .event{
 position:absolute;
-left:5%;
-width:90%;
+left:6%;
+width:88%;
 border-radius:6px;
 color:white;
 padding:4px;
@@ -88,7 +87,7 @@ font-size:16px;
 }
 
 .large .icon{
-font-size:36px;
+font-size:34px;
 display:block;
 }
 
@@ -111,8 +110,6 @@ text-align:center;
 <button onclick="today()">vandaag</button>
 <button onclick="nextWeek()">week ▶</button>
 
-<button onclick="toggleView()">dag/week</button>
-
 <button onclick="toggleIcons()">grote picto</button>
 
 <button onclick="selectAll()">alles aan</button>
@@ -132,9 +129,7 @@ const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleuserco
 let token=null
 let calendars=[]
 let events=[]
-
 let currentMonday=getMonday(new Date())
-let dayMode=false
 let bigIcons=false
 
 const HIDDEN=[
@@ -160,11 +155,9 @@ window.location=url+"?"+new URLSearchParams(params)
 }
 
 function logout(){
-
 token=null
 events=[]
 render()
-
 }
 
 function parseToken(){
@@ -213,9 +206,7 @@ let label=document.createElement("label")
 label.innerHTML=
 `<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
 
-let cb=label.querySelector("input")
-
-cb.addEventListener("change",render)
+label.querySelector("input").addEventListener("change",render)
 
 f.appendChild(label)
 
@@ -223,12 +214,10 @@ f.appendChild(label)
 
 }
 
-function rename(name){
+function rename(n){
 
-if(name.includes("Belgie Feestdagen"))
-return "feestdagen"
-
-return name
+if(n.includes("Belgie Feestdagen")) return "feestdagen"
+return n
 
 }
 
@@ -236,14 +225,25 @@ async function loadEvents(){
 
 events=[]
 
+let start=new Date(currentMonday)
+start.setHours(0,0,0)
+
+let end=new Date(currentMonday)
+end.setDate(end.getDate()+7)
+
 for(let cal of calendars){
 
-let r=await fetch(
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?maxResults=2500`,
-{
+let url=
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
+`timeMin=${start.toISOString()}&`+
+`timeMax=${end.toISOString()}&`+
+`singleEvents=true&`+
+`orderBy=startTime&`+
+`maxResults=2500`
+
+let r=await fetch(url,{
 headers:{Authorization:"Bearer "+token}
-}
-)
+})
 
 let data=await r.json()
 
@@ -257,8 +257,8 @@ title:e.summary,
 start:new Date(e.start.dateTime),
 end:new Date(e.end.dateTime),
 color:cal.backgroundColor||"#4285F4",
-location:e.location||"",
-calendar:cal.id
+calendar:cal.id,
+location:e.location||""
 
 })
 
@@ -289,9 +289,7 @@ let active=activeCalendars()
 let week=document.createElement("div")
 week.className="week"
 
-let days=dayMode?1:7
-
-for(let i=0;i<days;i++){
+for(let i=0;i<7;i++){
 
 let d=new Date(currentMonday)
 d.setDate(d.getDate()+i)
@@ -360,15 +358,10 @@ let t=e.title.toLowerCase()
 let l=e.location.toLowerCase()
 
 if(l.includes("orelia puthof")) return "👩‍⚕️"
-
 if(t.includes("bus")) return "🚌"
-
 if(t.includes("rijden")) return "🚗"
-
 if(t.includes("slapen")) return "😴"
-
-if(t.includes("rita oppas thuis") || t.includes("oppas door loriana")) return "🏠"
-
+if(t.includes("rita oppas thuis")) return "🏠"
 if(t.includes("rita oppas bij haar")) return "🧳"
 
 return "📌"
@@ -395,7 +388,6 @@ function getMonday(d){
 d=new Date(d)
 
 let day=d.getDay()
-
 let diff=d.getDate()-day+(day==0?-6:1)
 
 return new Date(d.setDate(diff))
@@ -405,28 +397,21 @@ return new Date(d.setDate(diff))
 function prevWeek(){
 
 currentMonday.setDate(currentMonday.getDate()-7)
-render()
+init()
 
 }
 
 function nextWeek(){
 
 currentMonday.setDate(currentMonday.getDate()+7)
-render()
+init()
 
 }
 
 function today(){
 
 currentMonday=getMonday(new Date())
-render()
-
-}
-
-function toggleView(){
-
-dayMode=!dayMode
-render()
+init()
 
 }
 
