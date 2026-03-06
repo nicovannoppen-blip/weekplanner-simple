@@ -96,11 +96,6 @@ flex-direction:column;
 text-align:center;
 }
 
-.dayview{
-width:80%;
-margin:auto;
-}
-
 </style>
 </head>
 
@@ -115,8 +110,6 @@ margin:auto;
 <button onclick="today()">vandaag</button>
 <button onclick="nextWeek()">week ▶</button>
 
-<button onclick="toggleView()">dag/week</button>
-  
 <button onclick="toggleIcons()">grote picto</button>
 
 <button onclick="selectAll()">alles aan</button>
@@ -432,11 +425,6 @@ init()
 
 }
 
-function toggleView(){
-view=view=="week"?"day":"week"
-render()
-}
-  
 function toggleIcons(){
 
 bigIcons=!bigIcons
