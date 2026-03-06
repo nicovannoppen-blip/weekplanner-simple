@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <title>Familie Agenda</title>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <style>
 
 body{
 font-family:Arial;
 margin:0;
-background:#f2f2f2;
+background:#f3f3f3;
 }
 
 header{
@@ -18,12 +20,11 @@ color:white;
 padding:10px;
 display:flex;
 flex-wrap:wrap;
-gap:8px;
-align-items:center;
+gap:10px;
 }
 
 button{
-padding:7px 12px;
+padding:8px 12px;
 border:none;
 border-radius:6px;
 background:white;
@@ -34,7 +35,7 @@ cursor:pointer;
 background:white;
 padding:10px;
 display:flex;
-gap:12px;
+gap:15px;
 flex-wrap:wrap;
 border-bottom:1px solid #ddd;
 }
@@ -57,7 +58,6 @@ text-align:center;
 font-weight:bold;
 padding:6px;
 border-bottom:1px solid #ddd;
-background:#fafafa;
 }
 
 .hour{
@@ -76,7 +76,7 @@ color:white;
 padding:4px;
 font-size:12px;
 display:flex;
-gap:5px;
+gap:6px;
 align-items:center;
 overflow:hidden;
 }
@@ -95,9 +95,11 @@ flex-direction:column;
 text-align:center;
 }
 
-.dayview{
+.dayView{
 width:80%;
 margin:auto;
+height:960px;
+display:flex;
 }
 
 </style>
@@ -110,21 +112,18 @@ margin:auto;
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
 
-<button onclick="prevWeek()">◀ week</button>
-<button onclick="today()">vandaag</button>
-<button onclick="nextWeek()">week ▶</button>
+<button onclick="prev()">◀</button>
+<button onclick="today()">Vandaag</button>
+<button onclick="next()">▶</button>
 
-<button onclick="toggleDayView()">dag/week</button>
-
-<button id="prevDayBtn" onclick="prevDay()" style="display:none">◀ dag</button>
-<button id="nextDayBtn" onclick="nextDay()" style="display:none">dag ▶</button>
+<button onclick="toggleView()">dag/week</button>
 
 <button onclick="toggleIcons()">grote picto</button>
 
 <button onclick="selectAll()">alles aan</button>
 <button onclick="selectNone()">alles uit</button>
 
-<button onclick="window.print()">print / pdf</button>
+<button onclick="window.print()">print</button>
 
 </header>
 
@@ -138,10 +137,9 @@ const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleuserco
 let token=null
 let calendars=[]
 let events=[]
-let currentMonday=getMonday(new Date())
-let currentDay=new Date()
+let currentDate=new Date()
 let bigIcons=false
-let dayView=false
+let dayMode=false
 
 const HIDDEN=[
 "Weeknummers",
@@ -199,22 +197,9 @@ let r=await fetch(
 
 let data=await r.json()
 
-calendars=data.items
-.filter(c=>!HIDDEN.includes(c.summary))
-.map(c=>({
-id:c.id,
-name:rename(c.summary),
-color:c.backgroundColor
-}))
+calendars=data.items.filter(c=>!HIDDEN.includes(c.summary))
 
 buildFilters()
-
-}
-
-function rename(n){
-
-if(n.includes("Belgie Feestdagen")) return "feestdagen"
-return n
 
 }
 
@@ -228,7 +213,7 @@ calendars.forEach(c=>{
 let label=document.createElement("label")
 
 label.innerHTML=
-`<input type="checkbox" checked value="${c.id}"> ${c.name}`
+`<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
 
 label.querySelector("input").addEventListener("change",render)
 
@@ -238,14 +223,19 @@ f.appendChild(label)
 
 }
 
+function rename(n){
+if(n.includes("Belgie Feestdagen")) return "feestdagen"
+return n
+}
+
 async function loadEvents(){
 
 events=[]
 
-let start=new Date(currentMonday)
-start.setHours(0,0,0)
+let start=new Date(currentDate)
+start.setDate(start.getDate()-7)
 
-let end=new Date(currentMonday)
+let end=new Date(currentDate)
 end.setDate(end.getDate()+7)
 
 for(let cal of calendars){
@@ -273,7 +263,7 @@ events.push({
 title:e.summary,
 start:new Date(e.start.dateTime),
 end:new Date(e.end.dateTime),
-color:cal.color,
+color:cal.backgroundColor,
 calendar:cal.id,
 location:e.location||""
 
@@ -301,21 +291,19 @@ function render(){
 let agenda=document.getElementById("agenda")
 agenda.innerHTML=""
 
-document.getElementById("prevDayBtn").style.display = dayView ? "inline-block":"none"
-document.getElementById("nextDayBtn").style.display = dayView ? "inline-block":"none"
-
 let active=activeCalendars()
 
-let container=document.createElement("div")
-container.className=dayView?"dayview":"week"
+let start=getMonday(currentDate)
 
-let days=dayView?1:7
+let days=dayMode?1:7
+
+let container=document.createElement("div")
+container.className=dayMode?"dayView":"week"
 
 for(let i=0;i<days;i++){
 
-let d = dayView ? new Date(currentDay) : new Date(currentMonday)
-
-if(!dayView) d.setDate(d.getDate()+i)
+let d=new Date(dayMode?currentDate:start)
+if(!dayMode)d.setDate(start.getDate()+i)
 
 let col=document.createElement("div")
 col.className="day"
@@ -341,65 +329,8 @@ col.appendChild(line)
 
 }
 
-let dayEvents=events
-.filter(e=>active.includes(e.calendar))
-.filter(e=>sameDay(e.start,d))
-.sort((a,b)=>a.start-b.start)
-
-let columns=[]
-
-dayEvents.forEach(e=>{
-
-let placed=false
-
-for(let colIndex=0;colIndex<columns.length;colIndex++){
-
-let last=columns[colIndex][columns[colIndex].length-1]
-
-if(e.start>=last.end){
-
-columns[colIndex].push(e)
-e.col=colIndex
-placed=true
-break
-
-}
-
-}
-
-if(!placed){
-
-columns.push([e])
-e.col=columns.length-1
-
-}
-
-})
-
-let totalCols=columns.length
-
-dayEvents.forEach(e=>{
-
-let start=(e.start.getHours()-7)*60+e.start.getMinutes()
-let dur=(e.end-e.start)/60000
-
-let div=document.createElement("div")
-div.className="event"
-
-div.style.top=start+"px"
-div.style.height=dur+"px"
-div.style.background=e.color
-
-div.style.width=(88/totalCols)+"%"
-div.style.left=(6+(e.col*(88/totalCols)))+"%"
-
-div.innerHTML=
-`<div class="icon">${icon(e)}</div>
-<div>${time(e.start)} ${e.title}</div>`
-
-col.appendChild(div)
-
-})
+let dayEvents=getEventsForDay(d)
+layoutEvents(dayEvents,col)
 
 container.appendChild(col)
 
@@ -412,6 +343,116 @@ else agenda.classList.remove("large")
 
 }
 
+function getEventsForDay(day){
+
+let list=[]
+
+events.forEach(e=>{
+
+let start=e.start
+let end=e.end
+
+let dayStart=new Date(day)
+dayStart.setHours(0,0,0)
+
+let dayEnd=new Date(day)
+dayEnd.setHours(23,59,59)
+
+if(end<dayStart||start>dayEnd) return
+
+let displayStart=new Date(start)
+let displayEnd=new Date(end)
+
+if(start<dayStart){
+
+displayStart=new Date(day)
+displayStart.setHours(8,0,0)
+
+}
+
+if(end>dayEnd){
+
+displayEnd=new Date(day)
+displayEnd.setHours(21,0,0)
+
+}
+
+list.push({
+...e,
+start:displayStart,
+end:displayEnd
+})
+
+})
+
+return list
+
+}
+
+function layoutEvents(dayEvents,col){
+
+let active=activeCalendars()
+
+dayEvents
+.filter(e=>active.includes(e.calendar))
+.sort((a,b)=>a.start-b.start)
+
+let columns=[]
+
+dayEvents.forEach(e=>{
+
+let placed=false
+
+for(let i=0;i<columns.length;i++){
+
+if(columns[i][columns[i].length-1].end<=e.start){
+
+columns[i].push(e)
+placed=true
+break
+
+}
+
+}
+
+if(!placed){
+
+columns.push([e])
+
+}
+
+})
+
+columns.forEach((colEvents,i)=>{
+
+colEvents.forEach(e=>{
+
+let start=(e.start.getHours()-7)*60+e.start.getMinutes()
+let dur=(e.end-e.start)/60000
+
+let div=document.createElement("div")
+div.className="event"
+
+div.style.top=start+"px"
+div.style.height=dur+"px"
+
+div.style.left=(i*(90/columns.length)+5)+"%"
+div.style.width=(90/columns.length-2)+"%"
+
+div.style.background=e.color
+
+div.innerHTML=
+`<div class="icon">${icon(e)}</div>
+<div>${time(e.start)} ${e.title}</div>`
+
+col.appendChild(div)
+
+})
+
+})
+
+}
+
 function icon(e){
 
 let t=e.title.toLowerCase()
@@ -419,41 +460,18 @@ let l=e.location.toLowerCase()
 
 if(l.includes("orelia")) return "👩‍⚕️"
 if(l.includes("kapelstraat")) return "⛑"
-if(t.includes("bus naar school")) return "🚌"
-if(t.includes("bus naar huis")) return "🏠🚌"
+if(t.includes("bus naar huis")) return "🚌🏠"
+if(t.includes("bus naar school")) return "🏠🚌"
+if(t.includes("rijden")) return "🚗"
+if(t.includes("fietsen")) return "🚴"
 if(t.includes("school")) return "🎒"
 if(t.includes("zwemmen")) return "🏊"
-if(t.includes("dokter")) return "🏥"
 if(t.includes("beugel")) return "🦷"
 if(t.includes("slapen")) return "😴"
-if(t.includes("rita oppas thuis")||t.includes("oppas door loriana")) return "🏠👵"
+if(t.includes("rita oppas thuis")||t.includes("loriana")) return "👵🏠"
 if(t.includes("rita oppas bij haar")) return "🧳👵"
-if(t.includes("rijden")) return "🚗"
-if(t.includes("winkel")) return "🛒"
 
 return "📌"
-
-}
-
-function prevDay(){
-
-currentDay.setDate(currentDay.getDate()-1)
-render()
-
-}
-
-function nextDay(){
-
-currentDay.setDate(currentDay.getDate()+1)
-render()
-
-}
-
-function sameDay(a,b){
-
-return a.getFullYear()==b.getFullYear() &&
-a.getMonth()==b.getMonth() &&
-a.getDate()==b.getDate()
 
 }
 
@@ -475,42 +493,61 @@ return new Date(d.setDate(diff))
 
 }
 
-function prevWeek(){
-currentMonday.setDate(currentMonday.getDate()-7)
+function prev(){
+
+if(dayMode) currentDate.setDate(currentDate.getDate()-1)
+else currentDate.setDate(currentDate.getDate()-7)
+
 init()
+
 }
 
-function nextWeek(){
-currentMonday.setDate(currentMonday.getDate()+7)
+function next(){
+
+if(dayMode) currentDate.setDate(currentDate.getDate()+1)
+else currentDate.setDate(currentDate.getDate()+7)
+
 init()
+
 }
 
 function today(){
-currentMonday=getMonday(new Date())
-currentDay=new Date()
+
+currentDate=new Date()
 init()
+
 }
 
 function toggleIcons(){
+
 bigIcons=!bigIcons
 render()
+
 }
 
-function toggleDayView(){
-dayView=!dayView
+function toggleView(){
+
+dayMode=!dayMode
 render()
+
 }
 
 function selectAll(){
+
 document.querySelectorAll("#filters input")
 .forEach(c=>c.checked=true)
+
 render()
+
 }
 
 function selectNone(){
+
 document.querySelectorAll("#filters input")
 .forEach(c=>c.checked=false)
+
 render()
+
 }
 
 parseToken()
