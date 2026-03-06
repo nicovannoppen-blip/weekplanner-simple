@@ -116,6 +116,9 @@ margin:auto;
 
 <button onclick="toggleDayView()">dag/week</button>
 
+<button id="prevDayBtn" onclick="prevDay()" style="display:none">◀ dag</button>
+<button id="nextDayBtn" onclick="nextDay()" style="display:none">dag ▶</button>
+
 <button onclick="toggleIcons()">grote picto</button>
 
 <button onclick="selectAll()">alles aan</button>
@@ -136,6 +139,7 @@ let token=null
 let calendars=[]
 let events=[]
 let currentMonday=getMonday(new Date())
+let currentDay=new Date()
 let bigIcons=false
 let dayView=false
 
@@ -162,11 +166,9 @@ window.location=url+"?"+new URLSearchParams(params)
 }
 
 function logout(){
-
 token=null
 events=[]
 render()
-
 }
 
 function parseToken(){
@@ -299,6 +301,9 @@ function render(){
 let agenda=document.getElementById("agenda")
 agenda.innerHTML=""
 
+document.getElementById("prevDayBtn").style.display = dayView ? "inline-block":"none"
+document.getElementById("nextDayBtn").style.display = dayView ? "inline-block":"none"
+
 let active=activeCalendars()
 
 let container=document.createElement("div")
@@ -308,8 +313,9 @@ let days=dayView?1:7
 
 for(let i=0;i<days;i++){
 
-let d=new Date(currentMonday)
-d.setDate(d.getDate()+i)
+let d = dayView ? new Date(currentDay) : new Date(currentMonday)
+
+if(!dayView) d.setDate(d.getDate()+i)
 
 let col=document.createElement("div")
 col.className="day"
@@ -429,6 +435,20 @@ return "📌"
 
 }
 
+function prevDay(){
+
+currentDay.setDate(currentDay.getDate()-1)
+render()
+
+}
+
+function nextDay(){
+
+currentDay.setDate(currentDay.getDate()+1)
+render()
+
+}
+
 function sameDay(a,b){
 
 return a.getFullYear()==b.getFullYear() &&
@@ -467,6 +487,7 @@ init()
 
 function today(){
 currentMonday=getMonday(new Date())
+currentDay=new Date()
 init()
 }
 
