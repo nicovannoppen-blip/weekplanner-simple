@@ -1,15 +1,8 @@
 {
-"name":"AgendaPicto",
-"short_name":"AgendaPicto",
-"start_url":"index.html",
+"name":"AgendaPicto PRO X",
+"short_name":"Agenda",
+"start_url":"/",
 "display":"standalone",
 "background_color":"#ffffff",
-"description":"Agenda met pictogrammen",
-"icons":[
-{
-"src":"icon.png",
-"sizes":"192x192",
-"type":"image/png"
-}
-]
+"theme_color":"#4285F4"
 }
