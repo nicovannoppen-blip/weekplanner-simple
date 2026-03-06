@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="nl">
 <head>
 <meta charset="UTF-8">
-<title>AgendaPicto EXTREME</title>
+<title>Familie Agenda</title>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
 
 body{
 font-family:Arial;
 margin:0;
-background:#eef2f5;
+background:#f3f3f3;
 }
 
 header{
@@ -18,98 +20,80 @@ color:white;
 padding:10px;
 display:flex;
 flex-wrap:wrap;
-gap:6px;
-align-items:center;
+gap:10px;
 }
 
 button{
+padding:8px 12px;
 border:none;
-padding:6px 10px;
-border-radius:4px;
+border-radius:6px;
+background:white;
 cursor:pointer;
-font-weight:bold;
 }
 
 #filters{
 background:white;
 padding:10px;
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+border-bottom:1px solid #ddd;
 }
 
-#calendar{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:8px;
-padding:10px;
+.week{
+display:flex;
+height:960px;
 }
 
 .day{
+flex:1;
 background:white;
+margin:4px;
 border-radius:8px;
 position:relative;
-height:1020px;
-overflow:hidden;
 }
 
-.dayTitle{
-background:#f5f5f5;
-padding:6px;
+.dayHeader{
 text-align:center;
 font-weight:bold;
-}
-
-.timeline{
-position:absolute;
-top:30px;
-left:0;
-right:0;
-bottom:0;
+padding:6px;
+border-bottom:1px solid #ddd;
 }
 
 .hour{
-height:60px;
+position:absolute;
+left:0;
+right:0;
 border-top:1px solid #eee;
 font-size:10px;
-padding-left:4px;
-color:#999;
+color:#888;
 }
 
 .event{
 position:absolute;
-border-radius:8px;
+left:6%;
+width:88%;
+border-radius:6px;
 color:white;
-padding:6px;
+padding:4px;
 font-size:12px;
-cursor:grab;
-text-align:center;
 display:flex;
-flex-direction:column;
+gap:6px;
 align-items:center;
-justify-content:center;
 }
 
-.event img{
-width:24px;
-height:24px;
-margin-bottom:3px;
+.icon{
+font-size:16px;
 }
 
-.kid .event{
-font-size:20px;
-padding:12px;
+.large .icon{
+font-size:34px;
+display:block;
 }
 
-.kid .event img{
-width:48px;
-height:48px;
-}
-
-@media print{
-header,#filters{
-display:none;
-}
-body{
-background:white;
-}
+.large .event{
+flex-direction:column;
+text-align:center;
 }
 
 </style>
@@ -119,28 +103,24 @@ background:white;
 
 <header>
 
-<b>AgendaPicto EXTREME</b>
-
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
 
-<button onclick="prevWeek()">←</button>
-<button onclick="nextWeek()">→</button>
+<button onclick="prevWeek()">◀ week</button>
+<button onclick="today()">vandaag</button>
+<button onclick="nextWeek()">week ▶</button>
 
-<button onclick="setWeek()">Week</button>
-<button onclick="setDay()">Dag</button>
+<button onclick="toggleIcons()">grote picto</button>
 
-<button onclick="toggleKid()">Kinder-modus</button>
+<button onclick="selectAll()">alles aan</button>
+<button onclick="selectNone()">alles uit</button>
 
-<button onclick="selectAll()">Alles aan</button>
-<button onclick="selectNone()">Alles uit</button>
-
-<button onclick="window.print()">Print</button>
+<button onclick="window.print()">print / pdf</button>
 
 </header>
 
 <div id="filters"></div>
-<div id="calendar"></div>
+<div id="agenda"></div>
 
 <script>
 
@@ -149,8 +129,15 @@ const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleuserco
 let token=null
 let calendars=[]
 let events=[]
-let monday=null
-let view="week"
+let currentMonday=getMonday(new Date())
+let bigIcons=false
+
+const HIDDEN=[
+"Weeknummers",
+"Agenda",
+"Borgloon Weather",
+"agenda website"
+]
 
 function login(){
 
@@ -168,13 +155,14 @@ window.location=url+"?"+new URLSearchParams(params)
 }
 
 function logout(){
-location.hash=""
-location.reload()
+token=null
+events=[]
+render()
 }
 
 function parseToken(){
 
-const hash=window.location.hash.substring(1)
+const hash=location.hash.substring(1)
 const params=new URLSearchParams(hash)
 
 token=params.get("access_token")
@@ -185,60 +173,51 @@ if(token) init()
 
 async function init(){
 
-monday=getMonday(new Date())
-
 await loadCalendars()
-
-renderFilters()
-
 await loadEvents()
-
 render()
 
-}
-
-function getMonday(d){
-
-d=new Date(d)
-
-d.setDate(d.getDate()-(d.getDay()+6)%7)
-
-d.setHours(0,0,0,0)
-
-return d
-
-}
-
-function nextWeek(){
-monday.setDate(monday.getDate()+7)
-loadEvents().then(render)
-}
-
-function prevWeek(){
-monday.setDate(monday.getDate()-7)
-loadEvents().then(render)
-}
-
-function setWeek(){
-view="week"
-render()
-}
-
-function setDay(){
-view="day"
-render()
 }
 
 async function loadCalendars(){
 
-const r=await fetch(
+let r=await fetch(
 "https://www.googleapis.com/calendar/v3/users/me/calendarList",
 {headers:{Authorization:"Bearer "+token}}
 )
 
-const data=await r.json()
+let data=await r.json()
 
-calendars=data.items
+calendars=data.items.filter(c=>!HIDDEN.includes(c.summary))
+
+buildFilters()
+
+}
+
+function buildFilters(){
+
+let f=document.getElementById("filters")
+f.innerHTML=""
+
+calendars.forEach(c=>{
+
+let label=document.createElement("label")
+
+label.innerHTML=
+`<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
+
+label.querySelector("input").addEventListener("change",render)
+
+f.appendChild(label)
+
+})
+
+}
+
+function rename(n){
+
+if(n.includes("Belgie Feestdagen")) return "feestdagen"
+return n
 
 }
 
@@ -246,234 +225,219 @@ async function loadEvents(){
 
 events=[]
 
-let end=new Date(monday)
-end.setDate(monday.getDate()+7)
+let start=new Date(currentMonday)
+start.setHours(0,0,0)
 
-for(const cal of calendars){
+let end=new Date(currentMonday)
+end.setDate(end.getDate()+7)
 
-const r=await fetch(
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${monday.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`,
-{headers:{Authorization:"Bearer "+token}}
-)
+for(let cal of calendars){
 
-const data=await r.json()
+let url=
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
+`timeMin=${start.toISOString()}&`+
+`timeMax=${end.toISOString()}&`+
+`singleEvents=true&`+
+`orderBy=startTime&`+
+`maxResults=2500`
 
-if(data.items){
+let r=await fetch(url,{
+headers:{Authorization:"Bearer "+token}
+})
+
+let data=await r.json()
 
 data.items.forEach(e=>{
-e.calendar=cal.summary
-e.color=cal.backgroundColor||"#5f6368"
-events.push(e)
+
+if(!e.start?.dateTime) return
+
+events.push({
+
+title:e.summary,
+start:new Date(e.start.dateTime),
+end:new Date(e.end.dateTime),
+color:cal.backgroundColor||"#4285F4",
+calendar:cal.id,
+location:e.location||""
+
+})
+
 })
 
 }
 
 }
 
-}
+function activeCalendars(){
 
-function renderFilters(){
+let list=[]
 
-const f=document.getElementById("filters")
+document.querySelectorAll("#filters input:checked")
+.forEach(cb=>list.push(cb.value))
 
-f.innerHTML="<b>Agenda's</b><br>"
+return list
 
-calendars.forEach(cal=>{
-
-const id="f"+cal.id.replace(/[^a-z0-9]/gi,"")
-
-f.innerHTML+=`
-<label>
-<input type="checkbox" id="${id}" checked onchange="render()">
-${cal.summary}
-</label>
-`
-
-})
-
-}
-
-function selectedCalendars(){
-
-return calendars.filter(cal=>{
-
-const id="f"+cal.id.replace(/[^a-z0-9]/gi,"")
-
-return document.getElementById(id)?.checked
-
-}).map(c=>c.summary)
-
-}
-
-function selectAll(){
-document.querySelectorAll("#filters input").forEach(i=>i.checked=true)
-render()
-}
-
-function selectNone(){
-document.querySelectorAll("#filters input").forEach(i=>i.checked=false)
-render()
 }
 
 function render(){
 
-const cal=document.getElementById("calendar")
+let agenda=document.getElementById("agenda")
+agenda.innerHTML=""
 
-cal.innerHTML=""
+let active=activeCalendars()
 
-const days=view==="week"?7:1
+let week=document.createElement("div")
+week.className="week"
 
-cal.style.gridTemplateColumns=view==="week"?"repeat(7,1fr)":"1fr"
+for(let i=0;i<7;i++){
 
-const names=["Ma","Di","Wo","Do","Vr","Za","Zo"]
+let d=new Date(currentMonday)
+d.setDate(d.getDate()+i)
 
-for(let i=0;i<days;i++){
+let col=document.createElement("div")
+col.className="day"
 
-let d=new Date(monday)
-d.setDate(monday.getDate()+i)
+let head=document.createElement("div")
+head.className="dayHeader"
 
-const day=document.createElement("div")
-day.className="day"
+head.innerText=
+d.toLocaleDateString("nl-BE",{weekday:"long"})+
+" "+
+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
 
-day.innerHTML=`<div class="dayTitle">${names[i]} ${d.getDate()}/${d.getMonth()+1}</div>`
+col.appendChild(head)
 
-const timeline=document.createElement("div")
-timeline.className="timeline"
+for(let h=7;h<=23;h++){
 
-for(let h=6;h<=23;h++){
+let line=document.createElement("div")
+line.className="hour"
+line.style.top=((h-7)*60)+"px"
+line.innerText=h+":00"
 
-const hour=document.createElement("div")
-hour.className="hour"
-hour.innerText=h+":00"
-
-timeline.appendChild(hour)
-
-}
-
-day.appendChild(timeline)
-
-cal.appendChild(day)
-
-renderEvents(day,i)
+col.appendChild(line)
 
 }
 
-}
+events
+.filter(e=>active.includes(e.calendar))
+.filter(e=>sameDay(e.start,d))
+.sort((a,b)=>a.start-b.start)
+.forEach(e=>{
 
-function renderEvents(day,index){
+let start=(e.start.getHours()-7)*60+e.start.getMinutes()
+let dur=(e.end-e.start)/60000
 
-const selected=selectedCalendars()
-
-const dayEvents=events
-.filter(e=>{
-if(!selected.includes(e.calendar)) return false
-const d=new Date(e.start.dateTime||e.start.date)
-return (d.getDay()+6)%7===index
-})
-.sort((a,b)=>new Date(a.start.dateTime||a.start.date)-new Date(b.start.dateTime||b.start.date))
-
-const lanes=[]
-
-dayEvents.forEach(e=>{
-
-const start=new Date(e.start.dateTime||e.start.date)
-const end=new Date(e.end?.dateTime||e.start.dateTime||e.start.date)
-
-const startMin=start.getHours()*60+start.getMinutes()
-const endMin=end.getHours()*60+end.getMinutes()
-
-let lane=0
-while(lanes[lane] && lanes[lane]>startMin) lane++
-
-lanes[lane]=endMin
-
-const dayStart=6*60
-const dayEnd=23*60
-const duration=dayEnd-dayStart
-
-const top=(startMin-dayStart)/duration*100
-const height=(endMin-startMin)/duration*100
-const width=100/(lanes.length+1)
-
-const div=document.createElement("div")
+let div=document.createElement("div")
 div.className="event"
+div.style.top=start+"px"
+div.style.height=dur+"px"
+div.style.background=e.color
 
-div.style.top=top+"%"
-div.style.height=height+"%"
-div.style.left=(lane*width)+"%"
-div.style.width=width+"%"
-div.style.background=colorAI(e)
+div.innerHTML=
+`<div class="icon">${icon(e)}</div>
+<div>${time(e.start)} ${e.title}</div>`
 
-const icon=getIcon(e)
-
-div.innerHTML=`
-<img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
-<div>${e.summary}</div>
-`
-
-enableDrag(div)
-
-day.appendChild(div)
+col.appendChild(div)
 
 })
 
-}
-
-function enableDrag(el){
-
-el.draggable=true
-
-el.addEventListener("dragstart",e=>{
-e.dataTransfer.setData("text/plain","drag")
-})
+week.appendChild(col)
 
 }
 
-function colorAI(e){
+agenda.appendChild(week)
 
-const t=(e.summary||"").toLowerCase()
-
-if(t.includes("school")) return "#34A853"
-if(t.includes("voetbal")) return "#EA4335"
-if(t.includes("zwem")) return "#00ACC1"
-if(t.includes("dokter")) return "#DB4437"
-if(t.includes("eten")) return "#FBBC05"
-if(t.includes("slapen")) return "#5C6BC0"
-
-return e.color
+if(bigIcons) agenda.classList.add("large")
+else agenda.classList.remove("large")
 
 }
 
-function getIcon(e){
+function icon(e){
 
-const t=(e.summary||"").toLowerCase()
-const l=(e.location||"").toLowerCase()
+let t=e.title.toLowerCase()
+let l=e.location.toLowerCase()
 
-if(t.includes("bus")) return "bus"
-if(t.includes("slapen")) return "sleep"
-if(t.includes("rijden")) return "car"
-if(t.includes("voetbal")) return "soccer"
-if(t.includes("zwem")) return "swim"
-if(t.includes("school")) return "school"
-if(t.includes("verjaardag")) return "cake"
-if(t.includes("feest")) return "party-popper"
-if(t.includes("dokter")) return "medical-bag"
-if(t.includes("tandarts")) return "tooth"
-if(t.includes("beugel")) return "tooth-outline"
-if(t.includes("eten")) return "silverware"
-if(t.includes("film")) return "movie-open"
-if(t.includes("muziek")) return "music"
-if(t.includes("oppas")) return "home-heart"
+if(l.includes("orelia puthof")) return "👩‍⚕️"
+if(t.includes("bus")) return "🚌"
+if(t.includes("rijden")) return "🚗"
+if(t.includes("slapen")) return "😴"
+if(t.includes("rita oppas thuis")) return "🏠"
+if(t.includes("rita oppas bij haar")) return "🧳"
 
-if(l.includes("kapelstraat 73")) return "medical-cross"
-if(l.includes("puthofveld")) return "nurse"
-
-return "calendar"
+return "📌"
 
 }
 
-function toggleKid(){
-document.body.classList.toggle("kid")
+function sameDay(a,b){
+
+return a.getFullYear()==b.getFullYear() &&
+a.getMonth()==b.getMonth() &&
+a.getDate()==b.getDate()
+
+}
+
+function time(d){
+
+return d.getHours().toString().padStart(2,"0")+":"+
+d.getMinutes().toString().padStart(2,"0")
+
+}
+
+function getMonday(d){
+
+d=new Date(d)
+
+let day=d.getDay()
+let diff=d.getDate()-day+(day==0?-6:1)
+
+return new Date(d.setDate(diff))
+
+}
+
+function prevWeek(){
+
+currentMonday.setDate(currentMonday.getDate()-7)
+init()
+
+}
+
+function nextWeek(){
+
+currentMonday.setDate(currentMonday.getDate()+7)
+init()
+
+}
+
+function today(){
+
+currentMonday=getMonday(new Date())
+init()
+
+}
+
+function toggleIcons(){
+
+bigIcons=!bigIcons
+render()
+
+}
+
+function selectAll(){
+
+document.querySelectorAll("#filters input")
+.forEach(c=>c.checked=true)
+
+render()
+
+}
+
+function selectNone(){
+
+document.querySelectorAll("#filters input")
+.forEach(c=>c.checked=false)
+
+render()
+
 }
 
 parseToken()
