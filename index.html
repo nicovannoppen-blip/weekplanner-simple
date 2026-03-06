@@ -1,53 +1,409 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html>
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgendaPicto PRO X ULTRA</title>
+<title>AgendaPicto</title>
 
 <link rel="stylesheet" href="style.css">
 
-<script src="https://apis.google.com/js/api.js"></script>
-<script src="https://accounts.google.com/gsi/client"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 </head>
-
 <body>
-
-<div id="loginScreen">
-
-<h1>AgendaPicto</h1>
-
-<button id="loginBtn">Aanmelden met Google</button>
-
-<label>
-<input type="checkbox" id="rememberLogin">
-Onthoud aanmelden
-</label>
-
-</div>
-
-<div id="app">
 
 <header>
 
-<div class="controls">
+<h1>AgendaPicto</h1>
 
-<button id="dayViewBtn">Dag</button>
-<button id="weekViewBtn">Week</button>
-<button id="bigPictoBtn">Grote pictogrammen</button>
+<button onclick="login()">Login</button>
+<button onclick="logout()">Logout</button>
 
-</div>
+<button onclick="prevWeek()">◀ week</button>
+<button onclick="nextWeek()">week ▶</button>
 
-<div id="calendarFilters"></div>
+<button onclick="toggleView()">Dag / Week</button>
+
+<button onclick="toggleIcons()">Grote picto</button>
+
+<button onclick="selectAll()">Alles aan</button>
+<button onclick="deselectAll()">Alles uit</button>
 
 </header>
 
-<div id="agendaContainer"></div>
 
-</div>
+<div id="filters"></div>
 
-<script src="app.js"></script>
+<div id="agenda"></div>
+
+
+<script>
+
+const CLIENT_ID = "259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com";
+
+let accessToken = null;
+
+let calendars = [];
+
+let events = [];
+
+let weekOffset = 0;
+
+let viewMode = "week";
+
+let bigIcons = false;
+
+
+
+function login(){
+
+const oauth2Endpoint = "https://accounts.google.com/o/oauth2/v2/auth";
+
+const params = {
+
+client_id: CLIENT_ID,
+
+redirect_uri: window.location.origin,
+
+response_type: "token",
+
+scope: "https://www.googleapis.com/auth/calendar.readonly",
+
+include_granted_scopes: "true"
+
+};
+
+window.location = oauth2Endpoint + "?" + new URLSearchParams(params).toString();
+
+}
+
+
+
+function logout(){
+
+accessToken = null;
+
+localStorage.removeItem("token");
+
+location.reload();
+
+}
+
+
+
+function parseToken(){
+
+const hash = window.location.hash.substring(1);
+
+const params = new URLSearchParams(hash);
+
+const token = params.get("access_token");
+
+if(token){
+
+accessToken = token;
+
+localStorage.setItem("token",token);
+
+}
+
+}
+
+
+
+async function loadCalendars(){
+
+const res = await fetch(
+
+"https://www.googleapis.com/calendar/v3/users/me/calendarList",
+
+{headers:{Authorization:"Bearer "+accessToken}}
+
+);
+
+const data = await res.json();
+
+calendars = data.items.filter(c=>{
+
+return !c.summary.includes("Weeknummers")
+
+&& !c.summary.includes("Weather")
+
+&& !c.summary.includes("agenda website");
+
+});
+
+renderFilters();
+
+loadEvents();
+
+}
+
+
+
+function renderFilters(){
+
+const div=document.getElementById("filters");
+
+div.innerHTML="";
+
+calendars.forEach(c=>{
+
+const label=document.createElement("label");
+
+label.innerHTML=`
+
+<input type="checkbox" checked value="${c.id}" onchange="loadEvents()">
+
+${c.summary}
+
+`;
+
+div.appendChild(label);
+
+});
+
+}
+
+
+
+async function loadEvents(){
+
+events=[];
+
+const checked=[...document.querySelectorAll("#filters input:checked")]
+
+.map(e=>e.value);
+
+for(const cal of calendars){
+
+if(!checked.includes(cal.id))continue;
+
+const res=await fetch(
+
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?singleEvents=true&orderBy=startTime&maxResults=250`,
+
+{headers:{Authorization:"Bearer "+accessToken}}
+
+);
+
+const data=await res.json();
+
+data.items.forEach(e=>{
+
+e.color=cal.backgroundColor;
+
+events.push(e);
+
+});
+
+}
+
+renderAgenda();
+
+}
+
+
+
+function startOfWeek(){
+
+const d=new Date();
+
+d.setDate(d.getDate()+weekOffset*7);
+
+const day=d.getDay();
+
+const diff=d.getDate()-day+1;
+
+return new Date(d.setDate(diff));
+
+}
+
+
+
+function renderAgenda(){
+
+const container=document.getElementById("agenda");
+
+container.innerHTML="";
+
+const start=startOfWeek();
+
+for(let i=0;i<7;i++){
+
+const day=new Date(start);
+
+day.setDate(day.getDate()+i);
+
+const col=document.createElement("div");
+
+col.className="day";
+
+const name=day.toLocaleDateString("nl-BE",{weekday:"long"});
+
+const date=day.toLocaleDateString("nl-BE");
+
+col.innerHTML=`<h3>${name} ${date}</h3>`;
+
+for(let h=7;h<=23;h++){
+
+const hour=document.createElement("div");
+
+hour.className="hour";
+
+hour.innerText=h+":00";
+
+col.appendChild(hour);
+
+}
+
+const dayEvents=events.filter(e=>{
+
+const s=new Date(e.start.dateTime||e.start.date);
+
+return s.toDateString()===day.toDateString();
+
+});
+
+dayEvents.sort((a,b)=>new Date(a.start.dateTime)-new Date(b.start.dateTime));
+
+dayEvents.forEach(e=>{
+
+const div=document.createElement("div");
+
+div.className="event";
+
+div.style.background=e.color||"#4285F4";
+
+const time=new Date(e.start.dateTime).toLocaleTimeString([],{
+
+hour:"2-digit",
+
+minute:"2-digit"
+
+});
+
+div.innerHTML=`
+
+<img src="${iconForEvent(e)}">
+
+<span>${time} ${e.summary}</span>
+
+`;
+
+col.appendChild(div);
+
+});
+
+container.appendChild(col);
+
+}
+
+}
+
+
+
+function iconForEvent(e){
+
+const text=(e.summary||"").toLowerCase();
+
+const loc=(e.location||"").toLowerCase();
+
+if(text.includes("bus"))return "https://api.iconify.design/mdi/bus.svg";
+
+if(text.includes("slapen"))return "https://api.iconify.design/mdi/sleep.svg";
+
+if(text.includes("rijden"))return "https://api.iconify.design/mdi/car.svg";
+
+if(text.includes("beugel"))return "https://api.iconify.design/mdi/tooth-outline.svg";
+
+if(loc.includes("orelia"))return "https://api.iconify.design/mdi/nurse.svg";
+
+if(text.includes("rita oppas thuis")||text.includes("loriana"))
+
+return "https://api.iconify.design/mdi/home-heart.svg";
+
+if(text.includes("rita oppas bij haar"))
+
+return "https://api.iconify.design/mdi/home-export-outline.svg";
+
+return "https://api.iconify.design/mdi/calendar.svg";
+
+}
+
+
+
+function prevWeek(){
+
+weekOffset--;
+
+renderAgenda();
+
+}
+
+
+
+function nextWeek(){
+
+weekOffset++;
+
+renderAgenda();
+
+}
+
+
+
+function toggleView(){
+
+viewMode=viewMode==="week"?"day":"week";
+
+document.body.classList.toggle("dayView");
+
+}
+
+
+
+function toggleIcons(){
+
+bigIcons=!bigIcons;
+
+document.body.classList.toggle("bigIcons");
+
+}
+
+
+
+function selectAll(){
+
+document.querySelectorAll("#filters input").forEach(c=>c.checked=true);
+
+loadEvents();
+
+}
+
+
+
+function deselectAll(){
+
+document.querySelectorAll("#filters input").forEach(c=>c.checked=false);
+
+loadEvents();
+
+}
+
+
+
+parseToken();
+
+accessToken=localStorage.getItem("token");
+
+if(accessToken){
+
+loadCalendars();
+
+}
+
+</script>
 
 </body>
 </html>
