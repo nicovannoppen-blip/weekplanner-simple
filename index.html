@@ -357,12 +357,14 @@ function icon(e){
 let t=e.title.toLowerCase()
 let l=e.location.toLowerCase()
 
-if(l.includes("orelia puthof")) return "👩‍⚕️"
-if(t.includes("bus")) return "🚌"
+if(l.includes("orelia")) return "👩‍⚕️"
+if(l.includes("kapelstraat")) return "🧔🏼‍♀️🏢"
+if(t.includes("Bus naar huis")) return "🏫🚌🏠"
+if(t.includes("Bus naar school")) return "🏠🚌🏫"
 if(t.includes("rijden")) return "🚗"
 if(t.includes("slapen")) return "😴"
-if(t.includes("rita oppas thuis")) return "🏠"
-if(t.includes("rita oppas bij haar")) return "🧳"
+if(t.includes("rita oppas thuis")) return "👵🏠"
+if(t.includes("rita oppas bij haar")) return "🧳🏠👵"
 
 return "📌"
 
