@@ -172,30 +172,45 @@ async function loadEvents(){
 events=[];
 
 const checked=[...document.querySelectorAll("#filters input:checked")]
-
 .map(e=>e.value);
+
+const start=startOfWeek();
+const end=new Date(start);
+end.setDate(end.getDate()+7);
 
 for(const cal of calendars){
 
-if(!checked.includes(cal.id))continue;
+if(!checked.includes(cal.id)) continue;
+
+let pageToken=null;
+
+do{
 
 const res=await fetch(
-
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?singleEvents=true&orderBy=startTime&maxResults=250`,
-
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events
+?singleEvents=true
+&orderBy=startTime
+&timeMin=${start.toISOString()}
+&timeMax=${end.toISOString()}
+&maxResults=250
+${pageToken ? "&pageToken="+pageToken : ""}`,
 {headers:{Authorization:"Bearer "+accessToken}}
-
 );
 
 const data=await res.json();
 
+if(data.items){
+
 data.items.forEach(e=>{
-
 e.color=cal.backgroundColor;
-
 events.push(e);
-
 });
+
+}
+
+pageToken=data.nextPageToken;
+
+}while(pageToken);
 
 }
 
