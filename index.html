@@ -2,59 +2,479 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Familie Agenda</title>
 
-<title>AgendaPicto PRO Z ULTRA</title>
+<style>
 
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+body{
+font-family:Arial;
+margin:0;
+background:#f3f3f3;
+}
 
+header{
+background:#4285F4;
+color:white;
+padding:10px;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:6px;
+background:white;
+cursor:pointer;
+}
+
+#filters{
+background:white;
+padding:10px;
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+border-bottom:1px solid #ddd;
+}
+
+.week{
+display:flex;
+height:960px;
+}
+
+.day{
+flex:1;
+background:white;
+margin:4px;
+border-radius:8px;
+position:relative;
+}
+
+.dayHeader{
+text-align:center;
+font-weight:bold;
+padding:6px;
+border-bottom:1px solid #ddd;
+}
+
+.hour{
+position:absolute;
+left:0;
+right:0;
+border-top:1px solid #eee;
+font-size:10px;
+color:#888;
+}
+
+.event{
+position:absolute;
+border-radius:6px;
+color:white;
+padding:4px;
+font-size:12px;
+display:flex;
+gap:6px;
+align-items:center;
+overflow:hidden;
+}
+
+.icon{
+font-size:16px;
+}
+
+.large .icon{
+font-size:34px;
+display:block;
+}
+
+.large .event{
+flex-direction:column;
+text-align:center;
+}
+
+</style>
 </head>
+
 <body>
-
-<div id="login">
-
-<h1>AgendaPicto</h1>
-
-<input id="email" placeholder="email">
-<input id="password" type="password" placeholder="password">
-
-<label>
-<input type="checkbox" id="remember">
-Onthoud aanmelden
-</label>
-
-<button onclick="login()">Aanmelden</button>
-
-</div>
-
-<div id="app">
 
 <header>
 
-<h1>AgendaPicto</h1>
+<button onclick="login()">Login</button>
+<button onclick="logout()">Logout</button>
 
-<div class="controls">
+<button onclick="prevWeek()">◀ week</button>
+<button onclick="today()">vandaag</button>
+<button onclick="nextWeek()">week ▶</button>
 
-<button onclick="setView('week')">Week</button>
-<button onclick="setView('day')">Dag</button>
+<button onclick="toggleIcons()">grote picto</button>
 
-<button onclick="toggleBigIcons()">Grote picto’s</button>
+<button onclick="selectAll()">alles aan</button>
+<button onclick="selectNone()">alles uit</button>
 
-<button onclick="selectAll()">Alles</button>
-<button onclick="deselectAll()">Geen</button>
-
-</div>
-
-<div id="filters"></div>
+<button onclick="window.print()">print / pdf</button>
 
 </header>
 
-<div id="calendar"></div>
+<div id="filters"></div>
+<div id="agenda"></div>
 
-</div>
+<script>
 
-<script src="app.js"></script>
+const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
+
+let token=null
+let calendars=[]
+let events=[]
+let currentMonday=getMonday(new Date())
+let bigIcons=false
+
+const HIDDEN=[
+"Weeknummers",
+"Agenda",
+"Borgloon Weather",
+"agenda website"
+]
+
+function login(){
+
+const url="https://accounts.google.com/o/oauth2/v2/auth"
+
+const params={
+client_id:CLIENT_ID,
+redirect_uri:window.location.origin,
+response_type:"token",
+scope:"https://www.googleapis.com/auth/calendar.readonly"
+}
+
+window.location=url+"?"+new URLSearchParams(params)
+
+}
+
+function logout(){
+token=null
+events=[]
+render()
+}
+
+function parseToken(){
+
+const hash=location.hash.substring(1)
+const params=new URLSearchParams(hash)
+
+token=params.get("access_token")
+
+if(token) init()
+
+}
+
+async function init(){
+
+await loadCalendars()
+await loadEvents()
+render()
+
+}
+
+async function loadCalendars(){
+
+let r=await fetch(
+"https://www.googleapis.com/calendar/v3/users/me/calendarList",
+{headers:{Authorization:"Bearer "+token}}
+)
+
+let data=await r.json()
+
+calendars=data.items
+.filter(c=>!HIDDEN.includes(c.summary))
+.map(c=>({
+id:c.id,
+name:rename(c.summary),
+
+/* EXACTE GOOGLE KLEUR */
+color:c.backgroundColor
+}))
+
+buildFilters()
+
+}
+
+function buildFilters(){
+
+let f=document.getElementById("filters")
+f.innerHTML=""
+
+calendars.forEach(c=>{
+
+let label=document.createElement("label")
+
+label.innerHTML=
+`<input type="checkbox" checked value="${c.id}"> ${c.name}`
+
+label.querySelector("input").addEventListener("change",render)
+
+f.appendChild(label)
+
+})
+
+}
+
+function rename(n){
+
+if(n.includes("Belgie Feestdagen")) return "feestdagen"
+return n
+
+}
+
+async function loadEvents(){
+
+events=[]
+
+let start=new Date(currentMonday)
+start.setHours(0,0,0)
+
+let end=new Date(currentMonday)
+end.setDate(end.getDate()+7)
+
+for(let cal of calendars){
+
+let url=
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
+`timeMin=${start.toISOString()}&`+
+`timeMax=${end.toISOString()}&`+
+`singleEvents=true&`+
+`orderBy=startTime&`+
+`maxResults=2500`
+
+let r=await fetch(url,{
+headers:{Authorization:"Bearer "+token}
+})
+
+let data=await r.json()
+
+data.items.forEach(e=>{
+
+if(!e.start?.dateTime) return
+
+events.push({
+
+title:e.summary,
+start:new Date(e.start.dateTime),
+end:new Date(e.end.dateTime),
+
+/* GOOGLE KLEUR */
+color:cal.color,
+
+calendar:cal.id,
+location:e.location||""
+
+})
+
+})
+
+}
+
+}
+
+function activeCalendars(){
+
+let list=[]
+
+document.querySelectorAll("#filters input:checked")
+.forEach(cb=>list.push(cb.value))
+
+return list
+
+}
+
+function render(){
+
+let agenda=document.getElementById("agenda")
+agenda.innerHTML=""
+
+let active=activeCalendars()
+
+let week=document.createElement("div")
+week.className="week"
+
+for(let i=0;i<7;i++){
+
+let d=new Date(currentMonday)
+d.setDate(d.getDate()+i)
+
+let col=document.createElement("div")
+col.className="day"
+
+let head=document.createElement("div")
+head.className="dayHeader"
+
+head.innerText=
+d.toLocaleDateString("nl-BE",{weekday:"long"})+
+" "+
+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
+
+col.appendChild(head)
+
+for(let h=7;h<=23;h++){
+
+let line=document.createElement("div")
+line.className="hour"
+line.style.top=((h-7)*60)+"px"
+line.innerText=h+":00"
+
+col.appendChild(line)
+
+}
+
+let dayEvents=events
+.filter(e=>active.includes(e.calendar))
+.filter(e=>sameDay(e.start,d))
+.sort((a,b)=>a.start-b.start)
+
+let columns=[]
+
+dayEvents.forEach(e=>{
+
+let placed=false
+
+for(let colIndex=0;colIndex<columns.length;colIndex++){
+
+let last=columns[colIndex][columns[colIndex].length-1]
+
+if(e.start>=last.end){
+
+columns[colIndex].push(e)
+e.col=colIndex
+placed=true
+break
+
+}
+
+}
+
+if(!placed){
+
+columns.push([e])
+e.col=columns.length-1
+
+}
+
+})
+
+let totalCols=columns.length
+
+dayEvents.forEach(e=>{
+
+let start=(e.start.getHours()-7)*60+e.start.getMinutes()
+let dur=(e.end-e.start)/60000
+
+let div=document.createElement("div")
+div.className="event"
+
+div.style.top=start+"px"
+div.style.height=dur+"px"
+
+/* exacte Google kleur */
+div.style.background=e.color
+
+div.style.width=(88/totalCols)+"%"
+div.style.left=(6+(e.col*(88/totalCols)))+"%"
+
+div.innerHTML=
+`<div class="icon">${icon(e)}</div>
+<div>${time(e.start)} ${e.title}</div>`
+
+col.appendChild(div)
+
+})
+
+week.appendChild(col)
+
+}
+
+agenda.appendChild(week)
+
+if(bigIcons) agenda.classList.add("large")
+else agenda.classList.remove("large")
+
+}
+
+function icon(e){
+
+let t=e.title.toLowerCase()
+let l=e.location.toLowerCase()
+
+if(l.includes("orelia")) return "👩🏼‍⚕️👩🏼‍🦽‍➡️"
+if(t.includes("school")) return "🎒📚"
+if(t.includes("zwemmen")) return "🏊🏼‍♂️"
+if(t.includes("dokter")) return "🏥"
+if(t.includes("slapen")) return "😴"
+
+return "📌"
+
+}
+
+function sameDay(a,b){
+
+return a.getFullYear()==b.getFullYear() &&
+a.getMonth()==b.getMonth() &&
+a.getDate()==b.getDate()
+
+}
+
+function time(d){
+
+return d.getHours().toString().padStart(2,"0")+":"+
+d.getMinutes().toString().padStart(2,"0")
+
+}
+
+function getMonday(d){
+
+d=new Date(d)
+
+let day=d.getDay()
+let diff=d.getDate()-day+(day==0?-6:1)
+
+return new Date(d.setDate(diff))
+
+}
+
+function prevWeek(){
+currentMonday.setDate(currentMonday.getDate()-7)
+init()
+}
+
+function nextWeek(){
+currentMonday.setDate(currentMonday.getDate()+7)
+init()
+}
+
+function today(){
+currentMonday=getMonday(new Date())
+init()
+}
+
+function toggleIcons(){
+bigIcons=!bigIcons
+render()
+}
+
+function selectAll(){
+document.querySelectorAll("#filters input")
+.forEach(c=>c.checked=true)
+render()
+}
+
+function selectNone(){
+document.querySelectorAll("#filters input")
+.forEach(c=>c.checked=false)
+render()
+}
+
+parseToken()
+
+</script>
 
 </body>
 </html>
