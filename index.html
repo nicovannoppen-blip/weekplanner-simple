@@ -358,10 +358,13 @@ let t=e.title.toLowerCase()
 let l=e.location.toLowerCase()
 
 if(l.includes("orelia")) return "👩‍⚕️"
-if(l.includes("kapelstraat")) return "🧔🏼‍♀️🏢"
-if(l.includes("rode kruis")) return "🧔🏼‍♀️🏢"
+if(l.includes("kapelstraat")||l.includes("rode kruis")) return "🧔🏼‍♀️🏢"
 if(t.includes("Bus naar huis")) return "🏫🚌🏠"
 if(t.includes("Bus naar school")) return "🏠🚌🏫"
+if(t.includes("rijden")) return "🚗"
+if(t.includes("fietsen")) return "🚗"
+if(t.includes("aldi")) return "🚗"
+if(t.includes("rijden")) return "🚗"
 if(t.includes("rijden")) return "🚗"
 if(t.includes("slapen")) return "😴"
 if(t.includes("rita oppas thuis")) return "👵🏠"
