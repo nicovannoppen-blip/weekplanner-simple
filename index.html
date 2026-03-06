@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<title>Familie Agenda</title>
+<title>AgendaPicto PRO Y</title>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -21,6 +21,7 @@ padding:10px;
 display:flex;
 flex-wrap:wrap;
 gap:10px;
+align-items:center;
 }
 
 button{
@@ -51,6 +52,7 @@ background:white;
 margin:4px;
 border-radius:8px;
 position:relative;
+overflow:hidden;
 }
 
 .dayHeader{
@@ -58,6 +60,7 @@ text-align:center;
 font-weight:bold;
 padding:6px;
 border-bottom:1px solid #ddd;
+background:#fafafa;
 }
 
 .hour{
@@ -78,6 +81,7 @@ font-size:12px;
 display:flex;
 gap:6px;
 align-items:center;
+cursor:move;
 overflow:hidden;
 }
 
@@ -95,6 +99,11 @@ flex-direction:column;
 text-align:center;
 }
 
+.dayView{
+width:80%;
+margin:auto;
+}
+
 </style>
 </head>
 
@@ -108,6 +117,8 @@ text-align:center;
 <button onclick="prevWeek()">◀ week</button>
 <button onclick="today()">vandaag</button>
 <button onclick="nextWeek()">week ▶</button>
+
+<button onclick="toggleDayView()">dag / week</button>
 
 <button onclick="toggleIcons()">grote picto</button>
 
@@ -129,7 +140,9 @@ let token=null
 let calendars=[]
 let events=[]
 let currentMonday=getMonday(new Date())
+
 let bigIcons=false
+let dayView=false
 
 const HIDDEN=[
 "Weeknummers",
@@ -285,10 +298,14 @@ agenda.innerHTML=""
 
 let active=activeCalendars()
 
+let days=dayView?1:7
+
 let week=document.createElement("div")
 week.className="week"
 
-for(let i=0;i<7;i++){
+if(dayView) week.classList.add("dayView")
+
+for(let i=0;i<days;i++){
 
 let d=new Date(currentMonday)
 d.setDate(d.getDate()+i)
@@ -341,6 +358,8 @@ let left=6+(e.col*width)
 
 div.style.width=width+"%"
 div.style.left=left+"%"
+
+div.draggable=true
 
 div.innerHTML=
 `<div class="icon">${icon(e)}</div>
@@ -395,21 +414,17 @@ function icon(e){
 let t=e.title.toLowerCase()
 let l=e.location.toLowerCase()
 
-if(l.includes("orelia")) return "👩🏼‍⚕️👩🏼‍🦽‍➡️"
-if(l.includes("kapelstraat")||l.includes("rode kruis")||t.includes("vorming")) return "🧔🏼‍♀️🏢"
-if(t.includes("bus naar huis")) return "🏫🚌🏠"
-if(t.includes("bus naar school")) return "🏠🚌🏫"
-if(t.includes("rijden")) return "🚗"
-if(t.includes("fietsen")) return "🚵🏼‍♀️"
-if(t.includes("aldi")||t.includes("colruyt")||t.includes("winkel")) return "🛒"
-if(t.includes("school")) return "🎒📚"
-if(t.includes("zwemmen")) return "🏊🏼‍♂️"
+if(l.includes("orelia")) return "👩‍⚕️"
+if(l.includes("kapelstraat")) return "⛑"
+if(t.includes("bus")) return "🚌"
+if(t.includes("school")) return "🎒"
+if(t.includes("zwem")) return "🏊"
+if(t.includes("dokter")) return "🏥"
 if(t.includes("beugel")) return "🦷"
-if(t.includes("pedicure")) return "🦶🏼💅🏼"
-if(t.includes("dokter")||t.includes("ziekenhuis")) return "🏥🧑🏼‍⚕️"
 if(t.includes("slapen")) return "😴"
-if(t.includes("rita oppas thuis")) return "👵🏠"
-if(t.includes("rita oppas bij haar")) return "🧳🏠👵"
+if(t.includes("rijden")) return "🚗"
+if(t.includes("winkel")) return "🛒"
+if(t.includes("oppas")) return "👵"
 
 return "📌"
 
@@ -465,6 +480,13 @@ init()
 function toggleIcons(){
 
 bigIcons=!bigIcons
+render()
+
+}
+
+function toggleDayView(){
+
+dayView=!dayView
 render()
 
 }
