@@ -71,8 +71,6 @@ color:#888;
 
 .event{
 position:absolute;
-left:6%;
-width:88%;
 border-radius:6px;
 color:white;
 padding:4px;
@@ -80,6 +78,7 @@ font-size:12px;
 display:flex;
 gap:6px;
 align-items:center;
+overflow:hidden;
 }
 
 .icon{
@@ -318,20 +317,30 @@ col.appendChild(line)
 
 }
 
-events
+let dayEvents=events
 .filter(e=>active.includes(e.calendar))
 .filter(e=>sameDay(e.start,d))
 .sort((a,b)=>a.start-b.start)
-.forEach(e=>{
+
+layoutEvents(dayEvents)
+
+dayEvents.forEach(e=>{
 
 let start=(e.start.getHours()-7)*60+e.start.getMinutes()
 let dur=(e.end-e.start)/60000
 
 let div=document.createElement("div")
 div.className="event"
+
 div.style.top=start+"px"
 div.style.height=dur+"px"
 div.style.background=e.color
+
+let width=88/e.cols
+let left=6+(e.col*width)
+
+div.style.width=width+"%"
+div.style.left=left+"%"
 
 div.innerHTML=
 `<div class="icon">${icon(e)}</div>
@@ -352,6 +361,35 @@ else agenda.classList.remove("large")
 
 }
 
+function layoutEvents(ev){
+
+for(let i=0;i<ev.length;i++){
+
+ev[i].col=0
+ev[i].cols=1
+
+for(let j=0;j<i;j++){
+
+if(overlap(ev[i],ev[j])){
+
+ev[i].col=ev[j].col+1
+ev[i].cols=Math.max(ev[i].cols,ev[i].col+1)
+ev[j].cols=ev[i].cols
+
+}
+
+}
+
+}
+
+}
+
+function overlap(a,b){
+
+return a.start<b.end && b.start<a.end
+
+}
+
 function icon(e){
 
 let t=e.title.toLowerCase()
@@ -363,7 +401,7 @@ if(t.includes("bus naar huis")) return "🏫🚌🏠"
 if(t.includes("bus naar school")) return "🏠🚌🏫"
 if(t.includes("rijden")) return "🚗"
 if(t.includes("fietsen")) return "🚵🏼‍♀️"
-if(t.includes("aldi")||t.includes("colruyt")||t.includes("winkel")||t.includes("hubo")||t.includes("decathlon")) return "🛒"
+if(t.includes("aldi")||t.includes("colruyt")||t.includes("winkel")) return "🛒"
 if(t.includes("school")) return "🎒📚"
 if(t.includes("zwemmen")) return "🏊🏼‍♂️"
 if(t.includes("beugel")) return "🦷"
@@ -372,7 +410,6 @@ if(t.includes("dokter")||t.includes("ziekenhuis")) return "🏥🧑🏼‍⚕️
 if(t.includes("slapen")) return "😴"
 if(t.includes("rita oppas thuis")) return "👵🏠"
 if(t.includes("rita oppas bij haar")) return "🧳🏠👵"
-
 
 return "📌"
 
