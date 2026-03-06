@@ -1,109 +1,115 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Agenda PRO I</title>
-
-<script src="https://apis.google.com/js/api.js"></script>
+<title>AgendaPicto EXTREME</title>
 
 <style>
 
 body{
 font-family:Arial;
 margin:0;
-background:#f3f3f3;
+background:#eef2f5;
 }
 
-#login{
-position:fixed;
-top:0;
-left:0;
-right:0;
-bottom:0;
-display:flex;
-align-items:center;
-justify-content:center;
-background:white;
-}
-
-#agendaApp{
-display:none;
-}
-
-.topbar{
-background:#ffffff;
+header{
+background:#4285F4;
+color:white;
 padding:10px;
-box-shadow:0 2px 4px rgba(0,0,0,0.1);
 display:flex;
 flex-wrap:wrap;
-gap:8px;
+gap:6px;
+align-items:center;
 }
 
 button{
-padding:8px 12px;
 border:none;
-background:#2b7cd3;
-color:white;
-border-radius:6px;
+padding:6px 10px;
+border-radius:4px;
 cursor:pointer;
-}
-
-button:hover{
-background:#1e5fa4;
+font-weight:bold;
 }
 
 #filters{
-padding:10px;
 background:white;
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-border-bottom:1px solid #ddd;
+padding:10px;
 }
 
-#agendaContainer{
-padding:20px;
-}
-
-.week{
+#calendar{
 display:grid;
 grid-template-columns:repeat(7,1fr);
-gap:10px;
+gap:8px;
+padding:10px;
 }
 
 .day{
 background:white;
 border-radius:8px;
-padding:10px;
-min-height:600px;
+position:relative;
+height:1020px;
+overflow:hidden;
 }
 
 .dayTitle{
+background:#f5f5f5;
+padding:6px;
+text-align:center;
 font-weight:bold;
-margin-bottom:10px;
+}
+
+.timeline{
+position:absolute;
+top:30px;
+left:0;
+right:0;
+bottom:0;
+}
+
+.hour{
+height:60px;
+border-top:1px solid #eee;
+font-size:10px;
+padding-left:4px;
+color:#999;
 }
 
 .event{
-padding:6px;
-margin-bottom:6px;
-border-radius:6px;
-font-size:13px;
+position:absolute;
+border-radius:8px;
 color:white;
+padding:6px;
+font-size:12px;
+cursor:grab;
+text-align:center;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
 }
 
-.dayview{
-width:80%;
-margin:auto;
+.event img{
+width:24px;
+height:24px;
+margin-bottom:3px;
 }
 
-.picto{
-font-size:22px;
-display:block;
+.kid .event{
+font-size:20px;
+padding:12px;
 }
 
-.smalltext{
-font-size:10px;
-display:block;
+.kid .event img{
+width:48px;
+height:48px;
+}
+
+@media print{
+header,#filters{
+display:none;
+}
+body{
+background:white;
+}
 }
 
 </style>
@@ -111,303 +117,366 @@ display:block;
 
 <body>
 
-<div id="login">
-<button onclick="login()">Aanmelden met Google</button>
-</div>
+<header>
 
-<div id="agendaApp">
+<b>AgendaPicto EXTREME</b>
 
-<div class="topbar">
+<button onclick="login()">Login</button>
+<button onclick="logout()">Logout</button>
 
-<button onclick="prevWeek()">◀ week</button>
-<button onclick="today()">vandaag</button>
-<button onclick="nextWeek()">week ▶</button>
+<button onclick="prevWeek()">←</button>
+<button onclick="nextWeek()">→</button>
 
-<button onclick="toggleView()">dag / week</button>
+<button onclick="setWeek()">Week</button>
+<button onclick="setDay()">Dag</button>
 
-<button onclick="togglePicto()">grote picto</button>
+<button onclick="toggleKid()">Kinder-modus</button>
 
-<button onclick="allOn()">alles aan</button>
-<button onclick="allOff()">alles uit</button>
+<button onclick="selectAll()">Alles aan</button>
+<button onclick="selectNone()">Alles uit</button>
 
-<button onclick="window.print()">print / pdf</button>
+<button onclick="window.print()">Print</button>
 
-</div>
+</header>
 
 <div id="filters"></div>
-
-<div id="agendaContainer"></div>
-
-</div>
+<div id="calendar"></div>
 
 <script>
 
-const CLIENT_ID = "259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com";
-const API_KEY = "AIzaSyCM4qaYbYNZ4vRIIsYGAAw66TnuBKiRLjY";
+const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
 
-const DISCOVERY = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
-const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
-
-let calendars=[];
-let events=[];
-let currentDate=new Date();
-let viewMode="week";
-let bigPicto=false;
+let token=null
+let calendars=[]
+let events=[]
+let monday=null
+let view="week"
 
 function login(){
-gapi.load("client:auth2", async ()=>{
 
-await gapi.client.init({
-apiKey:API_KEY,
-clientId:CLIENT_ID,
-discoveryDocs:DISCOVERY,
-scope:SCOPES
-});
+const url="https://accounts.google.com/o/oauth2/v2/auth"
 
-await gapi.auth2.getAuthInstance().signIn();
+const params={
+client_id:CLIENT_ID,
+redirect_uri:window.location.origin,
+response_type:"token",
+scope:"https://www.googleapis.com/auth/calendar.readonly"
+}
 
-document.getElementById("login").style.display="none";
-document.getElementById("agendaApp").style.display="block";
+window.location=url+"?"+new URLSearchParams(params)
 
-loadCalendars();
+}
 
-});
+function logout(){
+location.hash=""
+location.reload()
+}
+
+function parseToken(){
+
+const hash=window.location.hash.substring(1)
+const params=new URLSearchParams(hash)
+
+token=params.get("access_token")
+
+if(token) init()
+
+}
+
+async function init(){
+
+monday=getMonday(new Date())
+
+await loadCalendars()
+
+renderFilters()
+
+await loadEvents()
+
+render()
+
+}
+
+function getMonday(d){
+
+d=new Date(d)
+
+d.setDate(d.getDate()-(d.getDay()+6)%7)
+
+d.setHours(0,0,0,0)
+
+return d
+
+}
+
+function nextWeek(){
+monday.setDate(monday.getDate()+7)
+loadEvents().then(render)
+}
+
+function prevWeek(){
+monday.setDate(monday.getDate()-7)
+loadEvents().then(render)
+}
+
+function setWeek(){
+view="week"
+render()
+}
+
+function setDay(){
+view="day"
+render()
 }
 
 async function loadCalendars(){
 
-let res=await gapi.client.calendar.calendarList.list();
+const r=await fetch(
+"https://www.googleapis.com/calendar/v3/users/me/calendarList",
+{headers:{Authorization:"Bearer "+token}}
+)
 
-calendars=res.result.items;
+const data=await r.json()
 
-renderFilters();
-
-loadEvents();
-
-}
-
-function renderFilters(){
-
-let html="";
-
-calendars.forEach(cal=>{
-
-html+=`
-<label>
-<input type="checkbox" checked data-id="${cal.id}" onchange="loadEvents()">
-<span style="color:${cal.backgroundColor}">⬤</span>
-${cal.summary}
-</label>
-`;
-
-});
-
-document.getElementById("filters").innerHTML=html;
+calendars=data.items
 
 }
 
 async function loadEvents(){
 
-events=[];
+events=[]
 
-let checks=document.querySelectorAll("#filters input:checked");
+let end=new Date(monday)
+end.setDate(monday.getDate()+7)
 
-for(let c of checks){
+for(const cal of calendars){
 
-let res=await gapi.client.calendar.events.list({
+const r=await fetch(
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${monday.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`,
+{headers:{Authorization:"Bearer "+token}}
+)
 
-calendarId:c.dataset.id,
-timeMin:startWeek().toISOString(),
-timeMax:endWeek().toISOString(),
-singleEvents:true,
-orderBy:"startTime"
+const data=await r.json()
 
-});
+if(data.items){
 
-res.result.items.forEach(e=>{
-
-e.calendarId=c.dataset.id;
-
-events.push(e);
-
-});
+data.items.forEach(e=>{
+e.calendar=cal.summary
+e.color=cal.backgroundColor||"#5f6368"
+events.push(e)
+})
 
 }
 
-renderAgenda();
+}
 
 }
 
-function startWeek(){
+function renderFilters(){
 
-let d=new Date(currentDate);
-d.setDate(d.getDate()-d.getDay()+1);
-d.setHours(0,0,0);
+const f=document.getElementById("filters")
 
-return d;
+f.innerHTML="<b>Agenda's</b><br>"
 
-}
+calendars.forEach(cal=>{
 
-function endWeek(){
+const id="f"+cal.id.replace(/[^a-z0-9]/gi,"")
 
-let d=startWeek();
-d.setDate(d.getDate()+7);
-return d;
+f.innerHTML+=`
+<label>
+<input type="checkbox" id="${id}" checked onchange="render()">
+${cal.summary}
+</label>
+`
 
-}
-
-function renderAgenda(){
-
-if(viewMode==="week") renderWeek();
-else renderDay();
+})
 
 }
 
-function renderWeek(){
+function selectedCalendars(){
 
-let start=startWeek();
+return calendars.filter(cal=>{
 
-let html=`<div class="week">`;
+const id="f"+cal.id.replace(/[^a-z0-9]/gi,"")
 
-for(let i=0;i<7;i++){
+return document.getElementById(id)?.checked
 
-let d=new Date(start);
-d.setDate(d.getDate()+i);
-
-let label=d.toLocaleDateString("nl-BE",{weekday:"long"})+" "+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"});
-
-html+=`<div class="day"><div class="dayTitle">${label}</div>`;
-
-events.forEach(ev=>{
-
-let evDate=new Date(ev.start.dateTime||ev.start.date);
-
-if(evDate.toDateString()==d.toDateString()){
-
-let cal=calendars.find(c=>c.id==ev.calendarId);
-
-html+=eventHTML(ev,cal.backgroundColor);
+}).map(c=>c.summary)
 
 }
 
-});
+function selectAll(){
+document.querySelectorAll("#filters input").forEach(i=>i.checked=true)
+render()
+}
 
-html+="</div>";
+function selectNone(){
+document.querySelectorAll("#filters input").forEach(i=>i.checked=false)
+render()
+}
+
+function render(){
+
+const cal=document.getElementById("calendar")
+
+cal.innerHTML=""
+
+const days=view==="week"?7:1
+
+cal.style.gridTemplateColumns=view==="week"?"repeat(7,1fr)":"1fr"
+
+const names=["Ma","Di","Wo","Do","Vr","Za","Zo"]
+
+for(let i=0;i<days;i++){
+
+let d=new Date(monday)
+d.setDate(monday.getDate()+i)
+
+const day=document.createElement("div")
+day.className="day"
+
+day.innerHTML=`<div class="dayTitle">${names[i]} ${d.getDate()}/${d.getMonth()+1}</div>`
+
+const timeline=document.createElement("div")
+timeline.className="timeline"
+
+for(let h=6;h<=23;h++){
+
+const hour=document.createElement("div")
+hour.className="hour"
+hour.innerText=h+":00"
+
+timeline.appendChild(hour)
 
 }
 
-html+="</div>";
+day.appendChild(timeline)
 
-document.getElementById("agendaContainer").innerHTML=html;
+cal.appendChild(day)
 
-}
-
-function renderDay(){
-
-let d=currentDate;
-
-let html=`<div class="dayview"><div class="day"><div class="dayTitle">`;
-
-html+=d.toLocaleDateString("nl-BE",{weekday:"long"})+" "+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"});
-
-html+=`</div>`;
-
-events.forEach(ev=>{
-
-let evDate=new Date(ev.start.dateTime||ev.start.date);
-
-if(evDate.toDateString()==d.toDateString()){
-
-let cal=calendars.find(c=>c.id==ev.calendarId);
-
-html+=eventHTML(ev,cal.backgroundColor);
+renderEvents(day,i)
 
 }
 
-});
+}
 
-html+="</div></div>";
+function renderEvents(day,index){
 
-document.getElementById("agendaContainer").innerHTML=html;
+const selected=selectedCalendars()
+
+const dayEvents=events
+.filter(e=>{
+if(!selected.includes(e.calendar)) return false
+const d=new Date(e.start.dateTime||e.start.date)
+return (d.getDay()+6)%7===index
+})
+.sort((a,b)=>new Date(a.start.dateTime||a.start.date)-new Date(b.start.dateTime||b.start.date))
+
+const lanes=[]
+
+dayEvents.forEach(e=>{
+
+const start=new Date(e.start.dateTime||e.start.date)
+const end=new Date(e.end?.dateTime||e.start.dateTime||e.start.date)
+
+const startMin=start.getHours()*60+start.getMinutes()
+const endMin=end.getHours()*60+end.getMinutes()
+
+let lane=0
+while(lanes[lane] && lanes[lane]>startMin) lane++
+
+lanes[lane]=endMin
+
+const dayStart=6*60
+const dayEnd=23*60
+const duration=dayEnd-dayStart
+
+const top=(startMin-dayStart)/duration*100
+const height=(endMin-startMin)/duration*100
+const width=100/(lanes.length+1)
+
+const div=document.createElement("div")
+div.className="event"
+
+div.style.top=top+"%"
+div.style.height=height+"%"
+div.style.left=(lane*width)+"%"
+div.style.width=width+"%"
+div.style.background=colorAI(e)
+
+const icon=getIcon(e)
+
+div.innerHTML=`
+<img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
+<div>${e.summary}</div>
+`
+
+enableDrag(div)
+
+day.appendChild(div)
+
+})
 
 }
 
-function eventHTML(ev,color){
+function enableDrag(el){
 
-let title=ev.summary||"";
+el.draggable=true
 
-let icon="📅";
-
-if(ev.location && ev.location.toLowerCase().includes("orelia puthof"))
-icon="👩‍⚕️";
-
-if(title.includes("Rita oppas thuis")||title.includes("Oppas door Loriana"))
-icon="🏠";
-
-if(title.includes("Rita oppas bij haar"))
-icon="🧒";
-
-if(bigPicto){
-
-return `<div class="event" style="background:${color}">
-<span class="picto">${icon}</span>
-<span class="smalltext">${title}</span>
-</div>`;
+el.addEventListener("dragstart",e=>{
+e.dataTransfer.setData("text/plain","drag")
+})
 
 }
 
-return `<div class="event" style="background:${color}">${icon} ${title}</div>`;
+function colorAI(e){
+
+const t=(e.summary||"").toLowerCase()
+
+if(t.includes("school")) return "#34A853"
+if(t.includes("voetbal")) return "#EA4335"
+if(t.includes("zwem")) return "#00ACC1"
+if(t.includes("dokter")) return "#DB4437"
+if(t.includes("eten")) return "#FBBC05"
+if(t.includes("slapen")) return "#5C6BC0"
+
+return e.color
 
 }
 
-function prevWeek(){
+function getIcon(e){
 
-currentDate.setDate(currentDate.getDate()-7);
-loadEvents();
+const t=(e.summary||"").toLowerCase()
+const l=(e.location||"").toLowerCase()
 
-}
+if(t.includes("bus")) return "bus"
+if(t.includes("slapen")) return "sleep"
+if(t.includes("rijden")) return "car"
+if(t.includes("voetbal")) return "soccer"
+if(t.includes("zwem")) return "swim"
+if(t.includes("school")) return "school"
+if(t.includes("verjaardag")) return "cake"
+if(t.includes("feest")) return "party-popper"
+if(t.includes("dokter")) return "medical-bag"
+if(t.includes("tandarts")) return "tooth"
+if(t.includes("beugel")) return "tooth-outline"
+if(t.includes("eten")) return "silverware"
+if(t.includes("film")) return "movie-open"
+if(t.includes("muziek")) return "music"
+if(t.includes("oppas")) return "home-heart"
 
-function nextWeek(){
+if(l.includes("kapelstraat 73")) return "medical-cross"
+if(l.includes("puthofveld")) return "nurse"
 
-currentDate.setDate(currentDate.getDate()+7);
-loadEvents();
-
-}
-
-function today(){
-
-currentDate=new Date();
-loadEvents();
-
-}
-
-function toggleView(){
-
-viewMode=viewMode==="week"?"day":"week";
-renderAgenda();
-
-}
-
-function togglePicto(){
-
-bigPicto=!bigPicto;
-renderAgenda();
+return "calendar"
 
 }
 
-function allOn(){
-
-document.querySelectorAll("#filters input").forEach(i=>i.checked=true);
-loadEvents();
-
+function toggleKid(){
+document.body.classList.toggle("kid")
 }
 
-function allOff(){
-
-document.querySelectorAll("#filters input").forEach(i=>i.checked=false);
-loadEvents();
-
-}
+parseToken()
 
 </script>
 
