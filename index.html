@@ -2,102 +2,93 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<title>Familie Agenda</title>
+<title>Agenda PRO I</title>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js"></script>
 
 <style>
 
 body{
 font-family:Arial;
 margin:0;
-background:#f2f2f2;
+background:#f3f3f3;
 }
 
-header{
-background:#4285F4;
-color:white;
-padding:10px;
+#login{
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
 display:flex;
-gap:8px;
-flex-wrap:wrap;
 align-items:center;
+justify-content:center;
+background:white;
+}
+
+#agendaApp{
+display:none;
+}
+
+.topbar{
+background:#ffffff;
+padding:10px;
+box-shadow:0 2px 4px rgba(0,0,0,0.1);
+display:flex;
+flex-wrap:wrap;
+gap:8px;
 }
 
 button{
+padding:8px 12px;
 border:none;
-border-radius:8px;
-padding:8px 14px;
+background:#2b7cd3;
+color:white;
+border-radius:6px;
 cursor:pointer;
-background:white;
+}
+
+button:hover{
+background:#1e5fa4;
 }
 
 #filters{
-background:white;
 padding:10px;
+background:white;
 display:flex;
-gap:14px;
+gap:10px;
 flex-wrap:wrap;
 border-bottom:1px solid #ddd;
 }
 
-#agenda{
-padding:10px;
+#agendaContainer{
+padding:20px;
 }
 
 .week{
-display:flex;
-gap:6px;
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:10px;
 }
 
 .day{
-flex:1;
 background:white;
-border-radius:10px;
-position:relative;
-height:960px;
+border-radius:8px;
+padding:10px;
+min-height:600px;
 }
 
-.dayHeader{
-text-align:center;
+.dayTitle{
 font-weight:bold;
-padding:8px;
-border-bottom:1px solid #ddd;
-}
-
-.hour{
-position:absolute;
-left:0;
-right:0;
-border-top:1px solid #eee;
-font-size:10px;
-color:#888;
+margin-bottom:10px;
 }
 
 .event{
-position:absolute;
+padding:6px;
+margin-bottom:6px;
 border-radius:6px;
+font-size:13px;
 color:white;
-padding:4px;
-font-size:12px;
-display:flex;
-gap:5px;
-align-items:center;
-overflow:hidden;
-}
-
-.icon{
-font-size:16px;
-}
-
-.large .icon{
-font-size:34px;
-display:block;
-}
-
-.large .event{
-flex-direction:column;
-text-align:center;
 }
 
 .dayview{
@@ -105,375 +96,318 @@ width:80%;
 margin:auto;
 }
 
+.picto{
+font-size:22px;
+display:block;
+}
+
+.smalltext{
+font-size:10px;
+display:block;
+}
+
 </style>
 </head>
 
 <body>
 
-<header>
+<div id="login">
+<button onclick="login()">Aanmelden met Google</button>
+</div>
 
-<button onclick="login()">Login</button>
-<button onclick="logout()">Logout</button>
+<div id="agendaApp">
 
-<button onclick="prev()">◀ week</button>
+<div class="topbar">
+
+<button onclick="prevWeek()">◀ week</button>
 <button onclick="today()">vandaag</button>
-<button onclick="next()">week ▶</button>
+<button onclick="nextWeek()">week ▶</button>
 
-<button onclick="toggleView()">dag/week</button>
+<button onclick="toggleView()">dag / week</button>
 
-<button onclick="toggleIcons()">grote picto</button>
+<button onclick="togglePicto()">grote picto</button>
 
 <button onclick="allOn()">alles aan</button>
 <button onclick="allOff()">alles uit</button>
 
 <button onclick="window.print()">print / pdf</button>
 
-</header>
+</div>
 
 <div id="filters"></div>
-<div id="agenda"></div>
+
+<div id="agendaContainer"></div>
+
+</div>
 
 <script>
 
-const CLIENT="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
+const CLIENT_ID = "YOUR_CLIENT_ID";
+const API_KEY = "YOUR_API_KEY";
 
-let token=null
-let calendars=[]
-let events=[]
+const DISCOVERY = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
-let monday=getMonday(new Date())
-
-let view="week"
-let big=false
-
-const HIDDEN=[
-"Weeknummers",
-"Agenda",
-"Borgloon Weather",
-"agenda website"
-]
+let calendars=[];
+let events=[];
+let currentDate=new Date();
+let viewMode="week";
+let bigPicto=false;
 
 function login(){
+gapi.load("client:auth2", async ()=>{
 
-let url="https://accounts.google.com/o/oauth2/v2/auth"
+await gapi.client.init({
+apiKey:API_KEY,
+clientId:CLIENT_ID,
+discoveryDocs:DISCOVERY,
+scope:SCOPES
+});
 
-let params={
-client_id:CLIENT,
-redirect_uri:location.origin,
-response_type:"token",
-scope:"https://www.googleapis.com/auth/calendar.readonly"
-}
+await gapi.auth2.getAuthInstance().signIn();
 
-location=url+"?"+new URLSearchParams(params)
+document.getElementById("login").style.display="none";
+document.getElementById("agendaApp").style.display="block";
 
-}
+loadCalendars();
 
-function logout(){
-
-token=null
-localStorage.removeItem("token")
-render()
-
-}
-
-function checkToken(){
-
-let hash=new URLSearchParams(location.hash.substring(1))
-token=hash.get("access_token")
-
-if(token){
-localStorage.setItem("token",token)
-init()
-return
-}
-
-token=localStorage.getItem("token")
-
-if(token) init()
-
-}
-
-async function init(){
-
-await loadCalendars()
-await loadEvents()
-render()
-
+});
 }
 
 async function loadCalendars(){
 
-let r=await fetch(
-"https://www.googleapis.com/calendar/v3/users/me/calendarList",
-{headers:{Authorization:"Bearer "+token}}
-)
+let res=await gapi.client.calendar.calendarList.list();
 
-let data=await r.json()
+calendars=res.result.items;
 
-calendars=data.items.filter(c=>!HIDDEN.includes(c.summary))
+renderFilters();
 
-buildFilters()
+loadEvents();
 
 }
 
-function buildFilters(){
+function renderFilters(){
 
-let f=document.getElementById("filters")
-f.innerHTML=""
+let html="";
 
-calendars.forEach(c=>{
+calendars.forEach(cal=>{
 
-let label=document.createElement("label")
+html+=`
+<label>
+<input type="checkbox" checked data-id="${cal.id}" onchange="loadEvents()">
+<span style="color:${cal.backgroundColor}">⬤</span>
+${cal.summary}
+</label>
+`;
 
-label.innerHTML=
-`<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
+});
 
-label.querySelector("input").onchange=render
-
-f.appendChild(label)
-
-})
-
-}
-
-function rename(n){
-
-if(n.includes("Belgie Feestdagen")) return "feestdagen"
-return n
+document.getElementById("filters").innerHTML=html;
 
 }
 
 async function loadEvents(){
 
-events=[]
+events=[];
 
-let start=new Date(monday)
-let end=new Date(monday)
-end.setDate(end.getDate()+7)
+let checks=document.querySelectorAll("#filters input:checked");
 
-for(let cal of calendars){
+for(let c of checks){
 
-let url=
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
-`timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=2500`
+let res=await gapi.client.calendar.events.list({
 
-let r=await fetch(url,{
-headers:{Authorization:"Bearer "+token}
-})
+calendarId:c.dataset.id,
+timeMin:startWeek().toISOString(),
+timeMax:endWeek().toISOString(),
+singleEvents:true,
+orderBy:"startTime"
 
-let data=await r.json()
+});
 
-data.items.forEach(e=>{
+res.result.items.forEach(e=>{
 
-if(!e.start?.dateTime) return
+e.calendarId=c.dataset.id;
 
-events.push({
-title:e.summary,
-start:new Date(e.start.dateTime),
-end:new Date(e.end.dateTime),
-calendar:cal.id,
-color:cal.backgroundColor||"#4285F4",
-location:e.location||""
-})
+events.push(e);
 
-})
+});
 
 }
 
-}
-
-function activeCalendars(){
-
-let a=[]
-document.querySelectorAll("#filters input:checked")
-.forEach(c=>a.push(c.value))
-return a
+renderAgenda();
 
 }
 
-function render(){
+function startWeek(){
 
-let ag=document.getElementById("agenda")
-ag.innerHTML=""
+let d=new Date(currentDate);
+d.setDate(d.getDate()-d.getDay()+1);
+d.setHours(0,0,0);
 
-let container=document.createElement("div")
-
-if(view=="week") container.className="week"
-else container.className="week dayview"
-
-for(let i=0;i<(view=="week"?7:1);i++){
-
-let d=new Date(monday)
-d.setDate(d.getDate()+i)
-
-let col=document.createElement("div")
-col.className="day"
-
-let head=document.createElement("div")
-head.className="dayHeader"
-
-head.innerText=
-d.toLocaleDateString("nl-BE",{weekday:"long"})+
-" "+
-d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
-
-col.appendChild(head)
-
-for(let h=7;h<=23;h++){
-
-let line=document.createElement("div")
-line.className="hour"
-line.style.top=((h-7)*60)+"px"
-line.innerText=h+":00"
-
-col.appendChild(line)
+return d;
 
 }
 
-let dayEvents=events
-.filter(e=>activeCalendars().includes(e.calendar))
-.filter(e=>sameDay(e.start,d))
-.sort((a,b)=>a.start-b.start)
+function endWeek(){
 
-layoutEvents(dayEvents).forEach(ev=>{
-
-let top=(ev.start.getHours()-7)*60+ev.start.getMinutes()
-let dur=(ev.end-ev.start)/60000
-
-let div=document.createElement("div")
-
-div.className="event"
-div.style.top=top+"px"
-div.style.height=dur+"px"
-div.style.left=(ev.col*33+2)+"%"
-div.style.width="30%"
-div.style.background=ev.color
-
-div.innerHTML=
-`<div class="icon">${icon(ev)}</div>
-<div>${time(ev.start)} ${ev.title}</div>`
-
-col.appendChild(div)
-
-})
-
-container.appendChild(col)
+let d=startWeek();
+d.setDate(d.getDate()+7);
+return d;
 
 }
 
-ag.appendChild(container)
+function renderAgenda(){
 
-if(big) ag.classList.add("large")
-else ag.classList.remove("large")
-
-}
-
-function layoutEvents(list){
-
-let cols=[]
-
-list.forEach(e=>{
-
-let placed=false
-
-for(let i=0;i<cols.length;i++){
-
-if(cols[i].every(o=>e.start>=o.end||e.end<=o.start)){
-cols[i].push(e)
-e.col=i
-placed=true
-break
-}
+if(viewMode==="week") renderWeek();
+else renderDay();
 
 }
 
-if(!placed){
-cols.push([e])
-e.col=cols.length-1
-}
+function renderWeek(){
 
-})
+let start=startWeek();
 
-return list
+let html=`<div class="week">`;
 
-}
+for(let i=0;i<7;i++){
 
-function icon(e){
+let d=new Date(start);
+d.setDate(d.getDate()+i);
 
-let t=e.title.toLowerCase()
-let l=e.location.toLowerCase()
+let label=d.toLocaleDateString("nl-BE",{weekday:"long"})+" "+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"});
 
-if(l.includes("orelia puthof")) return "👩‍⚕️"
-if(t.includes("bus")) return "🚌"
-if(t.includes("rijden")) return "🚗"
-if(t.includes("slapen")) return "😴"
-if(t.includes("rita oppas thuis")) return "🏠"
-if(t.includes("rita oppas bij haar")) return "🧳"
+html+=`<div class="day"><div class="dayTitle">${label}</div>`;
 
-return "📌"
+events.forEach(ev=>{
 
-}
+let evDate=new Date(ev.start.dateTime||ev.start.date);
 
-function sameDay(a,b){
-return a.getFullYear()==b.getFullYear() &&
-a.getMonth()==b.getMonth() &&
-a.getDate()==b.getDate()
-}
+if(evDate.toDateString()==d.toDateString()){
 
-function time(d){
-return d.getHours().toString().padStart(2,"0")+":"+
-d.getMinutes().toString().padStart(2,"0")
-}
+let cal=calendars.find(c=>c.id==ev.calendarId);
 
-function getMonday(d){
-
-d=new Date(d)
-
-let day=d.getDay()
-let diff=d.getDate()-day+(day==0?-6:1)
-
-return new Date(d.setDate(diff))
+html+=eventHTML(ev,cal.backgroundColor);
 
 }
 
-function prev(){
-monday.setDate(monday.getDate()-7)
-init()
+});
+
+html+="</div>";
+
 }
 
-function next(){
-monday.setDate(monday.getDate()+7)
-init()
+html+="</div>";
+
+document.getElementById("agendaContainer").innerHTML=html;
+
+}
+
+function renderDay(){
+
+let d=currentDate;
+
+let html=`<div class="dayview"><div class="day"><div class="dayTitle">`;
+
+html+=d.toLocaleDateString("nl-BE",{weekday:"long"})+" "+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"});
+
+html+=`</div>`;
+
+events.forEach(ev=>{
+
+let evDate=new Date(ev.start.dateTime||ev.start.date);
+
+if(evDate.toDateString()==d.toDateString()){
+
+let cal=calendars.find(c=>c.id==ev.calendarId);
+
+html+=eventHTML(ev,cal.backgroundColor);
+
+}
+
+});
+
+html+="</div></div>";
+
+document.getElementById("agendaContainer").innerHTML=html;
+
+}
+
+function eventHTML(ev,color){
+
+let title=ev.summary||"";
+
+let icon="📅";
+
+if(ev.location && ev.location.toLowerCase().includes("orelia puthof"))
+icon="👩‍⚕️";
+
+if(title.includes("Rita oppas thuis")||title.includes("Oppas door Loriana"))
+icon="🏠";
+
+if(title.includes("Rita oppas bij haar"))
+icon="🧒";
+
+if(bigPicto){
+
+return `<div class="event" style="background:${color}">
+<span class="picto">${icon}</span>
+<span class="smalltext">${title}</span>
+</div>`;
+
+}
+
+return `<div class="event" style="background:${color}">${icon} ${title}</div>`;
+
+}
+
+function prevWeek(){
+
+currentDate.setDate(currentDate.getDate()-7);
+loadEvents();
+
+}
+
+function nextWeek(){
+
+currentDate.setDate(currentDate.getDate()+7);
+loadEvents();
+
 }
 
 function today(){
-monday=getMonday(new Date())
-init()
+
+currentDate=new Date();
+loadEvents();
+
 }
 
 function toggleView(){
-view=view=="week"?"day":"week"
-render()
+
+viewMode=viewMode==="week"?"day":"week";
+renderAgenda();
+
 }
 
-function toggleIcons(){
-big=!big
-render()
+function togglePicto(){
+
+bigPicto=!bigPicto;
+renderAgenda();
+
 }
 
 function allOn(){
-document.querySelectorAll("#filters input")
-.forEach(c=>c.checked=true)
-render()
+
+document.querySelectorAll("#filters input").forEach(i=>i.checked=true);
+loadEvents();
+
 }
 
 function allOff(){
-document.querySelectorAll("#filters input")
-.forEach(c=>c.checked=false)
-render()
-}
 
-checkToken()
+document.querySelectorAll("#filters input").forEach(i=>i.checked=false);
+loadEvents();
+
+}
 
 </script>
 
