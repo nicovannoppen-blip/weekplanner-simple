@@ -3,62 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>AgendaPicto Weekplanner</title>
+<title>AgendaPicto PRO X ULTRA</title>
 
 <link rel="stylesheet" href="style.css">
 
-<link rel="manifest" href="manifest.json">
+<script src="https://apis.google.com/js/api.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
 
 </head>
 
 <body>
 
+<div id="loginScreen">
+
 <h1>AgendaPicto</h1>
 
-<div class="week">
+<button id="loginBtn">Aanmelden met Google</button>
 
-<div class="day" data-day="ma">
-<h2>Maandag</h2>
-<div class="slots"></div>
-<button onclick="addItem('ma')">+</button>
+<label>
+<input type="checkbox" id="rememberLogin">
+Onthoud aanmelden
+</label>
+
 </div>
 
-<div class="day" data-day="di">
-<h2>Dinsdag</h2>
-<div class="slots"></div>
-<button onclick="addItem('di')">+</button>
+<div id="app">
+
+<header>
+
+<div class="controls">
+
+<button id="dayViewBtn">Dag</button>
+<button id="weekViewBtn">Week</button>
+<button id="bigPictoBtn">Grote pictogrammen</button>
+
 </div>
 
-<div class="day" data-day="wo">
-<h2>Woensdag</h2>
-<div class="slots"></div>
-<button onclick="addItem('wo')">+</button>
-</div>
+<div id="calendarFilters"></div>
 
-<div class="day" data-day="do">
-<h2>Donderdag</h2>
-<div class="slots"></div>
-<button onclick="addItem('do')">+</button>
-</div>
+</header>
 
-<div class="day" data-day="vr">
-<h2>Vrijdag</h2>
-<div class="slots"></div>
-<button onclick="addItem('vr')">+</button>
-</div>
-
-<div class="day" data-day="za">
-<h2>Zaterdag</h2>
-<div class="slots"></div>
-<button onclick="addItem('za')">+</button>
-</div>
-
-<div class="day" data-day="zo">
-<h2>Zondag</h2>
-<div class="slots"></div>
-<button onclick="addItem('zo')">+</button>
-</div>
+<div id="agendaContainer"></div>
 
 </div>
 
