@@ -1,51 +1,42 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html>
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AgendaPicto PRO X ULTRA</title>
+<title>AgendaPicto PRO X</title>
 
 <link rel="stylesheet" href="style.css">
-
-<script src="https://apis.google.com/js/api.js"></script>
-<script src="https://accounts.google.com/gsi/client"></script>
 
 </head>
 
 <body>
 
-<div id="loginScreen">
-
-<h1>AgendaPicto</h1>
-
-<button id="loginBtn">Aanmelden met Google</button>
-
-<label>
-<input type="checkbox" id="rememberLogin">
-Onthoud aanmelden
-</label>
-
-</div>
-
-<div id="app">
-
 <header>
 
-<div class="controls">
-
-<button id="dayViewBtn">Dag</button>
-<button id="weekViewBtn">Week</button>
-<button id="bigPictoBtn">Grote pictogrammen</button>
-
+<div class="title">
+AgendaPicto PRO X
 </div>
 
-<div id="calendarFilters"></div>
+<div class="buttons">
+
+<button onclick="login()">Login</button>
+<button onclick="logout()">Logout</button>
+
+<button onclick="previousWeek()">◀</button>
+<button onclick="nextWeek()">▶</button>
+
+<button onclick="weekView()">Week</button>
+<button onclick="dayView()">Dag</button>
+
+<button onclick="toggleBig()">Grote pictogrammen</button>
+
+</div>
 
 </header>
 
-<div id="agendaContainer"></div>
+<div id="filters"></div>
 
-</div>
+<div id="agenda"></div>
 
 <script src="app.js"></script>
 
