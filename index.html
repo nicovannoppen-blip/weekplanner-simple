@@ -11,7 +11,7 @@
 body{
 font-family:Arial;
 margin:0;
-background:#f3f3f3;
+background:#f2f2f2;
 }
 
 header{
@@ -19,44 +19,49 @@ background:#4285F4;
 color:white;
 padding:10px;
 display:flex;
+gap:8px;
 flex-wrap:wrap;
-gap:10px;
+align-items:center;
 }
 
 button{
-padding:8px 12px;
 border:none;
-border-radius:6px;
-background:white;
+border-radius:8px;
+padding:8px 14px;
 cursor:pointer;
+background:white;
 }
 
 #filters{
 background:white;
 padding:10px;
 display:flex;
-gap:15px;
+gap:14px;
 flex-wrap:wrap;
 border-bottom:1px solid #ddd;
 }
 
+#agenda{
+padding:10px;
+}
+
 .week{
 display:flex;
-height:960px;
+gap:6px;
 }
 
 .day{
 flex:1;
 background:white;
-margin:4px;
-border-radius:8px;
+border-radius:10px;
 position:relative;
+height:960px;
 }
 
 .dayHeader{
 text-align:center;
 font-weight:bold;
-padding:6px;
+padding:8px;
 border-bottom:1px solid #ddd;
 }
 
@@ -71,15 +76,14 @@ color:#888;
 
 .event{
 position:absolute;
-left:6%;
-width:88%;
 border-radius:6px;
 color:white;
 padding:4px;
 font-size:12px;
 display:flex;
-gap:6px;
+gap:5px;
 align-items:center;
+overflow:hidden;
 }
 
 .icon{
@@ -96,6 +100,11 @@ flex-direction:column;
 text-align:center;
 }
 
+.dayview{
+width:80%;
+margin:auto;
+}
+
 </style>
 </head>
 
@@ -106,14 +115,16 @@ text-align:center;
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
 
-<button onclick="prevWeek()">◀ week</button>
+<button onclick="prev()">◀ week</button>
 <button onclick="today()">vandaag</button>
-<button onclick="nextWeek()">week ▶</button>
+<button onclick="next()">week ▶</button>
+
+<button onclick="toggleView()">dag/week</button>
 
 <button onclick="toggleIcons()">grote picto</button>
 
-<button onclick="selectAll()">alles aan</button>
-<button onclick="selectNone()">alles uit</button>
+<button onclick="allOn()">alles aan</button>
+<button onclick="allOff()">alles uit</button>
 
 <button onclick="window.print()">print / pdf</button>
 
@@ -124,13 +135,16 @@ text-align:center;
 
 <script>
 
-const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
+const CLIENT="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com"
 
 let token=null
 let calendars=[]
 let events=[]
-let currentMonday=getMonday(new Date())
-let bigIcons=false
+
+let monday=getMonday(new Date())
+
+let view="week"
+let big=false
 
 const HIDDEN=[
 "Weeknummers",
@@ -141,31 +155,39 @@ const HIDDEN=[
 
 function login(){
 
-const url="https://accounts.google.com/o/oauth2/v2/auth"
+let url="https://accounts.google.com/o/oauth2/v2/auth"
 
-const params={
-client_id:CLIENT_ID,
-redirect_uri:window.location.origin,
+let params={
+client_id:CLIENT,
+redirect_uri:location.origin,
 response_type:"token",
 scope:"https://www.googleapis.com/auth/calendar.readonly"
 }
 
-window.location=url+"?"+new URLSearchParams(params)
+location=url+"?"+new URLSearchParams(params)
 
 }
 
 function logout(){
+
 token=null
-events=[]
+localStorage.removeItem("token")
 render()
+
 }
 
-function parseToken(){
+function checkToken(){
 
-const hash=location.hash.substring(1)
-const params=new URLSearchParams(hash)
+let hash=new URLSearchParams(location.hash.substring(1))
+token=hash.get("access_token")
 
-token=params.get("access_token")
+if(token){
+localStorage.setItem("token",token)
+init()
+return
+}
+
+token=localStorage.getItem("token")
 
 if(token) init()
 
@@ -206,7 +228,7 @@ let label=document.createElement("label")
 label.innerHTML=
 `<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
 
-label.querySelector("input").addEventListener("change",render)
+label.querySelector("input").onchange=render
 
 f.appendChild(label)
 
@@ -225,21 +247,15 @@ async function loadEvents(){
 
 events=[]
 
-let start=new Date(currentMonday)
-start.setHours(0,0,0)
-
-let end=new Date(currentMonday)
+let start=new Date(monday)
+let end=new Date(monday)
 end.setDate(end.getDate()+7)
 
 for(let cal of calendars){
 
 let url=
 `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
-`timeMin=${start.toISOString()}&`+
-`timeMax=${end.toISOString()}&`+
-`singleEvents=true&`+
-`orderBy=startTime&`+
-`maxResults=2500`
+`timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=2500`
 
 let r=await fetch(url,{
 headers:{Authorization:"Bearer "+token}
@@ -252,14 +268,12 @@ data.items.forEach(e=>{
 if(!e.start?.dateTime) return
 
 events.push({
-
 title:e.summary,
 start:new Date(e.start.dateTime),
 end:new Date(e.end.dateTime),
-color:cal.backgroundColor||"#4285F4",
 calendar:cal.id,
+color:cal.backgroundColor||"#4285F4",
 location:e.location||""
-
 })
 
 })
@@ -270,28 +284,26 @@ location:e.location||""
 
 function activeCalendars(){
 
-let list=[]
-
+let a=[]
 document.querySelectorAll("#filters input:checked")
-.forEach(cb=>list.push(cb.value))
-
-return list
+.forEach(c=>a.push(c.value))
+return a
 
 }
 
 function render(){
 
-let agenda=document.getElementById("agenda")
-agenda.innerHTML=""
+let ag=document.getElementById("agenda")
+ag.innerHTML=""
 
-let active=activeCalendars()
+let container=document.createElement("div")
 
-let week=document.createElement("div")
-week.className="week"
+if(view=="week") container.className="week"
+else container.className="week dayview"
 
-for(let i=0;i<7;i++){
+for(let i=0;i<(view=="week"?7:1);i++){
 
-let d=new Date(currentMonday)
+let d=new Date(monday)
 d.setDate(d.getDate()+i)
 
 let col=document.createElement("div")
@@ -318,37 +330,71 @@ col.appendChild(line)
 
 }
 
-events
-.filter(e=>active.includes(e.calendar))
+let dayEvents=events
+.filter(e=>activeCalendars().includes(e.calendar))
 .filter(e=>sameDay(e.start,d))
 .sort((a,b)=>a.start-b.start)
-.forEach(e=>{
 
-let start=(e.start.getHours()-7)*60+e.start.getMinutes()
-let dur=(e.end-e.start)/60000
+layoutEvents(dayEvents).forEach(ev=>{
+
+let top=(ev.start.getHours()-7)*60+ev.start.getMinutes()
+let dur=(ev.end-ev.start)/60000
 
 let div=document.createElement("div")
+
 div.className="event"
-div.style.top=start+"px"
+div.style.top=top+"px"
 div.style.height=dur+"px"
-div.style.background=e.color
+div.style.left=(ev.col*33+2)+"%"
+div.style.width="30%"
+div.style.background=ev.color
 
 div.innerHTML=
-`<div class="icon">${icon(e)}</div>
-<div>${time(e.start)} ${e.title}</div>`
+`<div class="icon">${icon(ev)}</div>
+<div>${time(ev.start)} ${ev.title}</div>`
 
 col.appendChild(div)
 
 })
 
-week.appendChild(col)
+container.appendChild(col)
 
 }
 
-agenda.appendChild(week)
+ag.appendChild(container)
 
-if(bigIcons) agenda.classList.add("large")
-else agenda.classList.remove("large")
+if(big) ag.classList.add("large")
+else ag.classList.remove("large")
+
+}
+
+function layoutEvents(list){
+
+let cols=[]
+
+list.forEach(e=>{
+
+let placed=false
+
+for(let i=0;i<cols.length;i++){
+
+if(cols[i].every(o=>e.start>=o.end||e.end<=o.start)){
+cols[i].push(e)
+e.col=i
+placed=true
+break
+}
+
+}
+
+if(!placed){
+cols.push([e])
+e.col=cols.length-1
+}
+
+})
+
+return list
 
 }
 
@@ -357,39 +403,26 @@ function icon(e){
 let t=e.title.toLowerCase()
 let l=e.location.toLowerCase()
 
-if(l.includes("orelia")) return "👩🏼‍⚕️👩🏼‍🦽‍➡️"
-if(l.includes("kapelstraat")||l.includes("rode kruis")||t.includes("vorming")) return "🧔🏼‍♀️🏢"
-if(t.includes("bus naar huis")) return "🏫🚌🏠"
-if(t.includes("bus naar school")) return "🏠🚌🏫"
+if(l.includes("orelia puthof")) return "👩‍⚕️"
+if(t.includes("bus")) return "🚌"
 if(t.includes("rijden")) return "🚗"
-if(t.includes("fietsen")) return "🚵🏼‍♀️"
-if(t.includes("aldi")||t.includes("colruyt")||t.includes("winkel")||t.includes("hubo")||t.includes("decathlon")) return "🛒"
-if(t.includes("school")) return "🎒📚"
-if(t.includes("zwemmen")) return "🏊🏼‍♂️"
-if(t.includes("beugel")) return "🦷"
-if(t.includes("pedicure")) return "🦶🏼💅🏼"
-if(t.includes("dokter")||t.includes("ziekenhuis")) return "🏥🧑🏼‍⚕️"
 if(t.includes("slapen")) return "😴"
-if(t.includes("rita oppas thuis")) return "👵🏠"
-if(t.includes("rita oppas bij haar")) return "🧳🏠👵"
+if(t.includes("rita oppas thuis")) return "🏠"
+if(t.includes("rita oppas bij haar")) return "🧳"
 
 return "📌"
 
 }
 
 function sameDay(a,b){
-
 return a.getFullYear()==b.getFullYear() &&
 a.getMonth()==b.getMonth() &&
 a.getDate()==b.getDate()
-
 }
 
 function time(d){
-
 return d.getHours().toString().padStart(2,"0")+":"+
 d.getMinutes().toString().padStart(2,"0")
-
 }
 
 function getMonday(d){
@@ -403,53 +436,44 @@ return new Date(d.setDate(diff))
 
 }
 
-function prevWeek(){
-
-currentMonday.setDate(currentMonday.getDate()-7)
+function prev(){
+monday.setDate(monday.getDate()-7)
 init()
-
 }
 
-function nextWeek(){
-
-currentMonday.setDate(currentMonday.getDate()+7)
+function next(){
+monday.setDate(monday.getDate()+7)
 init()
-
 }
 
 function today(){
-
-currentMonday=getMonday(new Date())
+monday=getMonday(new Date())
 init()
+}
 
+function toggleView(){
+view=view=="week"?"day":"week"
+render()
 }
 
 function toggleIcons(){
-
-bigIcons=!bigIcons
+big=!big
 render()
-
 }
 
-function selectAll(){
-
+function allOn(){
 document.querySelectorAll("#filters input")
 .forEach(c=>c.checked=true)
-
 render()
-
 }
 
-function selectNone(){
-
+function allOff(){
 document.querySelectorAll("#filters input")
 .forEach(c=>c.checked=false)
-
 render()
-
 }
 
-parseToken()
+checkToken()
 
 </script>
 
