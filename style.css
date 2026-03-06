@@ -1,78 +1,66 @@
 body{
 font-family:Arial;
-background:#f4f6f8;
 margin:0;
-}
-
-#app{
-width:80%;
-margin:auto;
+background:#f1f3f4;
 }
 
 header{
-background:white;
-padding:10px;
-position:sticky;
-top:0;
-z-index:10;
-box-shadow:0 2px 4px rgba(0,0,0,0.1);
-}
-
-.controls{
-margin-bottom:10px;
-}
-
-button{
-padding:8px 14px;
-margin-right:6px;
-border:none;
 background:#4285F4;
 color:white;
-border-radius:6px;
-cursor:pointer;
-}
-
-button:hover{
-opacity:0.9;
-}
-
-#calendarFilters{
+padding:10px;
 display:flex;
-flex-wrap:wrap;
 gap:8px;
+flex-wrap:wrap;
 }
 
-.dayColumn{
+#filters{
+padding:10px;
 background:white;
-margin:8px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+#agenda{
+display:flex;
+gap:10px;
+padding:10px;
+overflow-x:auto;
+}
+
+.day{
+background:white;
+min-width:220px;
 padding:10px;
 border-radius:8px;
-flex:1;
-min-width:160px;
 }
 
-.weekView{
-display:flex;
-}
-
-.dayTitle{
-font-weight:bold;
-margin-bottom:8px;
+.hour{
+font-size:11px;
+color:#999;
+border-top:1px solid #eee;
+height:35px;
 }
 
 .event{
-padding:6px;
-margin-bottom:6px;
-border-radius:6px;
 color:white;
+padding:4px;
+border-radius:5px;
+margin-top:3px;
 display:flex;
+gap:5px;
 align-items:center;
-gap:6px;
+font-size:12px;
 }
 
 .event img{
-width:20px;
-height:20px;
+width:18px;
+height:18px;
+}
+
+.bigIcons .event{
+flex-direction:column;
+text-align:center;
 }
 
 .bigIcons .event img{
@@ -80,11 +68,7 @@ width:36px;
 height:36px;
 }
 
-#agendaContainer{
-margin-top:10px;
-}
-
-#loginScreen{
-text-align:center;
-margin-top:100px;
+.dayView #agenda{
+width:80%;
+margin:auto;
 }
