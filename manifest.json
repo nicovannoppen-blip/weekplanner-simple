@@ -1,15 +1,1 @@
-{
-"name":"AgendaPicto",
-"short_name":"Agenda",
-"start_url":"/",
-"display":"standalone",
-"background_color":"#ffffff",
-"theme_color":"#4285F4",
-"icons":[
-{
-"src":"https://api.iconify.design/mdi/calendar.svg",
-"sizes":"192x192",
-"type":"image/png"
-}
-]
-}
+
