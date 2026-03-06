@@ -1,353 +1,224 @@
 const CLIENT_ID="259423355709-81s2fclv800ps73gqm8vb7t4vkcvct81.apps.googleusercontent.com";
+const API_KEY="AIzaSyCM4qaYbYNZ4vRIIsYGAAw66TnuBKiRLjY";
 
-let token=null;
-let calendars=[];
-let events=[];
-let weekStart=null;
-let view="week";
-let big=false;
+const DISCOVERY_DOC="https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest";
+const SCOPES="https://www.googleapis.com/auth/calendar.readonly";
 
-/* LOGIN */
+let calendars=[]
+let events=[]
+
+let viewMode="week"
+let bigIcons=false
+
+document.getElementById("loginBtn").onclick=login
 
 function login(){
 
-const url="https://accounts.google.com/o/oauth2/v2/auth";
+gapi.load('client', async ()=>{
 
-const params={
+await gapi.client.init({
+apiKey:API_KEY,
+discoveryDocs:[DISCOVERY_DOC]
+})
+
+const tokenClient=google.accounts.oauth2.initTokenClient({
 client_id:CLIENT_ID,
-redirect_uri:window.location.origin,
-response_type:"token",
-scope:"https://www.googleapis.com/auth/calendar.readonly"
-};
-
-window.location=url+"?"+new URLSearchParams(params);
-
+scope:SCOPES,
+callback:(tokenResponse)=>{
+loadCalendars()
 }
+})
 
-function logout(){
+tokenClient.requestAccessToken()
 
-localStorage.removeItem("token");
-location.reload();
+document.getElementById("loginScreen").style.display="none"
+document.getElementById("app").style.display="block"
 
+})
 }
-
-function parseToken(){
-
-const hash=window.location.hash.substring(1);
-const params=new URLSearchParams(hash);
-const t=params.get("access_token");
-
-if(t){
-localStorage.setItem("token",t);
-window.location.hash="";
-}
-
-token=localStorage.getItem("token");
-
-if(token) init();
-
-}
-
-/* INIT */
-
-async function init(){
-
-weekStart=startOfWeek(new Date());
-
-await loadCalendars();
-
-renderFilters();
-
-await loadEvents();
-
-render();
-
-}
-
-/* LOAD CALENDARS */
 
 async function loadCalendars(){
 
-const res=await fetch(
-"https://www.googleapis.com/calendar/v3/users/me/calendarList",
-{headers:{Authorization:"Bearer "+token}}
-);
+const res=await gapi.client.calendar.calendarList.list()
 
-const data=await res.json();
+calendars=res.result.items
 
-calendars=data.items.filter(c=>
+buildFilters()
 
-!c.summary.includes("Weeknummers") &&
-!c.summary.includes("Weather") &&
-!c.summary.includes("agenda website") &&
-!c.summary.includes("Agenda")
-
-);
+loadEvents()
 
 }
 
-/* LOAD EVENTS */
+function buildFilters(){
+
+const container=document.getElementById("calendarFilters")
+
+container.innerHTML=""
+
+calendars.forEach(cal=>{
+
+if(
+cal.summary==="Weeknummers" ||
+cal.summary==="Agenda" ||
+cal.summary==="Borgloon Weather" ||
+cal.summary==="agenda website"
+)return
+
+const label=document.createElement("label")
+
+const check=document.createElement("input")
+check.type="checkbox"
+check.checked=true
+check.dataset.id=cal.id
+check.onchange=loadEvents
+
+label.appendChild(check)
+label.append(cal.summary)
+
+container.appendChild(label)
+
+})
+
+}
 
 async function loadEvents(){
 
-events=[];
+events=[]
 
-const start=weekStart;
-const end=new Date(start);
-end.setDate(end.getDate()+7);
+const checks=document.querySelectorAll("#calendarFilters input:checked")
 
-for(const cal of calendars){
+for(let check of checks){
 
-let page=null;
+const calId=check.dataset.id
 
-do{
+const res=await gapi.client.calendar.events.list({
+calendarId:calId,
+timeMin:new Date().toISOString(),
+singleEvents:true,
+orderBy:"startTime",
+maxResults:2500
+})
 
-const res=await fetch(
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?singleEvents=true&orderBy=startTime&timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&maxResults=250${page?"&pageToken="+page:""}`,
-{headers:{Authorization:"Bearer "+token}}
-);
-
-const data=await res.json();
-
-if(data.items){
-
-data.items.forEach(e=>{
-
-e.color=cal.backgroundColor;
-e.calendar=cal.summary;
-
-events.push(e);
-
-});
+res.result.items.forEach(ev=>{
+ev.calendarId=calId
+events.push(ev)
+})
 
 }
 
-page=data.nextPageToken;
-
-}while(page);
+render()
 
 }
-
-}
-
-/* FILTERS */
-
-function renderFilters(){
-
-const div=document.getElementById("filters");
-div.innerHTML="";
-
-calendars.forEach(c=>{
-
-const id="f"+btoa(c.id);
-
-div.innerHTML+=`
-<label>
-<input type="checkbox" id="${id}" value="${c.summary}" checked onchange="render()">
-${c.summary}
-</label>
-`;
-
-});
-
-div.innerHTML+=`
-<button onclick="selectAll()">Alles</button>
-<button onclick="selectNone()">Geen</button>
-`;
-
-}
-
-function activeCalendars(){
-
-return [...document.querySelectorAll("#filters input:checked")]
-.map(e=>e.value);
-
-}
-
-function selectAll(){
-document.querySelectorAll("#filters input").forEach(e=>e.checked=true);
-render();
-}
-
-function selectNone(){
-document.querySelectorAll("#filters input").forEach(e=>e.checked=false);
-render();
-}
-
-/* ICON ENGINE PRO X */
-
-function iconFor(event){
-
-const text=(event.summary||"").toLowerCase();
-const location=(event.location||"").toLowerCase();
-
-if(location.includes("orelia puthof")) return "nurse";
-
-if(location.includes("kapelstraat 73")) return "medical-bag";
-
-if(text.includes("bus")) return "bus";
-
-if(text.includes("slapen")) return "sleep";
-
-if(text.includes("rijden")) return "car";
-
-if(text.includes("voetbal")) return "soccer";
-
-if(text.includes("zwem")) return "swim";
-
-if(text.includes("dokter")) return "stethoscope";
-
-if(text.includes("tandarts")) return "tooth";
-
-if(text.includes("school")) return "school";
-
-if(text.includes("werk")) return "briefcase";
-
-if(text.includes("verjaardag")) return "cake";
-
-if(text.includes("muziek")) return "music";
-
-if(text.includes("eten")) return "silverware";
-
-if(text.includes("beugel")) return "emoticon-excited";
-
-if(text.includes("rita oppas thuis")) return "home-heart";
-
-if(text.includes("loriana")) return "home-heart";
-
-if(text.includes("rita oppas bij haar")) return "home-export-outline";
-
-return "calendar";
-
-}
-
-/* RENDER */
 
 function render(){
 
-if(view==="week") renderWeek();
-else renderDay();
+const container=document.getElementById("agendaContainer")
 
-}
+container.innerHTML=""
 
-function renderWeek(){
+if(viewMode==="week"){
 
-const active=activeCalendars();
+container.className="weekView"
 
-const container=document.getElementById("agenda");
+const days=7
 
-container.className="week";
+for(let i=0;i<days;i++){
 
-container.innerHTML="";
+const date=new Date()
+date.setDate(date.getDate()+i)
 
-for(let i=0;i<7;i++){
+const col=document.createElement("div")
+col.className="dayColumn"
 
-const d=new Date(weekStart);
-d.setDate(d.getDate()+i);
+const title=document.createElement("div")
+title.className="dayTitle"
 
-const col=document.createElement("div");
-col.className="day";
+title.innerText=date.toLocaleDateString("nl-BE",{weekday:"long"})+" "+date.toLocaleDateString("nl-BE")
 
-col.innerHTML=`<div class="daytitle">
-${d.toLocaleDateString("nl-BE",{weekday:"long"})}
-${d.getDate()}/${d.getMonth()+1}
-</div>`;
+col.appendChild(title)
 
-const timeline=document.createElement("div");
-timeline.className="timeline";
+events.forEach(ev=>{
 
-for(let h=7;h<=23;h++){
+const start=new Date(ev.start.dateTime||ev.start.date)
 
-const hr=document.createElement("div");
-hr.className="hour";
-hr.style.top=((h-7)*60)+"px";
-hr.innerText=h+":00";
+if(start.toDateString()!==date.toDateString())return
+if(start.getHours()<7)return
 
-timeline.appendChild(hr);
+col.appendChild(buildEvent(ev))
 
-}
-
-const dayEvents=events
-.filter(e=>active.includes(e.calendar))
-.filter(e=>{
-const date=new Date(e.start.dateTime||e.start.date);
-return date.toDateString()===d.toDateString();
 })
-.sort((a,b)=>new Date(a.start.dateTime)-new Date(b.start.dateTime));
 
-dayEvents.forEach(e=>{
-
-const start=new Date(e.start.dateTime||e.start.date);
-const end=new Date(e.end.dateTime||e.end.date);
-
-const block=document.createElement("div");
-block.className="event";
-
-block.style.background=e.color;
-
-const top=((start.getHours()-7)*60)+start.getMinutes();
-const height=((end-start)/60000);
-
-block.style.top=top+"px";
-block.style.height=height+"px";
-
-const icon=iconFor(e);
-
-block.innerHTML=`
-<img src="https://api.iconify.design/mdi/${icon}.svg?color=white">
-${e.summary}
-`;
-
-timeline.appendChild(block);
-
-});
-
-col.appendChild(timeline);
-container.appendChild(col);
+container.appendChild(col)
 
 }
 
 }
 
-/* WEEK NAV */
+}
 
-function startOfWeek(d){
+function buildEvent(ev){
 
-const date=new Date(d);
+const div=document.createElement("div")
 
-const day=date.getDay();
-const diff=date.getDate()-day+1;
+const cal=calendars.find(c=>c.id===ev.calendarId)
 
-return new Date(date.setDate(diff));
+div.className="event"
+div.style.background=cal.backgroundColor
+
+const img=document.createElement("img")
+
+img.src=getIcon(ev)
+
+div.appendChild(img)
+
+const span=document.createElement("span")
+span.innerText=ev.summary
+
+div.appendChild(span)
+
+return div
 
 }
 
-function nextWeek(){
+function getIcon(ev){
 
-weekStart.setDate(weekStart.getDate()+7);
-loadEvents().then(render);
+const text=(ev.summary||"").toLowerCase()
+const loc=(ev.location||"").toLowerCase()
 
-}
+if(loc.includes("orelia puthof"))
+return "icons/nurse.png"
 
-function previousWeek(){
+if(text.includes("rita oppas thuis"))
+return "icons/babysit_home.png"
 
-weekStart.setDate(weekStart.getDate()-7);
-loadEvents().then(render);
+if(text.includes("oppas door loriana"))
+return "icons/babysit_home.png"
 
-}
+if(text.includes("rita oppas bij haar"))
+return "icons/logeren.png"
 
-/* VIEW */
-
-function weekView(){view="week";render();}
-function dayView(){view="day";render();}
-
-/* BIG */
-
-function toggleBig(){
-
-big=!big;
-document.body.classList.toggle("big");
+return "icons/default.png"
 
 }
 
-parseToken();
+document.getElementById("bigPictoBtn").onclick=()=>{
+
+bigIcons=!bigIcons
+
+document.body.classList.toggle("bigIcons")
+
+}
+
+document.getElementById("dayViewBtn").onclick=()=>{
+
+viewMode="day"
+render()
+
+}
+
+document.getElementById("weekViewBtn").onclick=()=>{
+
+viewMode="week"
+render()
+
+}
