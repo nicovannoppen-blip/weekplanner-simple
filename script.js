@@ -18,7 +18,7 @@ const ICON_AI={
 school:["school","klas","les"],
 thuis:["thuis","huis"],    
 kunstschool:["beeldatelier"],
-bus:["bus"],
+bus:["bus naar"],
 zwemmen:["zwem","zwembad","zwemmen"],
 dokter:["dokter","arts","ziekenhuis"],
 tandarts:["tandarts"],
