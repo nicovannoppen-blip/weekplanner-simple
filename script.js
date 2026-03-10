@@ -178,8 +178,11 @@ line.className="hour"
 line.style.top=((h-7)*60)+"px"
 col.appendChild(line)
 }
+
+// Meerdaagse events + overlappende naast elkaar
 let dayEvents=eventsForDay(d,active)
 layoutEvents(dayEvents,col)
+
 container.appendChild(col)
 }
 agenda.appendChild(container)
@@ -187,25 +190,49 @@ if(bigIcons) agenda.classList.add("large")
 else agenda.classList.remove("large")
 }
 
-// LAYOUT EVENTS
+// LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
 function layoutEvents(list,col){
 list.sort((a,b)=>a.start-b.start)
+let columns=[]
+
 list.forEach(e=>{
+let placed=false
+for(let i=0;i<columns.length;i++){
+if(columns[i][columns[i].length-1].end<=e.start){
+columns[i].push(e)
+placed=true
+break
+}
+}
+if(!placed){
+columns.push([e])
+}
+})
+
+// Render events
+columns.forEach((colEvents,i)=>{
+colEvents.forEach(e=>{
 let start=(e.start.getHours()-7)*60+e.start.getMinutes()
 let dur=(e.end-e.start)/60000
 let div=document.createElement("div")
 div.className="event"
 div.style.top=start+"px"
 div.style.height=dur+"px"
-div.style.left="5%"
-div.style.width="90%"
+
+// Breedte en positie afhankelijk van aantal overlappende kolommen
+let width=90/columns.length
+let left=5 + i*width
+div.style.left=left+"%"
+div.style.width=(width-2)+"%"
 div.style.background=e.color
+
 let icons=iconsForEvent(e)
 let html=""
 icons.forEach(i=>{html+=`<img src="icons/${i}.png" class="picto">`})
 html+=`<div>${time(e.start)} ${e.title}</div>`
 div.innerHTML=html
 col.appendChild(div)
+})
 })
 }
 
