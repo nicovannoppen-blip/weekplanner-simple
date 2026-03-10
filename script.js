@@ -311,8 +311,8 @@ function showNextEvents(){
     // Start direct spraak
     speakText(speechText);
 
-    // Overlay na 8 seconden automatisch verbergen
-    setTimeout(()=>{overlay.style.display="none";},8000);
+    // Overlay na 15 seconden automatisch verbergen
+    setTimeout(()=>{overlay.style.display="none";},15000);
 }
 
 // Web Speech API functie
