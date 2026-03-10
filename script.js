@@ -279,8 +279,8 @@ function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.c
 // INIT
 parseToken()
 
-// Toon huidige en volgende 3 agendapunten, optioneel hardop
-function showNextEvents(speak=false){
+// Toon huidige en volgende 3 agendapunten, direct spraak + overlay
+function showNextEvents(){
     let active = activeCalendars();
     let now = new Date();
     
@@ -290,24 +290,29 @@ function showNextEvents(speak=false){
         .sort((a,b) => a.start - b.start)
         .slice(0,4); // huidige + volgende 3
 
+    let overlay = document.getElementById("speechOverlay");
+    overlay.innerHTML = ""; // reset
+    overlay.style.display = "block";
+
     if(upcoming.length === 0){
-        alert("Er zijn geen komende agendapunten.");
-        if(speak) speakText("Er zijn geen komende agendapunten.");
+        overlay.innerText = "Er zijn geen komende agendapunten.";
+        speakText("Er zijn geen komende agendapunten.");
         return;
     }
 
-    let message = "Komende agendapunten:\n";
     let speechText = "Komende afspraken: ";
-
     upcoming.forEach(e => {
         let startStrDate = e.start.toLocaleDateString("nl-BE", {weekday:"long", day:"2-digit", month:"2-digit"});
         let startStrTime = e.start.toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"});
-        message += `${startStrDate} ${startStrTime} - ${e.title}\n`;
+        overlay.innerHTML += `<div>${startStrDate} ${startStrTime} - ${e.title}</div>`;
         speechText += `${e.title} om ${startStrTime}. `;
     });
 
-    alert(message);
-    if(speak) speakText(speechText);
+    // Start direct spraak
+    speakText(speechText);
+
+    // Overlay na 8 seconden automatisch verbergen
+    setTimeout(()=>{overlay.style.display="none";},8000);
 }
 
 // Web Speech API functie
