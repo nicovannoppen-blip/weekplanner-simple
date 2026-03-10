@@ -279,8 +279,8 @@ function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.c
 // INIT
 parseToken()
 
-// Toon huidige en volgende 3 agendapunten
-function showNextEvents(){
+// Toon huidige en volgende 3 agendapunten, optioneel hardop
+function showNextEvents(speak=false){
     let active = activeCalendars();
     let now = new Date();
     
@@ -292,15 +292,31 @@ function showNextEvents(){
 
     if(upcoming.length === 0){
         alert("Er zijn geen komende agendapunten.");
+        if(speak) speakText("Er zijn geen komende agendapunten.");
         return;
     }
 
     let message = "Komende agendapunten:\n";
+    let speechText = "Komende afspraken: ";
+
     upcoming.forEach(e => {
-        let startStr = e.start.toLocaleDateString("nl-BE", {weekday:"short", day:"2-digit", month:"2-digit"});
-        let timeStr = e.start.toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"});
-        message += `${startStr} ${timeStr} - ${e.title}\n`;
+        let startStrDate = e.start.toLocaleDateString("nl-BE", {weekday:"short", day:"2-digit", month:"2-digit"});
+        let startStrTime = e.start.toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"});
+        message += `${startStrDate} ${startStrTime} - ${e.title}\n`;
+        speechText += `${e.title} op ${startStrDate} om ${startStrTime}. `;
     });
 
     alert(message);
+    if(speak) speakText(speechText);
+}
+
+// Web Speech API functie
+function speakText(text){
+    if('speechSynthesis' in window){
+        let utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'nl-NL';
+        window.speechSynthesis.speak(utter);
+    } else {
+        console.warn("Spraakfunctie niet ondersteund in deze browser.");
+    }
 }
