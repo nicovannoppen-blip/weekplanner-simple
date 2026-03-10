@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
+
 <meta charset="UTF-8">
-<title>AgendaPicto PRO</title>
+<title>AgendaPicto PRO AI</title>
 
 <style>
 
 body{
 font-family:Arial;
 margin:0;
-background:#f3f3f3;
+background:#f2f2f2;
 }
 
 header{
@@ -18,7 +20,7 @@ color:white;
 padding:10px;
 display:flex;
 flex-wrap:wrap;
-gap:10px;
+gap:8px;
 }
 
 button{
@@ -33,8 +35,8 @@ cursor:pointer;
 background:white;
 padding:10px;
 display:flex;
-gap:15px;
 flex-wrap:wrap;
+gap:14px;
 border-bottom:1px solid #ddd;
 }
 
@@ -94,14 +96,8 @@ flex-direction:column;
 text-align:center;
 }
 
-.dayView{
-width:80%;
-margin:auto;
-height:960px;
-display:flex;
-}
-
 </style>
+
 </head>
 
 <body>
@@ -121,8 +117,6 @@ display:flex;
 <button onclick="selectAll()">alles aan</button>
 <button onclick="selectNone()">alles uit</button>
 
-<button onclick="window.print()">print</button>
-
 </header>
 
 <div id="filters"></div>
@@ -136,6 +130,7 @@ let token=null
 let calendars=[]
 let events=[]
 let currentDate=new Date()
+
 let bigIcons=false
 let dayMode=false
 
@@ -146,37 +141,32 @@ const HIDDEN=[
 "agenda website"
 ]
 
-/* PICTOGRAM BIBLIOTHEEK */
+/* SMART PICTO AI */
 
-const ICON_LIBRARY=[
+const ICON_AI={
 
-{icon:"icons/school.png",words:["school","klas","les"]},
+school:["school","klas","les"],
+bus:["bus"],
+zwemmen:["zwem","zwembad"],
+dokter:["dokter","arts","ziekenhuis"],
+tandarts:["tandarts","beugel"],
+fiets:["fiets","fietsen"],
+auto:["auto","rijden"],
+eten:["eten","lunch","avondeten"],
+slapen:["slapen","bedtijd"],
+sport:["sport","training"],
+winkel:["winkel","boodschappen"],
+verjaardag:["verjaardag"],
+thuis:["thuis"],
+oppas:["oppas","oma"],
+spelen:["spelen","speeltuin"],
+muziek:["muziek","piano","gitaar"],
+computer:["computer","tablet"],
+lezen:["lezen","boek"],
+douchen:["douchen","bad"]
+}
 
-{icon:"icons/bus.png",words:["bus"]},
-
-{icon:"icons/zwemmen.png",words:["zwemmen","zwemles","zwembad"]},
-
-{icon:"icons/dokter.png",words:["dokter","arts","ziekenhuis"]},
-
-{icon:"icons/tandarts.png",words:["tandarts","beugel"]},
-
-{icon:"icons/fiets.png",words:["fiets","fietsen"]},
-
-{icon:"icons/auto.png",words:["auto","rijden"]},
-
-{icon:"icons/slapen.png",words:["slapen","bedtijd"]},
-
-{icon:"icons/oppas.png",words:["oppas","oma","rita"]},
-
-{icon:"icons/thuis.png",words:["thuis","huis"]},
-
-{icon:"icons/verjaardag.png",words:["verjaardag"]},
-
-{icon:"icons/winkel.png",words:["winkel","boodschappen"]},
-
-{icon:"icons/sport.png",words:["sport","training"]}
-
-]
+/* LOGIN */
 
 function login(){
 
@@ -209,6 +199,8 @@ token=params.get("access_token")
 if(token) init()
 
 }
+
+/* GOOGLE API */
 
 async function init(){
 
@@ -253,6 +245,8 @@ f.appendChild(label)
 
 }
 
+/* EVENTS */
+
 async function loadEvents(){
 
 events=[]
@@ -269,8 +263,7 @@ let url=
 `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
 `timeMin=${start.toISOString()}&`+
 `timeMax=${end.toISOString()}&`+
-`singleEvents=true&`+
-`orderBy=startTime`
+`singleEvents=true&orderBy=startTime`
 
 let r=await fetch(url,{
 headers:{Authorization:"Bearer "+token}
@@ -280,18 +273,18 @@ let data=await r.json()
 
 data.items.forEach(e=>{
 
-let start=e.start.dateTime||e.start.date
-let end=e.end.dateTime||e.end.date
+let s=e.start.dateTime||e.start.date
+let en=e.end.dateTime||e.end.date
 
-if(!start)return
+if(!s)return
 
 events.push({
 
 title:e.summary||"",
-start:new Date(start),
-end:new Date(end),
-color:cal.backgroundColor,
+start:new Date(s),
+end:new Date(en),
 calendar:cal.id,
+color:cal.backgroundColor,
 location:e.location||""
 
 })
@@ -302,25 +295,53 @@ location:e.location||""
 
 }
 
-function icon(e){
+/* FILTERS */
+
+function activeCalendars(){
+
+let list=[]
+
+document
+.querySelectorAll("#filters input")
+.forEach(c=>{
+if(c.checked)list.push(c.value)
+})
+
+return list
+
+}
+
+/* SMART PICTO AI */
+
+function iconsForEvent(e){
 
 let text=(e.title+" "+e.location).toLowerCase()
 
-for(let item of ICON_LIBRARY){
+let found=[]
 
-for(let w of item.words){
+for(let icon in ICON_AI){
 
-if(text.includes(w)){
-return `<img src="${item.icon}" class="picto">`
-}
+ICON_AI[icon].forEach(word=>{
 
-}
+if(text.includes(word)){
 
-}
-
-return `<img src="icons/algemeen.png" class="picto">`
+found.push(icon)
 
 }
+
+})
+
+}
+
+if(found.length==0){
+found.push("algemeen")
+}
+
+return found
+
+}
+
+/* RENDER */
 
 function render(){
 
@@ -331,11 +352,14 @@ let start=getMonday(currentDate)
 let days=dayMode?1:7
 
 let container=document.createElement("div")
-container.className=dayMode?"dayView":"week"
+container.className="week"
+
+let active=activeCalendars()
 
 for(let i=0;i<days;i++){
 
 let d=new Date(dayMode?currentDate:start)
+
 if(!dayMode)d.setDate(start.getDate()+i)
 
 let col=document.createElement("div")
@@ -353,13 +377,16 @@ for(let h=7;h<=23;h++){
 let line=document.createElement("div")
 line.className="hour"
 line.style.top=((h-7)*60)+"px"
-line.innerText=h+":00"
 
 col.appendChild(line)
 
 }
 
-let dayEvents=events.filter(e=>sameDay(e.start,d))
+let dayEvents=events.filter(e=>{
+
+return sameDay(e.start,d) && active.includes(e.calendar)
+
+})
 
 layoutEvents(dayEvents,col)
 
@@ -374,35 +401,13 @@ else agenda.classList.remove("large")
 
 }
 
-function layoutEvents(list,col){
+/* EVENTS LAYOUT */
 
-let columns=[]
+function layoutEvents(list,col){
 
 list.sort((a,b)=>a.start-b.start)
 
 list.forEach(e=>{
-
-let placed=false
-
-for(let c of columns){
-
-if(c[c.length-1].end<=e.start){
-
-c.push(e)
-placed=true
-break
-
-}
-
-}
-
-if(!placed)columns.push([e])
-
-})
-
-columns.forEach((colEvents,i)=>{
-
-colEvents.forEach(e=>{
 
 let start=(e.start.getHours()-7)*60+e.start.getMinutes()
 let dur=(e.end-e.start)/60000
@@ -412,29 +417,35 @@ div.className="event"
 
 div.style.top=start+"px"
 div.style.height=dur+"px"
-
-div.style.left=(i*(90/columns.length)+5)+"%"
-div.style.width=(90/columns.length-2)+"%"
-
+div.style.left="5%"
+div.style.width="90%"
 div.style.background=e.color
 
-div.innerHTML=
-`${icon(e)}
-<div>${time(e.start)} ${e.title}</div>`
+let icons=iconsForEvent(e)
+
+let html=""
+
+icons.forEach(i=>{
+html+=`<img src="icons/${i}.png" class="picto">`
+})
+
+html+=`<div>${time(e.start)} ${e.title}</div>`
+
+div.innerHTML=html
 
 col.appendChild(div)
 
 })
 
-})
-
 }
+
+/* HELPERS */
 
 function sameDay(a,b){
 
-return a.getFullYear()==b.getFullYear()
-&&a.getMonth()==b.getMonth()
-&&a.getDate()==b.getDate()
+return a.getFullYear()==b.getFullYear() &&
+a.getMonth()==b.getMonth() &&
+a.getDate()==b.getDate()
 
 }
 
@@ -455,6 +466,8 @@ let diff=d.getDate()-day+(day==0?-6:1)
 return new Date(d.setDate(diff))
 
 }
+
+/* NAVIGATION */
 
 function prev(){
 dayMode?currentDate.setDate(currentDate.getDate()-1)
@@ -484,13 +497,21 @@ render()
 }
 
 function selectAll(){
-document.querySelectorAll("#filters input").forEach(c=>c.checked=true)
+
+document.querySelectorAll("#filters input")
+.forEach(c=>c.checked=true)
+
 render()
+
 }
 
 function selectNone(){
-document.querySelectorAll("#filters input").forEach(c=>c.checked=false)
+
+document.querySelectorAll("#filters input")
+.forEach(c=>c.checked=false)
+
 render()
+
 }
 
 parseToken()
