@@ -393,13 +393,14 @@ function layoutEvents(dayEvents,col){
 
 let active=activeCalendars()
 
-dayEvents
+// FILTER correct toepassen
+let filtered = dayEvents
 .filter(e=>active.includes(e.calendar))
 .sort((a,b)=>a.start-b.start)
 
 let columns=[]
 
-dayEvents.forEach(e=>{
+filtered.forEach(e=>{
 
 let placed=false
 
