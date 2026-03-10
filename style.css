@@ -1,1 +1,87 @@
+body{
+font-family:Arial;
+margin:0;
+background:#f2f2f2;
+}
 
+header{
+background:#4285F4;
+color:white;
+padding:10px;
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+}
+
+button{
+padding:8px 12px;
+border:none;
+border-radius:6px;
+background:white;
+cursor:pointer;
+}
+
+#filters{
+background:white;
+padding:10px;
+display:flex;
+flex-wrap:wrap;
+gap:14px;
+border-bottom:1px solid #ddd;
+}
+
+.week{
+display:flex;
+height:960px;
+}
+
+.day{
+flex:1;
+background:white;
+margin:4px;
+border-radius:8px;
+position:relative;
+}
+
+.dayHeader{
+text-align:center;
+font-weight:bold;
+padding:6px;
+border-bottom:1px solid #ddd;
+}
+
+.hour{
+position:absolute;
+left:0;
+right:0;
+border-top:1px solid #eee;
+font-size:10px;
+color:#888;
+}
+
+.event{
+position:absolute;
+border-radius:6px;
+color:white;
+padding:4px;
+font-size:12px;
+display:flex;
+gap:6px;
+align-items:center;
+overflow:hidden;
+}
+
+.picto{
+width:28px;
+height:28px;
+}
+
+.large .picto{
+width:64px;
+height:64px;
+}
+
+.large .event{
+flex-direction:column;
+text-align:center;
+}
