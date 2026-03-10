@@ -194,15 +194,28 @@ return list
 
 // SMART PICTO AI
 function iconsForEvent(e){
-let text=(e.title).toLowerCase()
+
+let text=(e.title+" "+e.location).toLowerCase()
 let found=[]
+
 for(let icon in ICON_AI){
+
 ICON_AI[icon].forEach(word=>{
-if(text.includes(word)) found.push(icon)
-})
+
+let regex=new RegExp("\\b"+word.toLowerCase()+"\\b","i")
+
+if(regex.test(text)){
+found.push(icon)
 }
+
+})
+
+}
+
 if(found.length==0) found.push("algemeen")
+
 return found
+
 }
 
 // MEERDAAGSE EVENTS OPSPLITSEN
