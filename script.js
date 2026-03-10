@@ -84,7 +84,17 @@ verpleegster:["v18","n14","l80","l89","l90","v18","v23"],
 Vinny:["vinny"],
 vliegtuig:["vliegtuig"],
 vorming_werk:["vorming"],
-naschoolse_opvang:["strooppotje"]
+naschoolse_opvang:["strooppotje"],
+Ophelie:["ophelie","ophélie"],
+Vansenne:["vansenne"],
+SylvieEnKids:["sylvie en kids","sylvie en kindjes","sylvie met kindjes","sylvie met de kindjes"],
+IrenaGezin:["naar irena","irena komt","irena"],
+Irena:["irena alleen"],
+AnthonyEnkids:["anthony en kids","anthony en kindjes","anthony met kindjes","anthony met de kindjes"],
+IrenaEnJulian:["irena en julian", "irena met julian"],
+Sylvie:["sylvie"],
+Anthony:["anthony"],
+Thibeau:["thibeau"]
 }
 
 // LOGIN / LOGOUT
