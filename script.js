@@ -302,8 +302,8 @@ function showNextEvents(speak=false){
     upcoming.forEach(e => {
         let startStrDate = e.start.toLocaleDateString("nl-BE", {weekday:"short", day:"2-digit", month:"2-digit"});
         let startStrTime = e.start.toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"});
-        message += `${startStrTime} - ${e.title}\n`;
-        speechText += `${e.title} op ${startStrDate} om ${startStrTime}. `;
+        message += `${startStrDate} ${startStrTime} - ${e.title}\n`;
+        speechText += `${e.title} om ${startStrTime}. `;
     });
 
     alert(message);
