@@ -5,6 +5,22 @@
 <meta charset="UTF-8">
 <title>AgendaPicto PRO</title>
 <link rel="stylesheet" href="style.css">
+<style>
+#speechOverlay{
+    position:fixed;
+    top:10px;
+    right:10px;
+    background:white;
+    border:2px solid #4285F4;
+    border-radius:8px;
+    padding:12px;
+    z-index:1000;
+    max-width:300px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    font-size:14px;
+    line-height:1.4;
+}
+</style>
 </head>
 
 <body>
@@ -24,11 +40,14 @@
 <button onclick="selectNone()">alles uit</button>
 
 <!-- Toon en lees komende 4 agendapunten -->
-<button onclick="showNextEvents(true)">Komende 4 events</button>
+<button onclick="showNextEvents()">Komende 4 events</button>
 </header>
 
 <div id="filters"></div>
 <div id="agenda"></div>
+
+<!-- Overlay voor spraaktekst -->
+<div id="speechOverlay" style="display:none;"></div>
 
 <script src="config.js"></script>
 <script src="script.js"></script>
