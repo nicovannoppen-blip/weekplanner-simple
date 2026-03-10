@@ -16,7 +16,7 @@ function rename(name){
 // SMART PICTO AI
 const ICON_AI={
 school:["school","klas","les"],
-Beeldatelier 1.2:["kunstschool"],
+Beeldatelier:["kunstschool"],
 bus:["bus"],
 zwemmen:["zwem","zwembad"],
 dokter:["dokter","arts","ziekenhuis"],
