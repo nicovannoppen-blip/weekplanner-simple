@@ -82,7 +82,8 @@ Verjaardag:["Verjaardag"],
 verpleegster:["v18","n14","l80","l89","l90","v18","v23"],
 Vinny:["Vinny"],
 vliegtuig:["vliegtuig"],
-vorming_werk:["vorming"]
+vorming_werk:["vorming"],
+naschoolse_opvang:["strooppotje"]
 }
 
 // LOGIN / LOGOUT
