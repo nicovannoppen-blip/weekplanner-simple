@@ -279,17 +279,28 @@ function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.c
 // INIT
 parseToken()
 
-function printAgenda(){
-    let agendaDiv = document.getElementById("agenda");
-    let newWin = window.open("", "PRINT", "height=800,width=1200");
-    newWin.document.write('<html><head><title>Feestdagen Agenda</title>');
-    newWin.document.write('<link rel="stylesheet" href="style.css">');
-    newWin.document.write('</head><body>');
-    newWin.document.write('<h2>Feestdagen</h2>');
-    newWin.document.write(agendaDiv.innerHTML);
-    newWin.document.write('</body></html>');
-    newWin.document.close();
-    newWin.focus();
-    newWin.print();
-    newWin.close();
+// Toon huidige en volgende 3 agendapunten
+function showNextEvents(){
+    let active = activeCalendars();
+    let now = new Date();
+    
+    // Sorteer alle toekomstige events
+    let upcoming = events
+        .filter(e => active.includes(e.calendar) && e.end >= now)
+        .sort((a,b) => a.start - b.start)
+        .slice(0,4); // huidige + volgende 3
+
+    if(upcoming.length === 0){
+        alert("Er zijn geen komende agendapunten.");
+        return;
+    }
+
+    let message = "Komende agendapunten:\n";
+    upcoming.forEach(e => {
+        let startStr = e.start.toLocaleDateString("nl-BE", {weekday:"short", day:"2-digit", month:"2-digit"});
+        let timeStr = e.start.toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"});
+        message += `${startStr} ${timeStr} - ${e.title}\n`;
+    });
+
+    alert(message);
 }
