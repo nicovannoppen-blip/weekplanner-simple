@@ -40,7 +40,7 @@ wandelen_rugzak:["wandelen rugzak"],
 wandeling_park_bos:["wandeling park bos"],
 wandelzoektocht_bos:["wandelzoektocht bos"],
 ziekenhuis:["ziekenhuis"],
-zitten_bureau:["rode kruis","kapelstraat"],
+zitten_bureau:["nacht","nachtvergadering","team"],
 algemeen:["algemeen"],
 bakfiets:["bakfiets"],
 bezoek_van:["bezoek van","komt","komen"],
@@ -79,7 +79,7 @@ Thomas:["Thomas"],
 trein:["trein"],
 tuin:["tuin"],
 Verjaardag:["Verjaardag"],
-verpleegster:["orelai","puthof"],
+verpleegster:["v18","n14","l80","l89","l90","v18","v23"],
 Vinny:["Vinny"],
 vliegtuig:["vliegtuig"],
 vorming_werk:["vorming werk"]
@@ -182,7 +182,7 @@ return list
 
 // SMART PICTO AI
 function iconsForEvent(e){
-let text=(e.title+" "+e.location).toLowerCase()
+let text=(e.title).toLowerCase()
 let found=[]
 for(let icon in ICON_AI){
 ICON_AI[icon].forEach(word=>{
