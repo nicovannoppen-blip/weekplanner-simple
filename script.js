@@ -5,6 +5,14 @@ let currentDate=new Date()
 let dayMode=false
 let bigIcons=false
 
+// Hernoem lange kalender namen
+function rename(name){
+    if(name.toLowerCase().includes("belgie feestdagen") || name.toLowerCase().includes("schoolvakanties") || name.toLowerCase().includes("www.feestdagen-belgie.be")){
+        return "Feestdagen";
+    }
+    return name;
+}
+
 // SMART PICTO AI
 const ICON_AI={
 school:["school","klas","les"],
@@ -76,7 +84,7 @@ let f=document.getElementById("filters")
 f.innerHTML=""
 calendars.forEach(c=>{
 let label=document.createElement("label")
-label.innerHTML=`<input type="checkbox" checked value="${c.id}"> ${c.summary}`
+label.innerHTML=`<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
 label.querySelector("input").addEventListener("change",render)
 f.appendChild(label)
 })
@@ -270,3 +278,18 @@ function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.c
 
 // INIT
 parseToken()
+
+function printAgenda(){
+    let agendaDiv = document.getElementById("agenda");
+    let newWin = window.open("", "PRINT", "height=800,width=1200");
+    newWin.document.write('<html><head><title>Feestdagen Agenda</title>');
+    newWin.document.write('<link rel="stylesheet" href="style.css">');
+    newWin.document.write('</head><body>');
+    newWin.document.write('<h2>Feestdagen</h2>');
+    newWin.document.write(agendaDiv.innerHTML);
+    newWin.document.write('</body></html>');
+    newWin.document.close();
+    newWin.focus();
+    newWin.print();
+    newWin.close();
+}
