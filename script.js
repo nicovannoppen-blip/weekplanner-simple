@@ -286,7 +286,16 @@ let col=document.createElement("div")
 col.className="day"
 let head=document.createElement("div")
 head.className="dayHeader"
-head.innerText=d.toLocaleDateString("nl-BE",{weekday:"long",day:"2-digit",month:"2-digit"})
+let dayIcons=["☀️","🌙","🔥","🌳","⭐","🎉","🌈"]
+
+let weekday=d.getDay()
+
+head.innerHTML=
+dayIcons[weekday]+" "+
+d.toLocaleDateString("nl-BE",{weekday:"long"})+
+" "+
+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
+    
 col.appendChild(head)
 for(let h=7;h<=23;h++){
 let line=document.createElement("div")
