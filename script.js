@@ -203,18 +203,31 @@ for(let icon in ICON_AI){
 ICON_AI[icon].forEach(word=>{
 
 let regex=new RegExp("\\b"+word.toLowerCase()+"\\b","i")
+let match=text.match(regex)
 
-if(regex.test(text)){
-found.push(icon)
+if(match){
+
+found.push({
+icon:icon,
+pos:match.index
+})
+
 }
 
 })
 
 }
 
-// geen pictogram tonen als er niets gevonden is en dubbele vermijden
+// sorteer volgens positie in tekst
+found.sort((a,b)=>a.pos-b.pos)
 
-return [...new Set(found)]
+// enkel icon naam teruggeven
+let icons=found.map(f=>f.icon)
+
+// dubbele verwijderen
+icons=[...new Set(icons)]
+
+return icons
 
 }
 
