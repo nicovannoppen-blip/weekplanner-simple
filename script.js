@@ -282,8 +282,19 @@ let active=activeCalendars()
 for(let i=0;i<days;i++){
 let d=new Date(dayMode?currentDate:start)
 if(!dayMode)d.setDate(start.getDate()+i)
+
 let col=document.createElement("div")
 col.className="day"
+
+let today=new Date()
+
+if(
+d.getDate()==today.getDate() &&
+d.getMonth()==today.getMonth() &&
+d.getFullYear()==today.getFullYear()
+){
+col.id="today"
+}
 let head=document.createElement("div")
 head.className="dayHeader"
 let dayIcons=["☀️","🌙","🔥","🌳","⭐","🎉","🌈"]
@@ -308,6 +319,16 @@ col.onclick=()=>{
 currentDate=new Date(d)
 dayMode=true
 render()
+
+let todayCol=document.getElementById("today")
+
+if(todayCol){
+todayCol.scrollIntoView({
+behavior:"smooth",
+inline:"center",
+block:"nearest"
+})
+}
 
 }
     
