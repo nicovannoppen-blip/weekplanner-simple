@@ -40,7 +40,7 @@ wandelen_rugzak:["wandelen rugzak"],
 wandeling_park_bos:["wandeling park bos"],
 wandelzoektocht_bos:["wandelzoektocht bos"],
 ziekenhuis:["ziekenhuis"],
-bureau:["nacht","nachtvergadering","team"],
+bureau:["nacht","nachtvergadering","team","teambuilding"],
 algemeen:["algemeen"],
 bakfiets:["bakfiets"],
 bezoek_van:["bezoek van","komt","komen"],
@@ -78,11 +78,11 @@ stad:["stad"],
 Steven:["steven"],
 Thomas:["thomas"],
 trein:["trein"],
-tuin:["tuin"],
+tuin:["tuin","snoeien"],
 verpleegster:["v18","n14","l80","l89","l90","v18","v23"],
 Vinny:["vinny"],
 vliegtuig:["vliegtuig"],
-vorming:["vorming"],
+vorming:["vorming","Bedrijfseerstehulp"],
 naschoolse_opvang:["strooppotje"],
 Ophelie:["ophelie","ophélie"],
 Vansenne:["vansenne","anthony en sylvie","sylvie en anthony"],
@@ -93,7 +93,9 @@ AnthonyEnkids:["anthony en kids","anthony en kindjes","anthony met kindjes","ant
 IrenaEnJulian:["irena en julian", "irena met julian"],
 Sylvie:["sylvie"],
 Anthony:["anthony"],
-Thibeau:["thibeau"]
+Thibeau:["thibeau"],
+vannoppen:["vannoppen","vannoppens"],
+broers:["broers"]
 }
 
 // LOGIN / LOGOUT
