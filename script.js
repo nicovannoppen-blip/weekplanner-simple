@@ -19,7 +19,7 @@ school:["school","klas","les"],
 thuis:["thuis","huis"],    
 kunstschool:["beeldatelier"],
 bus:["bus"],
-zwemmen:["zwem","zwembad","zwemmen","plopsaqua","zwembad"],
+zwemmen:["zwem","zwembad","zwemmen","plopsaqua"],
 dokter:["dokter","arts","ziekenhuis"],
 tandarts:["tandarts"],
 beugel:["beugel"],
@@ -212,7 +212,7 @@ found.push(icon)
 
 }
 
-if(found.length==0) found.push("algemeen")
+// geen pictogram tonen als er niets gevonden is
 
 return found
 
