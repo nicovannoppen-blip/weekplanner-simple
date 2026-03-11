@@ -195,7 +195,7 @@ return list
 // SMART PICTO AI
 function iconsForEvent(e){
 
-let text=(e.title+" "+e.location).toLowerCase()
+let text=(e.title).toLowerCase()
 let found=[]
 
 for(let icon in ICON_AI){
