@@ -302,6 +302,15 @@ let line=document.createElement("div")
 line.className="hour"
 line.style.top=((h-7)*60)+"px"
 col.appendChild(line)
+
+col.onclick=()=>{
+
+currentDate=new Date(d)
+dayMode=true
+render()
+
+}
+    
 }
 
 // Meerdaagse events + overlappende naast elkaar
