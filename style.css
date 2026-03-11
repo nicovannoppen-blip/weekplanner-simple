@@ -8,17 +8,24 @@ header{
 background:#4285F4;
 color:white;
 padding:10px;
-display:flex;
-flex-wrap:wrap;
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
 gap:8px;
 }
 
 button{
-padding:8px 12px;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:6px;
+
+padding:10px;
 border:none;
-border-radius:6px;
+border-radius:8px;
 background:white;
 cursor:pointer;
+font-size:14px;
 }
 
 #filters{
