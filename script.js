@@ -286,8 +286,7 @@ if(!dayMode)d.setDate(start.getDate()+i)
 
 let col=document.createElement("div")
 col.className="day"
-/* vandaag markeren */
-    
+
 let today=new Date()
 
 if(
@@ -297,8 +296,6 @@ d.getFullYear()==today.getFullYear()
 ){
 col.id="today"
 }
-
-/* header */
 let head=document.createElement("div")
 head.className="dayHeader"
 let dayIcons=["☀️","🌙","🔥","🌳","⭐","🎉","🌈"]
@@ -312,20 +309,28 @@ d.toLocaleDateString("nl-BE",{weekday:"long"})+
 d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
     
 col.appendChild(head)
-
-/* uren */
 for(let h=7;h<=23;h++){
 let line=document.createElement("div")
 line.className="hour"
 line.style.top=((h-7)*60)+"px"
 col.appendChild(line)
-}
-/* klik ? dagweergave */    
+
 col.onclick=()=>{
 
 currentDate=new Date(d)
 dayMode=true
 render()
+
+let todayCol=document.getElementById("today")
+
+if(todayCol){
+todayCol.scrollIntoView({
+behavior:"smooth",
+inline:"center",
+block:"nearest"
+})
+}
+
 }
     
 }
