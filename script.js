@@ -486,7 +486,7 @@ let text="Volgende afspraken"
 upcoming.forEach(e=>{
 
 text+=
-"van "
+"van " +
 time(e.start)+
 " tot "+
 time(e.end)+
