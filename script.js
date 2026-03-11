@@ -481,7 +481,7 @@ return e.start>now
 .sort((a,b)=>a.start-b.start)
 .slice(0,4)
 
-let text="Volgende afspraken"
+let text="Volgende afspraken:\n"
 
 upcoming.forEach(e=>{
 
