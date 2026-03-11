@@ -42,6 +42,7 @@ border-bottom:1px solid #ddd;
 .week{
 display:flex;
 height:960px;
+overflow-x:auto;
 }
 
 .day{
