@@ -87,6 +87,11 @@ width:28px;
 height:28px;
 }
 
+.icon img{
+max-width:100%;
+height:auto;
+}
+
 .large .picto{
 width:64px;
 height:64px;
