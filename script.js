@@ -214,7 +214,7 @@ found.push(icon)
 
 // geen pictogram tonen als er niets gevonden is
 
-return found
+return [...new Set(found)]
 
 }
 
