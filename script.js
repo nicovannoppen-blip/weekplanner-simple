@@ -464,7 +464,6 @@ function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.c
 parseToken()
 
 /* ---------------- KOMENDE AFSPRAKEN ---------------- */
-
 function showNextEvents(){
 
 let now=new Date()
@@ -490,11 +489,14 @@ text+=time(e.start)+" "+e.title+"\n"
 
 })
 
-alert(text)
+document.getElementById("popupText").innerText=text
+
+document.getElementById("popup").style.display="flex"
 
 speak(text)
 
 }
+
 
 /* ---------------- STEM ---------------- */
 
@@ -508,7 +510,12 @@ speechSynthesis.speak(msg)
 
 }
 
+//popup
+function closePopup(){
 
+document.getElementById("popup").style.display="none"
+
+}
 
 
 
