@@ -212,7 +212,7 @@ found.push(icon)
 
 }
 
-// geen pictogram tonen als er niets gevonden is
+// geen pictogram tonen als er niets gevonden is en dubbele vermijden
 
 return [...new Set(found)]
 
