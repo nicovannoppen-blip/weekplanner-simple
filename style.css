@@ -31,9 +31,11 @@ font-size:14px;
 #filters{
 background:white;
 padding:10px;
-display:flex;
-flex-wrap:wrap;
-gap:14px;
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+gap:10px;
+
 border-bottom:1px solid #ddd;
 }
 
