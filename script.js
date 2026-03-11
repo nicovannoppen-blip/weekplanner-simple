@@ -126,15 +126,16 @@ Zomervakantie:["zomervakantie"]
 // LOGIN / LOGOUT
 function login(){
 const url="https://accounts.google.com/o/oauth2/v2/auth"
+
+window.location=url+"?"+new URLSearchParams(params)
+}
 const params={
 client_id:CLIENT_ID,
 redirect_uri:window.location.origin,
 response_type:"token",
-scope:"https://www.googleapis.com/auth/calendar.readonly"
+scope:"https://www.googleapis.com/auth/calendar.readonly",
+prompt:"select_account"
 }
-window.location=url+"?"+new URLSearchParams(params)
-}
-
 
 // PARSE TOKEN
 function parseToken(){
