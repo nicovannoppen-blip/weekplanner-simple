@@ -485,12 +485,17 @@ let text=""
 
 upcoming.forEach(e=>{
 
-text+=time(e.start)+" "+e.title+"\n"
+text+=
+time(e.start)+
+" tot "+
+time(e.end)+
+" "+
+e.title+
+"\n"
 
 })
 
 document.getElementById("popupText").innerText=text
-
 document.getElementById("popup").style.display="flex"
 
 speak(text)
