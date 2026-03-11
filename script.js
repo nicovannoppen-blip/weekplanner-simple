@@ -423,6 +423,29 @@ let html=""
 icons.forEach(i=>{html+=`<img src="icons/${i}.png" class="picto">`})
 html+=`<div>${time(e.start)} ${e.title}</div>`
 div.innerHTML=html
+
+div.onclick=(ev)=>{
+
+ev.stopPropagation()
+
+let dag=e.start.toLocaleDateString(
+"nl-BE",
+{weekday:"long"}
+)
+
+let text=
+dag+
+". "+
+e.title+
+". Van "+
+time(e.start)+
+" tot "+
+time(e.end)
+
+speak(text)
+
+}
+    
 col.appendChild(div)
 })
 })
