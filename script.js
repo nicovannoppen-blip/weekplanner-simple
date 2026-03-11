@@ -481,11 +481,12 @@ return e.start>now
 .sort((a,b)=>a.start-b.start)
 .slice(0,4)
 
-let text=""
+let text="Volgende afspraken"
 
 upcoming.forEach(e=>{
 
 text+=
+"van "
 time(e.start)+
 " tot "+
 time(e.end)+
