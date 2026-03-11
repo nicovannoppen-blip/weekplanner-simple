@@ -439,52 +439,54 @@ function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.c
 // INIT
 parseToken()
 
-// Toon huidige en volgende 3 agendapunten, direct spraak + overlay
+/* ---------------- KOMENDE AFSPRAKEN ---------------- */
+
 function showNextEvents(){
-    let active = activeCalendars();
-    let now = new Date();
-    
-    // Sorteer alle toekomstige events
-    let upcoming = events
-        .filter(e => active.includes(e.calendar) && e.end >= now)
-        .sort((a,b) => a.start - b.start)
-        .slice(0,4); // huidige + volgende 3
 
-    let overlay = document.getElementById("speechOverlay");
-    overlay.innerHTML = ""; // reset
-    overlay.style.display = "block";
+let now=new Date()
 
-    if(upcoming.length === 0){
-        overlay.innerText = "Er zijn geen komende agendapunten.";
-        speakText("Er zijn geen komende agendapunten.");
-        return;
-    }
+let upcoming=events
+.filter(e=>{
 
-    let speechText = "Komende afspraken: ";
-    upcoming.forEach(e => {
-        let startStrDate = e.start.toLocaleDateString("nl-BE", {weekday:"long", day:"2-digit", month:"2-digit"});
-        let startStrTime = e.start.toLocaleTimeString("nl-BE",{hour:"2-digit",minute:"2-digit"});
-        overlay.innerHTML += `<div>${startStrDate} ${startStrTime} - ${e.title}</div>`;
-        speechText += `${e.title} om ${startStrTime}. `;
-    });
+let dur=(e.end-e.start)/3600000
 
-    // Start direct spraak
-    speakText(speechText);
+if(dur>=15) return false
 
-    // Overlay na 15 seconden automatisch verbergen
-    setTimeout(()=>{overlay.style.display="none";},15000);
+return e.start>now
+
+})
+.sort((a,b)=>a.start-b.start)
+.slice(0,4)
+
+let text=""
+
+upcoming.forEach(e=>{
+
+text+=time(e.start)+" "+e.title+"\n"
+
+})
+
+alert(text)
+
+speak(text)
+
 }
 
-// Web Speech API functie
-function speakText(text){
-    if('speechSynthesis' in window){
-        let utter = new SpeechSynthesisUtterance(text);
-        utter.lang = 'nl-NL';
-        window.speechSynthesis.speak(utter);
-    } else {
-        console.warn("Spraakfunctie niet ondersteund in deze browser.");
-    }
+/* ---------------- STEM ---------------- */
+
+function speak(t){
+
+let msg=new SpeechSynthesisUtterance(t)
+
+msg.lang="nl-BE"
+
+speechSynthesis.speak(msg)
+
 }
+
+
+
+
 
 // Swipe ondersteuning (gsm/tablet)
 let touchStartX=0
