@@ -135,11 +135,6 @@ scope:"https://www.googleapis.com/auth/calendar.readonly"
 window.location=url+"?"+new URLSearchParams(params)
 }
 
-function logout(){
-token=null
-events=[]
-render()
-}
 
 // PARSE TOKEN
 function parseToken(){
