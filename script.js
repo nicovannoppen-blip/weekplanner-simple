@@ -12,6 +12,17 @@ function rename(name){
     }
     return name;
 }
+//volgorde filter
+const CALENDAR_ORDER=[
+"Gezin",
+"Nico",
+"Elke",
+"Niel",
+"Odin",
+"Rifter",
+"Rita",
+"Feestdagen"
+]
 
 // SMART PICTO AI
 const ICON_AI={
@@ -158,7 +169,20 @@ let r=await fetch(
 {headers:{Authorization:"Bearer "+token}}
 )
 let data=await r.json()
-calendars=data.items.filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
+    
+calendars=data.items
+.filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
+.sort((a,b)=>{
+
+let ia=CALENDAR_ORDER.indexOf(rename(a.summary))
+let ib=CALENDAR_ORDER.indexOf(rename(b.summary))
+
+if(ia==-1) ia=999
+if(ib==-1) ib=999
+
+return ia-ib
+
+})
 buildFilters()
 }
 
