@@ -451,3 +451,20 @@ function speakText(text){
         console.warn("Spraakfunctie niet ondersteund in deze browser.");
     }
 }
+
+// Swipe ondersteuning (gsm/tablet)
+let touchStartX=0
+
+document.addEventListener("touchstart",e=>{
+touchStartX=e.changedTouches[0].screenX
+})
+
+document.addEventListener("touchend",e=>{
+
+let touchEndX=e.changedTouches[0].screenX
+let diff=touchStartX-touchEndX
+
+if(diff>60) next()
+if(diff<-60) prev()
+
+})
