@@ -131,7 +131,8 @@ pasen:["pasen"],
 ramadan:["ramadan"],
 trouwen:["trouwen"],
 voorraad:["voorraad"],
-Zomervakantie:["zomervakantie"]
+Zomervakantie:["zomervakantie"],
+steffifamilie:["steffie","steffi"]
 }
 
 // LOGIN / LOGOUT
