@@ -131,7 +131,10 @@ ramadan:["ramadan"],
 trouwen:["trouwen"],
 voorraad:["voorraad"],
 Zomervakantie:["zomervakantie"],
-steffifamilie:["steffie","steffi"]
+steffifamilie:["steffie","steffi"],
+Koen:["koen"],
+Bhodi:["bhodi","bodi","bohdi"],
+concert:["concert","festival"],
 }
 
 // LOGIN / LOGOUT
