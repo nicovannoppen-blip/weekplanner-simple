@@ -134,7 +134,7 @@ Zomervakantie:["zomervakantie"],
 steffifamilie:["steffie","steffi"],
 Koen:["koen"],
 Bhodi:["bhodi","bodi","bohdi"],
-concert:["concert","festival"],
+concert:["concert","festival","optreden"],
 }
 
 // LOGIN / LOGOUT
