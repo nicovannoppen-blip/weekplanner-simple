@@ -145,12 +145,8 @@ reptiel:["reptiel","reptielen"],
 dierenwinkel:["dierenwinkel","schoubben"],   
 }
 
-// LOGIN / LOGOUT
-function login(){
-const url="https://accounts.google.com/o/oauth2/v2/auth"
+// ====================== LOGIN / LOGOUT ======================
 
-window.location=url+"?"+new URLSearchParams(params)
-}
 const params={
 client_id:CLIENT_ID,
 redirect_uri:window.location.origin,
@@ -159,15 +155,33 @@ scope:"https://www.googleapis.com/auth/calendar.readonly",
 prompt:"select_account"
 }
 
-// PARSE TOKEN
-function parseToken(){
-const hash=location.hash.substring(1)
-const params=new URLSearchParams(hash)
-token=params.get("access_token")
-if(token) init()
+function login(){
+    console.log("CLIENT_ID:", CLIENT_ID);
+    console.log("params:", params);
+    const url="https://accounts.google.com/o/oauth2/v2/auth";
+    window.location=url+"?"+new URLSearchParams(params);
 }
 
-// GOOGLE API
+// parse token alleen uitvoeren als access_token in URL staat
+window.addEventListener("load", ()=>{
+    if(location.hash.includes("access_token")){
+        parseToken();
+    }
+});
+
+function parseToken(){
+    const hash=location.hash.substring(1);
+    const urlParams=new URLSearchParams(hash);
+    token=urlParams.get("access_token");
+    if(token){
+        console.log("Token gevonden:", token);
+        init();
+    } else {
+        console.log("Geen token aanwezig.");
+    }
+}
+
+// ====================== GOOGLE API ======================
 async function init(){
 await loadCalendars()
 await loadEvents()
@@ -240,7 +254,7 @@ location:e.location||""
 }
 }
 
-// FILTER
+// ====================== FILTER ======================
 function activeCalendars(){
 let list=[]
 document.querySelectorAll("#filters input").forEach(c=>{
@@ -249,7 +263,7 @@ if(c.checked) list.push(c.value)
 return list
 }
 
-// SMART PICTO AI
+// ====================== SMART PICTO AI ======================
 function iconsForEvent(e){
 
 let text=(e.title).toLowerCase()
@@ -288,7 +302,7 @@ return icons
 
 }
 
-// MEERDAAGSE EVENTS OPSPLITSEN
+// ====================== MEERDAAGSE EVENTS ======================
 function eventsForDay(day,active){
 let startDay=new Date(day)
 startDay.setHours(8,0,0,0)
@@ -306,7 +320,7 @@ list.push({...e,start:start,end:end})
 return list
 }
 
-// RENDER
+// ====================== RENDER ======================
 function render(){
 let agenda=document.getElementById("agenda")
 agenda.innerHTML=""
@@ -488,7 +502,7 @@ col.appendChild(div)
 })
 }
 
-// HELPERS
+// ====================== HELPERS ======================
 function sameDay(a,b){
 return a.getFullYear()==b.getFullYear() &&
 a.getMonth()==b.getMonth() &&
@@ -519,9 +533,6 @@ function toggleIcons(){bigIcons=!bigIcons; render()}
 function toggleView(){dayMode=!dayMode; render()}
 function selectAll(){document.querySelectorAll("#filters input").forEach(c=>c.checked=true); render()}
 function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.checked=false); render()}
-
-// INIT
-parseToken()
 
 /* ---------------- KOMENDE AFSPRAKEN ---------------- */
 function showNextEvents(){
