@@ -160,10 +160,12 @@ prompt:"select_account"
 
 // PARSE TOKEN
 function parseToken(){
-const hash=location.hash.substring(1)
-const params=new URLSearchParams(hash)
-token=params.get("access_token")
-if(token) init()
+    const hash = location.hash.substring(1)
+    console.log("hash:", hash)   // <- kijk hier wat Google terugstuurt
+    const params = new URLSearchParams(hash)
+    token = params.get("access_token")
+    console.log("token:", token)
+    if(token) init()
 }
 
 // GOOGLE API
