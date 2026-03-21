@@ -791,8 +791,35 @@ ${html}
 
 w.document.close()
 
+// wacht tot alle afbeeldingen geladen zijn
+let images = w.document.images
+let loaded = 0
+
+    //tijdelijk
+console.log("images loaded:", images.length)
+    
+if(images.length === 0){
+w.print()
+return
+}
+
+for(let img of images){
+
+img.onload = img.onerror = () => {
+
+loaded++
+
+if(loaded === images.length){
+
+// kleine extra delay voor zekerheid
 setTimeout(()=>{
 w.print()
-},300)
+},100)
+
+}
+
+}
+
+}
 
 }
