@@ -145,8 +145,12 @@ reptiel:["reptiel","reptielen"],
 dierenwinkel:["dierenwinkel","schoubben"],   
 }
 
-// ====================== LOGIN / LOGOUT ======================
+// LOGIN / LOGOUT
+function login(){
+const url="https://accounts.google.com/o/oauth2/v2/auth"
 
+window.location=url+"?"+new URLSearchParams(params)
+}
 const params={
 client_id:CLIENT_ID,
 redirect_uri:window.location.origin,
@@ -155,52 +159,15 @@ scope:"https://www.googleapis.com/auth/calendar.readonly",
 prompt:"select_account"
 }
 
-function login(){
-    console.log("CLIENT_ID:", CLIENT_ID);
-    console.log("params:", params);
-    const url="https://accounts.google.com/o/oauth2/v2/auth";
-    window.location=url+"?"+new URLSearchParams(params);
-}
-
-// parse token alleen uitvoeren als access_token in URL staat
-window.addEventListener("load", ()=>{
-    if(location.hash.includes("access_token")){
-        parseToken();
-    }
-});
-
-
-function checkTokenInUrl(){
-    const hash = window.location.hash.substring(1);
-    if(!hash) return;
-    const params = new URLSearchParams(hash);
-    const t = params.get("access_token");
-    if(t){
-        token = t;
-        console.log("Token gevonden:", token);
-        // Verwijder token uit URL zodat reload werkt zonder opnieuw token
-        window.history.replaceState(null, null, window.location.pathname);
-        init();
-    }
-}
-
-// Bij load en direct uitvoeren
-window.addEventListener("load", checkTokenInUrl);
-checkTokenInUrl();
-
+// PARSE TOKEN
 function parseToken(){
-    const hash=location.hash.substring(1);
-    const urlParams=new URLSearchParams(hash);
-    token=urlParams.get("access_token");
-    if(token){
-        console.log("Token gevonden:", token);
-        init();
-    } else {
-        console.log("Geen token aanwezig.");
-    }
+const hash=location.hash.substring(1)
+const params=new URLSearchParams(hash)
+token=params.get("access_token")
+if(token) init()
 }
 
-// ====================== GOOGLE API ======================
+// GOOGLE API
 async function init(){
 await loadCalendars()
 await loadEvents()
@@ -273,7 +240,7 @@ location:e.location||""
 }
 }
 
-// ====================== FILTER ======================
+// FILTER
 function activeCalendars(){
 let list=[]
 document.querySelectorAll("#filters input").forEach(c=>{
@@ -282,7 +249,7 @@ if(c.checked) list.push(c.value)
 return list
 }
 
-// ====================== SMART PICTO AI ======================
+// SMART PICTO AI
 function iconsForEvent(e){
 
 let text=(e.title).toLowerCase()
@@ -321,7 +288,7 @@ return icons
 
 }
 
-// ====================== MEERDAAGSE EVENTS ======================
+// MEERDAAGSE EVENTS OPSPLITSEN
 function eventsForDay(day,active){
 let startDay=new Date(day)
 startDay.setHours(8,0,0,0)
@@ -339,7 +306,7 @@ list.push({...e,start:start,end:end})
 return list
 }
 
-// ====================== RENDER ======================
+// RENDER
 function render(){
 let agenda=document.getElementById("agenda")
 agenda.innerHTML=""
@@ -427,49 +394,23 @@ block:"nearest"
 }
 
 // LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
-function layoutEvents(list,col,printMode=false){
-    list.sort((a,b)=>a.start-b.start)
-    let columns=[]
+function layoutEvents(list,col){
+list.sort((a,b)=>a.start-b.start)
+let columns=[]
 
-    list.forEach(e=>{
-        let placed=false
-        for(let i=0;i<columns.length;i++){
-            if(columns[i][columns[i].length-1].end<=e.start){
-                columns[i].push(e)
-                placed=true
-                break
-            }
-        }
-        if(!placed){
-            columns.push([e])
-        }
-    })
-
-    columns.forEach((colEvents,i)=>{
-        colEvents.forEach(e=>{
-            let start=(e.start.getHours()-7)*60+e.start.getMinutes()
-            let dur=(e.end-e.start)/60000
-            let div=document.createElement("div")
-            div.className = printMode ? "event printEvent" : "event"
-            div.style.top=start+"px"
-            div.style.height=dur+"px"
-
-            let width=90/columns.length
-            let left=5 + i*width
-            div.style.left=left+"%"
-            div.style.width=(width-2)+"%"
-            div.style.background=e.color
-
-            let icons=iconsForEvent(e)
-            let html=""
-            icons.forEach(i=>{html+=`<img src="icons/${i}.png" class="picto">`})
-            html+=`<div>${time(e.start)} ${e.title}</div>`
-            div.innerHTML=html
-
-            col.appendChild(div)
-        })
-    })
+list.forEach(e=>{
+let placed=false
+for(let i=0;i<columns.length;i++){
+if(columns[i][columns[i].length-1].end<=e.start){
+columns[i].push(e)
+placed=true
+break
 }
+}
+if(!placed){
+columns.push([e])
+}
+})
 
 // Render events
 columns.forEach((colEvents,i)=>{
@@ -521,7 +462,7 @@ col.appendChild(div)
 })
 }
 
-// ====================== HELPERS ======================
+// HELPERS
 function sameDay(a,b){
 return a.getFullYear()==b.getFullYear() &&
 a.getMonth()==b.getMonth() &&
@@ -552,6 +493,9 @@ function toggleIcons(){bigIcons=!bigIcons; render()}
 function toggleView(){dayMode=!dayMode; render()}
 function selectAll(){document.querySelectorAll("#filters input").forEach(c=>c.checked=true); render()}
 function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.checked=false); render()}
+
+// INIT
+parseToken()
 
 /* ---------------- KOMENDE AFSPRAKEN ---------------- */
 function showNextEvents(){
@@ -643,7 +587,7 @@ function printWeek() {
         printContainer.id = "printContainer";
         document.body.appendChild(printContainer);
     }
-    printContainer.innerHTML = "";
+    printContainer.innerHTML = ""; // leegmaken
 
     let active = activeCalendars();
 
@@ -656,27 +600,21 @@ function printWeek() {
         let dayDiv = document.createElement("div");
         dayDiv.className = "printDay";
 
-        // Header
         let h2 = document.createElement("h2");
         h2.innerText = d.toLocaleDateString("nl-BE", {weekday:"long", day:"2-digit", month:"2-digit"});
         dayDiv.appendChild(h2);
 
-        // Container voor uren
-        let dayContainer = document.createElement("div");
-        dayContainer.className = "printDayContainer";
-        dayDiv.appendChild(dayContainer);
+        dayEvents.forEach(e=>{
+            let icons = iconsForEvent(e);
+            let iconHTML = "";
+            icons.forEach(i=>{
+                iconHTML += `<img src="icons/${i}.png" class="picto"> `;
+            });
 
-        // Urenlijn
-        for(let h=7;h<=23;h++){
-            let hourLine = document.createElement("div");
-            hourLine.className = "printHour";
-            hourLine.innerText = h+":00";
-            hourLine.style.top = ((h-7)*60)+"px"; // 1px per minuut
-            dayContainer.appendChild(hourLine);
-        }
-
-        // Events renderen
-        layoutEvents(dayEvents, dayContainer, true); // true = print mode
+            let eventDiv = document.createElement("div");
+            eventDiv.innerHTML = `${time(e.start)}-${time(e.end)} ${iconHTML} ${e.title}`;
+            dayDiv.appendChild(eventDiv);
+        });
 
         printContainer.appendChild(dayDiv);
     }
