@@ -169,6 +169,25 @@ window.addEventListener("load", ()=>{
     }
 });
 
+
+function checkTokenInUrl(){
+    const hash = window.location.hash.substring(1);
+    if(!hash) return;
+    const params = new URLSearchParams(hash);
+    const t = params.get("access_token");
+    if(t){
+        token = t;
+        console.log("Token gevonden:", token);
+        // Verwijder token uit URL zodat reload werkt zonder opnieuw token
+        window.history.replaceState(null, null, window.location.pathname);
+        init();
+    }
+}
+
+// Bij load en direct uitvoeren
+window.addEventListener("load", checkTokenInUrl);
+checkTokenInUrl();
+
 function parseToken(){
     const hash=location.hash.substring(1);
     const urlParams=new URLSearchParams(hash);
