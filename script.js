@@ -576,10 +576,9 @@ if(diff<-60) prev()
 
 
 
-//afdrukken
-window.printWeek = function(){
+/* ---------------- AFDRUKKEN ---------------- */
 
-console.log("printWeek gestart")
+window.printWeek = function(){
 
 let start=getMonday(currentDate)
 
@@ -597,33 +596,104 @@ dayStart.setHours(0,0,0)
 let dayEnd=new Date(d)
 dayEnd.setHours(23,59,59)
 
-// filter events ZONDER getEventsForDay
+// events filteren
 let dayEvents=events.filter(e=>{
-
 return !(e.end<dayStart || e.start>dayEnd)
+})
+
+// MEERDAAGS CORRECT MAKEN (08–23 regel)
+dayEvents=dayEvents.map(e=>{
+
+let s=new Date(e.start)
+let en=new Date(e.end)
+
+if(s<dayStart){
+s=new Date(d)
+s.setHours(8,0,0)
+}
+
+if(en>dayEnd){
+en=new Date(d)
+en.setHours(23,0,0)
+}
+
+return {...e,start:s,end:en}
 
 })
 
-html+=`
-<div class="printDay">
-<h2>
-${d.toLocaleDateString("nl-BE",{weekday:"long"})}
-${d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})}
-</h2>
-`
+// sorteren
+dayEvents.sort((a,b)=>a.start-b.start)
+
+// overlap layout
+let columns=[]
 
 dayEvents.forEach(e=>{
 
+let placed=false
+
+for(let col of columns){
+
+if(col[col.length-1].end<=e.start){
+col.push(e)
+placed=true
+break
+}
+
+}
+
+if(!placed){
+columns.push([e])
+}
+
+})
+
+// HTML opbouw
 html+=`
-<div>
-${time(e.start)} - ${time(e.end)} ${e.title}
+<div class="day">
+<div class="dayHeader">
+${d.toLocaleDateString("nl-BE",{weekday:"long"})}
+${d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})}
+</div>
+`
+
+// uren
+for(let h=8;h<=23;h++){
+html+=`<div class="hour" style="top:${(h-8)*60}px">${h}:00</div>`
+}
+
+// events tekenen
+columns.forEach((colEvents,i)=>{
+
+colEvents.forEach(e=>{
+
+let startMin=(e.start.getHours()-8)*60+e.start.getMinutes()
+let dur=(e.end-e.start)/60000
+
+let icons=iconsForEvent(e)
+.map(icon=>`<img src="icons/${icon}" class="picto">`)
+.join("")
+
+html+=`
+<div class="event"
+style="
+top:${startMin}px;
+height:${dur}px;
+left:${i*(90/columns.length)+5}%;
+width:${90/columns.length-2}%;
+background:${e.color};
+">
+
+<div class="pictoRow">${icons}</div>
+<div class="text">${time(e.start)} - ${time(e.end)}<br>${e.title}</div>
+
 </div>
 `
 
 })
 
-html+=`</div>`
+})
 
+html+=`</div>`
 }
 
 // nieuw venster
@@ -632,31 +702,76 @@ let w=window.open("","PRINT")
 w.document.write(`
 <html>
 <head>
-<title>Print</title>
+<title>Weekplanner</title>
+
 <style>
 
 body{
 font-family:Arial;
+background:white;
 }
 
-.printDay{
+.day{
+position:relative;
+height:1120px;
 page-break-after:always;
-padding:20px;
+border:1px solid #ddd;
+margin:0;
 }
 
-h2{
-font-size:24px;
+.dayHeader{
+text-align:center;
+font-weight:bold;
+padding:10px;
+font-size:22px;
+border-bottom:1px solid #ccc;
 }
 
-div{
-font-size:18px;
-margin:5px 0;
+.hour{
+position:absolute;
+left:0;
+right:0;
+border-top:1px solid #eee;
+font-size:10px;
+color:#888;
+}
+
+.event{
+position:absolute;
+border-radius:8px;
+color:white;
+padding:4px;
+font-size:14px;
+overflow:visible;
+}
+
+.pictoRow{
+display:flex;
+flex-wrap:wrap;
+gap:2px;
+}
+
+.picto{
+width:28px;
+height:28px;
+}
+
+.text{
+font-size:14px;
+}
+
+@page{
+size:A4 portrait;
+margin:10mm;
 }
 
 </style>
+
 </head>
 <body>
+
 ${html}
+
 </body>
 </html>
 `)
