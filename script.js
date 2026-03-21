@@ -573,3 +573,70 @@ if(diff>60) next()
 if(diff<-60) prev()
 
 })
+
+//afdrukken
+function printWeek(){
+
+let originalDayMode=dayMode
+let originalDate=new Date(currentDate)
+
+let start=getMonday(currentDate)
+
+// nieuwe print container
+let printContainer=document.createElement("div")
+printContainer.id="printContainer"
+
+// maak 7 dagen
+for(let i=0;i<7;i++){
+
+let d=new Date(start)
+d.setDate(start.getDate()+i)
+
+// tijdelijke dag render
+let col=document.createElement("div")
+col.className="day printDay"
+
+let head=document.createElement("div")
+head.className="dayHeader"
+
+head.innerText=
+d.toLocaleDateString("nl-BE",{weekday:"long"})+
+" "+
+d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
+
+col.appendChild(head)
+
+// uren
+for(let h=7;h<=23;h++){
+
+let line=document.createElement("div")
+line.className="hour"
+line.style.top=((h-7)*60)+"px"
+line.innerText=h+":00"
+
+col.appendChild(line)
+
+}
+
+// events
+let dayEvents=getEventsForDay(d)
+layoutEvents(dayEvents,col)
+
+printContainer.appendChild(col)
+
+}
+
+// voeg toe aan body
+document.body.appendChild(printContainer)
+
+// print
+window.print()
+
+// verwijder nadien
+document.body.removeChild(printContainer)
+
+// herstel
+dayMode=originalDayMode
+currentDate=originalDate
+
+}
