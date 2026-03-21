@@ -705,65 +705,77 @@ w.document.write(`
 <title>Weekplanner</title>
 
 <style>
+<style>
 
 body{
 font-family:Arial;
 background:white;
+margin:0;
 }
 
+/* volledige pagina benutten */
 .day{
 position:relative;
 height:1120px;
 page-break-after:always;
-border:1px solid #ddd;
-margin:0;
 }
 
+/* titel groter */
 .dayHeader{
 text-align:center;
 font-weight:bold;
-padding:10px;
-font-size:22px;
-border-bottom:1px solid #ccc;
+padding:12px;
+font-size:28px;
+border-bottom:2px solid #ccc;
 }
 
+/* uur lijnen duidelijker */
 .hour{
 position:absolute;
 left:0;
 right:0;
-border-top:1px solid #eee;
-font-size:10px;
-color:#888;
+border-top:1px solid #ddd;
+font-size:12px;
+color:#666;
 }
 
+/* afspraken VEEL groter */
 .event{
 position:absolute;
-border-radius:8px;
+border-radius:12px;
 color:white;
-padding:4px;
-font-size:14px;
+padding:6px;
+font-size:18px;
 overflow:visible;
+box-shadow:0 2px 4px rgba(0,0,0,0.2);
 }
 
+/* pictogrammen groot */
 .pictoRow{
 display:flex;
 flex-wrap:wrap;
-gap:2px;
+gap:4px;
+margin-bottom:4px;
 }
 
 .picto{
-width:28px;
-height:28px;
+width:40px;
+height:40px;
 }
 
+/* tekst duidelijk */
 .text{
-font-size:14px;
+font-size:18px;
+line-height:1.2;
 }
 
+/* A4 instellingen */
 @page{
 size:A4 portrait;
-margin:10mm;
+margin:8mm;
 }
+
+</style>
 
 </style>
 
