@@ -4,6 +4,7 @@ let events=[]
 let currentDate=new Date()
 let dayMode=false
 let bigIcons=false
+const BASE_URL = window.location.origin
 
 // Hernoem lange kalender namen
 function rename(name){
@@ -670,7 +671,7 @@ let startMin=(e.start.getHours()-7)*60+e.start.getMinutes()
 let dur=(e.end-e.start)/60000
 
 let icons=iconsForEvent(e)
-.map(icon=>`<img src="icons/${icon}" class="picto">`)
+.map(icon=>`<img src="${BASE_URL}/icons/${icon}" class="picto">`)
 .join("")
 
 html+=`
