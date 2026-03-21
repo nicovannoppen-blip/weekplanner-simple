@@ -657,7 +657,7 @@ ${d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})}
 `
 
 // uren
-for(let h=8;h<=23;h++){
+for(let h=7;h<=23;h++){
 html+=`<div class="hour" style="top:${(h-8)*60}px">${h}:00</div>`
 }
 
@@ -666,7 +666,7 @@ columns.forEach((colEvents,i)=>{
 
 colEvents.forEach(e=>{
 
-let startMin=(e.start.getHours()-8)*60+e.start.getMinutes()
+let startMin=(e.start.getHours()-7)*60+e.start.getMinutes()
 let dur=(e.end-e.start)/60000
 
 let icons=iconsForEvent(e)
