@@ -579,7 +579,7 @@ if(diff<-60) prev()
 
 /* ---------------- AFDRUKKEN ---------------- */
 
-async function getBase64Image(url){
+/*async function getBase64Image(url){
 
 let res = await fetch(url)
 let blob = await res.blob()
@@ -591,6 +591,7 @@ reader.readAsDataURL(blob)
 })
 
 }
+*/
 
 window.printWeek = async function(){
 
