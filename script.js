@@ -574,68 +574,9 @@ if(diff<-60) prev()
 
 })
 
+
+
 //afdrukken
-function printWeek(){
-
-let start=getMonday(currentDate)
-
-// container maken
-let printContainer=document.createElement("div")
-printContainer.id="printContainer"
-
-// 7 dagen maken
-for(let i=0;i<7;i++){
-
-let d=new Date(start)
-d.setDate(start.getDate()+i)
-
-// dag container
-let dayDiv=document.createElement("div")
-dayDiv.className="printDay"
-
-// titel
-let title=document.createElement("h2")
-title.innerText=
-d.toLocaleDateString("nl-BE",{weekday:"long"})+
-" "+
-d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
-
-dayDiv.appendChild(title)
-
-// afspraken ophalen
-let dayEvents=getEventsForDay(d)
-
-// lijst maken (simpeler = stabieler)
-dayEvents.forEach(e=>{
-
-let item=document.createElement("div")
-
-item.innerText=
-time(e.start)+" - "+time(e.end)+"  "+e.title
-
-dayDiv.appendChild(item)
-
-})
-
-printContainer.appendChild(dayDiv)
-
-}
-
-// toevoegen aan pagina
-document.body.appendChild(printContainer)
-
-// print starten
-setTimeout(()=>{
-window.print()
-
-// opruimen
-document.body.removeChild(printContainer)
-
-},300)
-
-}
-
-
 window.printWeek = function(){
 
 console.log("printWeek gestart")
@@ -649,6 +590,20 @@ for(let i=0;i<7;i++){
 let d=new Date(start)
 d.setDate(start.getDate()+i)
 
+// dag grenzen
+let dayStart=new Date(d)
+dayStart.setHours(0,0,0)
+
+let dayEnd=new Date(d)
+dayEnd.setHours(23,59,59)
+
+// filter events ZONDER getEventsForDay
+let dayEvents=events.filter(e=>{
+
+return !(e.end<dayStart || e.start>dayEnd)
+
+})
+
 html+=`
 <div class="printDay">
 <h2>
@@ -656,8 +611,6 @@ ${d.toLocaleDateString("nl-BE",{weekday:"long"})}
 ${d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})}
 </h2>
 `
-
-let dayEvents=getEventsForDay(d)
 
 dayEvents.forEach(e=>{
 
@@ -673,87 +626,7 @@ html+=`</div>`
 
 }
 
-// NIEUW VENSTER (werkt ALTIJD)
-let w=window.open("","PRINT")
-
-w.document.write(`
-<html>
-<head>
-<title>Print</title>
-<style>
-
-body{
-font-family:Arial;
-}
-
-.printDay{
-page-break-after:always;
-padding:20px;
-}
-
-h2{
-font-size:24px;
-}
-
-div{
-font-size:18px;
-margin:5px 0;
-}
-
-</style>
-</head>
-<body>
-${html}
-</body>
-</html>
-`)
-
-w.document.close()
-
-setTimeout(()=>{
-w.print()
-},300)
-
-}
-
-window.printWeek = function(){
-
-console.log("printWeek gestart")
-
-let start=getMonday(currentDate)
-
-let html=""
-
-for(let i=0;i<7;i++){
-
-let d=new Date(start)
-d.setDate(start.getDate()+i)
-
-html+=`
-<div class="printDay">
-<h2>
-${d.toLocaleDateString("nl-BE",{weekday:"long"})}
-${d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})}
-</h2>
-`
-
-let dayEvents=getEventsForDay(d)
-
-dayEvents.forEach(e=>{
-
-html+=`
-<div>
-${time(e.start)} - ${time(e.end)} ${e.title}
-</div>
-`
-
-})
-
-html+=`</div>`
-
-}
-
-// NIEUW VENSTER (werkt ALTIJD)
+// nieuw venster
 let w=window.open("","PRINT")
 
 w.document.write(`
