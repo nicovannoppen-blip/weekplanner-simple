@@ -579,7 +579,7 @@ if(diff<-60) prev()
 
 /* ---------------- AFDRUKKEN ---------------- */
 
-/*async function getBase64Image(url){
+async function getBase64Image(url){
 
 let res = await fetch(url)
 let blob = await res.blob()
@@ -591,7 +591,7 @@ reader.readAsDataURL(blob)
 })
 
 }
-*/
+
 
 window.printWeek = async function(){
 
@@ -816,7 +816,7 @@ let images = w.document.images
 let loaded = 0
 
     //tijdelijk
-/*console.log("images loaded:", images.length)*/
+console.log("images loaded:", images.length)
     
 if(images.length === 0){
 w.print()
