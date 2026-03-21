@@ -1,3 +1,19 @@
+async function getBase64Image(url){
+
+let res = await fetch(url)
+let blob = await res.blob()
+
+return new Promise(resolve=>{
+let reader = new FileReader()
+reader.onloadend = ()=>resolve(reader.result)
+reader.readAsDataURL(blob)
+})
+
+}
+
+
+
+
 let token=null
 let calendars=[]
 let events=[]
@@ -579,7 +595,7 @@ if(diff<-60) prev()
 
 /* ---------------- AFDRUKKEN ---------------- */
 
-window.printWeek = function(){
+window.printWeek = async function(){
 
 let start=getMonday(currentDate)
 
@@ -670,9 +686,15 @@ colEvents.forEach(e=>{
 let startMin=(e.start.getHours()-7)*60+e.start.getMinutes()
 let dur=(e.end-e.start)/60000
 
-let icons=iconsForEvent(e)
-.map(icon=>`<img src="${BASE_URL}/icons/${icon}" class="picto">`)
-.join("")
+let iconHtml=""
+
+for(let icon of iconsForEvent(e)){
+
+let base64 = await getBase64Image(BASE_URL+"/icons/"+icon)
+
+iconHtml += `<img src="${base64}" class="picto">`
+
+}
 
 html+=`
 <div class="event"
