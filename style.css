@@ -127,3 +127,46 @@ max-width:300px;
 text-align:center;
 font-size:18px;
 }
+@media print{
+
+body *{
+visibility:hidden;
+}
+
+#printContainer,
+#printContainer *{
+visibility:visible;
+}
+
+#printContainer{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+}
+
+/* elke dag = nieuwe pagina */
+.printDay{
+page-break-after:always;
+height:100vh;
+margin:0;
+}
+
+/* geen marges */
+@page{
+size:A4 portrait;
+margin:10mm;
+}
+
+/* dag layout netjes */
+.printDay{
+position:relative;
+border:none;
+}
+
+/* tekst groter voor duidelijkheid */
+.printDay .event{
+font-size:16px;
+}
+
+}
