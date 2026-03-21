@@ -575,3 +575,49 @@ if(diff>60) next()
 if(diff<-60) prev()
 
 })
+
+
+/* print week */
+
+function printWeek() {
+    let start = getMonday(currentDate);
+    let printContainer = document.getElementById("printContainer");
+    if(!printContainer){
+        printContainer = document.createElement("div");
+        printContainer.id = "printContainer";
+        document.body.appendChild(printContainer);
+    }
+    printContainer.innerHTML = ""; // leegmaken
+
+    let active = activeCalendars();
+
+    for(let i=0;i<7;i++){
+        let d = new Date(start);
+        d.setDate(start.getDate()+i);
+
+        let dayEvents = eventsForDay(d, active);
+
+        let dayDiv = document.createElement("div");
+        dayDiv.className = "printDay";
+
+        let h2 = document.createElement("h2");
+        h2.innerText = d.toLocaleDateString("nl-BE", {weekday:"long", day:"2-digit", month:"2-digit"});
+        dayDiv.appendChild(h2);
+
+        dayEvents.forEach(e=>{
+            let icons = iconsForEvent(e);
+            let iconHTML = "";
+            icons.forEach(i=>{
+                iconHTML += `<img src="icons/${i}.png" class="picto"> `;
+            });
+
+            let eventDiv = document.createElement("div");
+            eventDiv.innerHTML = `${time(e.start)}-${time(e.end)} ${iconHTML} ${e.title}`;
+            dayDiv.appendChild(eventDiv);
+        });
+
+        printContainer.appendChild(dayDiv);
+    }
+
+    window.print();
+}
