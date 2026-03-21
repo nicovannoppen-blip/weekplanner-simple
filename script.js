@@ -4,7 +4,6 @@ let events=[]
 let currentDate=new Date()
 let dayMode=false
 let bigIcons=false
-const BASE_URL = window.location.origin
 
 // Hernoem lange kalender namen
 function rename(name){
@@ -160,12 +159,10 @@ prompt:"select_account"
 
 // PARSE TOKEN
 function parseToken(){
-    const hash = location.hash.substring(1)
-    console.log("hash:", hash)   // <- kijk hier wat Google terugstuurt
-    const params = new URLSearchParams(hash)
-    token = params.get("access_token")
-    console.log("token:", token)
-    if(token) init()
+const hash=location.hash.substring(1)
+const params=new URLSearchParams(hash)
+token=params.get("access_token")
+if(token) init()
 }
 
 // GOOGLE API
@@ -181,7 +178,7 @@ let r=await fetch(
 {headers:{Authorization:"Bearer "+token}}
 )
 let data=await r.json()
-    
+
 calendars=data.items
 .filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
 .sort((a,b)=>{
@@ -356,7 +353,7 @@ dayIcons[weekday]+" "+
 d.toLocaleDateString("nl-BE",{weekday:"long"})+
 " "+
 d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})
-    
+
 col.appendChild(head)
 
 /* uren */    
@@ -365,7 +362,7 @@ let line=document.createElement("div")
 line.className="hour"
 line.style.top=((h-7)*60)+"px"
 col.appendChild(line)
-    
+
 }
 
 // Meerdaagse events + overlappende naast elkaar
@@ -391,7 +388,7 @@ block:"nearest"
 })
 
 }
-    
+
 }
 
 // LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
@@ -457,7 +454,7 @@ time(e.end)
 speak(text)
 
 }
-    
+
 col.appendChild(div)
 })
 })
@@ -581,21 +578,7 @@ if(diff<-60) prev()
 
 /* ---------------- AFDRUKKEN ---------------- */
 
-async function getBase64Image(url){
-
-let res = await fetch(url)
-let blob = await res.blob()
-
-return new Promise(resolve=>{
-let reader = new FileReader()
-reader.onloadend = ()=>resolve(reader.result)
-reader.readAsDataURL(blob)
-})
-
-}
-
-
-window.printWeek = async function(){
+window.printWeek = function(){
 
 let start=getMonday(currentDate)
 
@@ -674,6 +657,7 @@ ${d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})}
 `
 
 // uren
+for(let h=8;h<=23;h++){
 for(let h=7;h<=23;h++){
 html+=`<div class="hour" style="top:${(h-8)*60}px">${h}:00</div>`
 }
@@ -683,18 +667,13 @@ columns.forEach((colEvents,i)=>{
 
 colEvents.forEach(e=>{
 
+let startMin=(e.start.getHours()-8)*60+e.start.getMinutes()
 let startMin=(e.start.getHours()-7)*60+e.start.getMinutes()
 let dur=(e.end-e.start)/60000
 
-let iconHtml=""
-
-for(let icon of iconsForEvent(e)){
-
-let base64 = await getBase64Image(BASE_URL+"/icons/"+icon)
-
-iconHtml += `<img src="${base64}" class="picto">`
-
-}
+let icons=iconsForEvent(e)
+.map(icon=>`<img src="icons/${icon}" class="picto">`)
+.join("")
 
 html+=`
 <div class="event"
@@ -706,7 +685,7 @@ width:${90/columns.length-2}%;
 background:${e.color};
 ">
 
-<div class="pictoRow">${iconHtml}</div>
+<div class="pictoRow">${icons}</div>
 <div class="text">${time(e.start)} - ${time(e.end)}<br>${e.title}</div>
 
 </div>
@@ -813,35 +792,8 @@ ${html}
 
 w.document.close()
 
-// wacht tot alle afbeeldingen geladen zijn
-let images = w.document.images
-let loaded = 0
-
-    //tijdelijk
-console.log("images loaded:", images.length)
-    
-if(images.length === 0){
-w.print()
-return
-}
-
-for(let img of images){
-
-img.onload = img.onerror = () => {
-
-loaded++
-
-if(loaded === images.length){
-
-// kleine extra delay voor zekerheid
 setTimeout(()=>{
 w.print()
-},100)
-
-}
-
-}
-
-}
+},300)
 
 }
