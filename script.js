@@ -706,7 +706,7 @@ width:${90/columns.length-2}%;
 background:${e.color};
 ">
 
-<div class="pictoRow">${icons}</div>
+<div class="pictoRow">${iconHtml}</div>
 <div class="text">${time(e.start)} - ${time(e.end)}<br>${e.title}</div>
 
 </div>
