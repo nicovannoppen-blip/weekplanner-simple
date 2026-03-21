@@ -1,19 +1,3 @@
-async function getBase64Image(url){
-
-let res = await fetch(url)
-let blob = await res.blob()
-
-return new Promise(resolve=>{
-let reader = new FileReader()
-reader.onloadend = ()=>resolve(reader.result)
-reader.readAsDataURL(blob)
-})
-
-}
-
-
-
-
 let token=null
 let calendars=[]
 let events=[]
@@ -594,6 +578,19 @@ if(diff<-60) prev()
 
 
 /* ---------------- AFDRUKKEN ---------------- */
+
+async function getBase64Image(url){
+
+let res = await fetch(url)
+let blob = await res.blob()
+
+return new Promise(resolve=>{
+let reader = new FileReader()
+reader.onloadend = ()=>resolve(reader.result)
+reader.readAsDataURL(blob)
+})
+
+}
 
 window.printWeek = async function(){
 
