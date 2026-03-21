@@ -634,3 +634,164 @@ document.body.removeChild(printContainer)
 },300)
 
 }
+
+
+window.printWeek = function(){
+
+console.log("printWeek gestart")
+
+let start=getMonday(currentDate)
+
+let html=""
+
+for(let i=0;i<7;i++){
+
+let d=new Date(start)
+d.setDate(start.getDate()+i)
+
+html+=`
+<div class="printDay">
+<h2>
+${d.toLocaleDateString("nl-BE",{weekday:"long"})}
+${d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})}
+</h2>
+`
+
+let dayEvents=getEventsForDay(d)
+
+dayEvents.forEach(e=>{
+
+html+=`
+<div>
+${time(e.start)} - ${time(e.end)} ${e.title}
+</div>
+`
+
+})
+
+html+=`</div>`
+
+}
+
+// NIEUW VENSTER (werkt ALTIJD)
+let w=window.open("","PRINT")
+
+w.document.write(`
+<html>
+<head>
+<title>Print</title>
+<style>
+
+body{
+font-family:Arial;
+}
+
+.printDay{
+page-break-after:always;
+padding:20px;
+}
+
+h2{
+font-size:24px;
+}
+
+div{
+font-size:18px;
+margin:5px 0;
+}
+
+</style>
+</head>
+<body>
+${html}
+</body>
+</html>
+`)
+
+w.document.close()
+
+setTimeout(()=>{
+w.print()
+},300)
+
+}
+
+window.printWeek = function(){
+
+console.log("printWeek gestart")
+
+let start=getMonday(currentDate)
+
+let html=""
+
+for(let i=0;i<7;i++){
+
+let d=new Date(start)
+d.setDate(start.getDate()+i)
+
+html+=`
+<div class="printDay">
+<h2>
+${d.toLocaleDateString("nl-BE",{weekday:"long"})}
+${d.toLocaleDateString("nl-BE",{day:"2-digit",month:"2-digit"})}
+</h2>
+`
+
+let dayEvents=getEventsForDay(d)
+
+dayEvents.forEach(e=>{
+
+html+=`
+<div>
+${time(e.start)} - ${time(e.end)} ${e.title}
+</div>
+`
+
+})
+
+html+=`</div>`
+
+}
+
+// NIEUW VENSTER (werkt ALTIJD)
+let w=window.open("","PRINT")
+
+w.document.write(`
+<html>
+<head>
+<title>Print</title>
+<style>
+
+body{
+font-family:Arial;
+}
+
+.printDay{
+page-break-after:always;
+padding:20px;
+}
+
+h2{
+font-size:24px;
+}
+
+div{
+font-size:18px;
+margin:5px 0;
+}
+
+</style>
+</head>
+<body>
+${html}
+</body>
+</html>
+`)
+
+w.document.close()
+
+setTimeout(()=>{
+w.print()
+},300)
+
+}
