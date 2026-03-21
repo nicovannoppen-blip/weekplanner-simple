@@ -394,23 +394,49 @@ block:"nearest"
 }
 
 // LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
-function layoutEvents(list,col){
-list.sort((a,b)=>a.start-b.start)
-let columns=[]
+function layoutEvents(list,col,printMode=false){
+    list.sort((a,b)=>a.start-b.start)
+    let columns=[]
 
-list.forEach(e=>{
-let placed=false
-for(let i=0;i<columns.length;i++){
-if(columns[i][columns[i].length-1].end<=e.start){
-columns[i].push(e)
-placed=true
-break
+    list.forEach(e=>{
+        let placed=false
+        for(let i=0;i<columns.length;i++){
+            if(columns[i][columns[i].length-1].end<=e.start){
+                columns[i].push(e)
+                placed=true
+                break
+            }
+        }
+        if(!placed){
+            columns.push([e])
+        }
+    })
+
+    columns.forEach((colEvents,i)=>{
+        colEvents.forEach(e=>{
+            let start=(e.start.getHours()-7)*60+e.start.getMinutes()
+            let dur=(e.end-e.start)/60000
+            let div=document.createElement("div")
+            div.className = printMode ? "event printEvent" : "event"
+            div.style.top=start+"px"
+            div.style.height=dur+"px"
+
+            let width=90/columns.length
+            let left=5 + i*width
+            div.style.left=left+"%"
+            div.style.width=(width-2)+"%"
+            div.style.background=e.color
+
+            let icons=iconsForEvent(e)
+            let html=""
+            icons.forEach(i=>{html+=`<img src="icons/${i}.png" class="picto">`})
+            html+=`<div>${time(e.start)} ${e.title}</div>`
+            div.innerHTML=html
+
+            col.appendChild(div)
+        })
+    })
 }
-}
-if(!placed){
-columns.push([e])
-}
-})
 
 // Render events
 columns.forEach((colEvents,i)=>{
@@ -587,7 +613,7 @@ function printWeek() {
         printContainer.id = "printContainer";
         document.body.appendChild(printContainer);
     }
-    printContainer.innerHTML = ""; // leegmaken
+    printContainer.innerHTML = "";
 
     let active = activeCalendars();
 
@@ -600,21 +626,27 @@ function printWeek() {
         let dayDiv = document.createElement("div");
         dayDiv.className = "printDay";
 
+        // Header
         let h2 = document.createElement("h2");
         h2.innerText = d.toLocaleDateString("nl-BE", {weekday:"long", day:"2-digit", month:"2-digit"});
         dayDiv.appendChild(h2);
 
-        dayEvents.forEach(e=>{
-            let icons = iconsForEvent(e);
-            let iconHTML = "";
-            icons.forEach(i=>{
-                iconHTML += `<img src="icons/${i}.png" class="picto"> `;
-            });
+        // Container voor uren
+        let dayContainer = document.createElement("div");
+        dayContainer.className = "printDayContainer";
+        dayDiv.appendChild(dayContainer);
 
-            let eventDiv = document.createElement("div");
-            eventDiv.innerHTML = `${time(e.start)}-${time(e.end)} ${iconHTML} ${e.title}`;
-            dayDiv.appendChild(eventDiv);
-        });
+        // Urenlijn
+        for(let h=7;h<=23;h++){
+            let hourLine = document.createElement("div");
+            hourLine.className = "printHour";
+            hourLine.innerText = h+":00";
+            hourLine.style.top = ((h-7)*60)+"px"; // 1px per minuut
+            dayContainer.appendChild(hourLine);
+        }
+
+        // Events renderen
+        layoutEvents(dayEvents, dayContainer, true); // true = print mode
 
         printContainer.appendChild(dayDiv);
     }
