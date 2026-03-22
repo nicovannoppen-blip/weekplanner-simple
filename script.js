@@ -632,3 +632,8 @@ function printWeek() {
 
     window.print();
 }
+
+window.onafterprint = function() {
+    alert("Hello");
+    window.location.reload(true);
+};
