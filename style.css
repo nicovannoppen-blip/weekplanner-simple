@@ -152,7 +152,7 @@ font-size:18px;
     .printDayContainer {
       position: relative;
       height: 16*60px; /* 16 uur van 7-23, 60px per uur */
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid #74b9cf;
     }
 
     .printHour {
