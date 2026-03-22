@@ -436,8 +436,9 @@ function layoutEvents(list, col, printMode=false){
             let icons = iconsForEvent(e);
             let html = `<div class="iconContainer">`;
             icons.forEach(ic => {
-            if(ic === "steffifamilie"|| ic === "IrenaGezin"|| ic === "kindjeshalen"|| ic === "trein"
-               || ic === "trein"|| ic === "trein"|| ic === "trein"){
+            if(ic === "steffifamilie"|| ic === "IrenaGezin"|| ic === "kindjeshalen"|| ic === "kindjesnaar"
+               || ic === "Jana_en_Vinny"|| ic === "SylvieEnKids"|| ic === "Vansenne"|| ic === "AnthonyEnkids"
+               || ic === "IrenaEnJulian"|| ic === "vannoppen"){
             extraClass = " bigIcon";
             }
             else{
