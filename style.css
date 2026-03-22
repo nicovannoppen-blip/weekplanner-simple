@@ -173,6 +173,7 @@ font-size:18px;
         box-sizing: border-box;
         overflow: hidden;
         color: #000;
+        background-color:#800080
     }
 
     .printEvent .picto {
