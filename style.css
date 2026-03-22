@@ -128,12 +128,33 @@ text-align:center;
 font-size:18px;
 }
 
-/* Zorg dat pictogrammen naast elkaar staan */
+/* Pictogrammen naast elkaar voor scherm en print */
+.event, .event.printEvent {
+    display: flex;
+    align-items: center;   /* pictogrammen verticaal gecentreerd met tekst */
+    gap: 4px;              /* ruimte tussen pictogrammen en tekst */
+    padding: 2px 4px;
+    border-radius: 4px;
+    color: #000;           /* tekstkleur */
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+/* Pictogrammen zelf */
 .event .picto,
 .event.printEvent .picto {
-    display: inline-block; /* naast elkaar */
-    margin-right: 2px;     /* kleine ruimte tussen pictogrammen */
-    vertical-align: middle; /* netjes uitlijnen met tekst */
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+/* Print-specifiek */
+@media print {
+    .event.printEvent {
+        color: #000;
+        page-break-inside: avoid;
+    }
 }
 
 /* Optioneel: container voor pictogrammen + titel */
