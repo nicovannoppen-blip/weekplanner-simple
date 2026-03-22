@@ -631,12 +631,7 @@ function printWeek() {
     }
 
     window.print();
+    location.reload();
 }
 
-window.onafterprint = (event) => {
-  console.log("After print");
-};
 
-window.addEventListener("afterprint", (event) => {
-  console.log("After print event listener");
-});
