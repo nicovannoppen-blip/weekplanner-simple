@@ -437,8 +437,14 @@ function layoutEvents(list, col, printMode=false){
             let icons = iconsForEvent(e);
             let html = `<div class="iconContainer">`;
             icons.forEach(ic => {
-                html += `<img src="icons/${ic}.png" class="picto">`;
+            if(ic === "steffifamilie"|| ic === "IrenaGezin"|| ic === "kindjeshalen"|| ic === "trein"|| ic === "trein"|| ic === "trein"|| ic === "trein"){
+            extraClass = " bigIcon";
+            }
+
+            html += `<img src="icons/${ic}.png" class="picto${extraClass}">`;
+           
             });
+            else{html += `<img src="icons/${ic}.png" class="picto">`;}
             html += `</div><div>${time(e.start)} ${e.title}</div>`;
             div.innerHTML = html;
 
