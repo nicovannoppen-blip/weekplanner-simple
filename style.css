@@ -153,6 +153,7 @@ font-size:18px;
       position: relative;
       height: 16*60px; /* 16 uur van 7-23, 60px per uur */
       border-bottom: 1px solid #74b9cf;
+        background:#f02405;
     }
 
     .printHour {
