@@ -636,3 +636,7 @@ function printWeek() {
 window.onafterprint = (event) => {
   console.log("After print");
 };
+
+window.addEventListener("afterprint", (event) => {
+  console.log("After print event listener");
+});
