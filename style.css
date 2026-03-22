@@ -128,6 +128,21 @@ text-align:center;
 font-size:18px;
 }
 
+/* Zorg dat pictogrammen naast elkaar staan */
+.event .picto,
+.event.printEvent .picto {
+    display: inline-block; /* naast elkaar */
+    margin-right: 2px;     /* kleine ruimte tussen pictogrammen */
+    vertical-align: middle; /* netjes uitlijnen met tekst */
+}
+
+/* Optioneel: container voor pictogrammen + titel */
+.event div {
+    display: flex;
+    align-items: center;  /* pictogrammen en tekst verticaal gecentreerd */
+    gap: 2px;             /* kleine ruimte tussen pictogrammen en tekst */
+}
+
 @media print {
     body * { 
         display:none; 
