@@ -577,7 +577,7 @@ if(diff<-60) prev()
 })
 
 
-/* print week */
+/* ---------------- PRINT WEEK ---------------- */
 function printWeek() {
     let start = getMonday(currentDate);
     let printContainer = document.getElementById("printContainer");
@@ -594,10 +594,11 @@ function printWeek() {
 
     for(let i=0;i<7;i++){
         let d = new Date(start);
-        d.setDate(start.getDate()+i);
+        d.setDate(start.getDate() + i);
 
         let dayEvents = eventsForDay(d, active);
 
+        // Dagdiv
         let dayDiv = document.createElement("div");
         dayDiv.className = "printDay";
 
@@ -619,37 +620,76 @@ function printWeek() {
         for(let h=7; h<=23; h++){
             let hourLine = document.createElement("div");
             hourLine.className = "printHour";
-            hourLine.style.top = ((h-7)*60)+"px"; // 1px per minuut
-            hourLine.innerText = h+":00";
+            hourLine.style.top = ((h-7)*60) + "px"; // 1px per minuut
+            hourLine.innerText = h + ":00";
             dayContainer.appendChild(hourLine);
         }
 
-        // Events renderen in print mode
-        let width = 90 / columns.length;
-        let left = 5 + i * width;
-        div.style.left = left + "%";
-        div.style.width = (width - 2) + "%";
-        
-        // Kleur behouden voor print
-        div.style.background = e.color;
-        
-        // content
-        let icons = iconsForEvent(e);
-        let html = "";
-        icons.forEach(i => { html += `<img src="icons/${i}.png" class="picto"> `; });
-        html += `<div>${time(e.start)} ${e.title}</div>`;
-        div.innerHTML = html;
-
-        
+        // Render events in print mode
         layoutEvents(dayEvents, dayContainer, true); // true = printMode
 
         printContainer.appendChild(dayDiv);
     }
 
     window.print();
-
-    //pagina herladen omdat hij anders gek doet
-    location.reload();
 }
+
+/* ---------------- LAYOUT EVENTS ---------------- */
+function layoutEvents(list, container, printMode=false){
+    list.sort((a,b) => a.start - b.start);
+    let columns = [];
+
+    // Kolommen bepalen
+    list.forEach(e => {
+        let placed = false;
+        for(let i=0; i<columns.length; i++){
+            if(columns[i][columns[i].length-1].end <= e.start){
+                columns[i].push(e);
+                placed = true;
+                break;
+            }
+        }
+        if(!placed) columns.push([e]);
+    });
+
+    // Render events
+    columns.forEach((colEvents, i) => {
+        colEvents.forEach(e => {
+            let start = (e.start.getHours()-7)*60 + e.start.getMinutes();
+            let dur = (e.end - e.start)/60000;
+
+            let div = document.createElement("div");
+            div.className = printMode ? "event printEvent" : "event";
+            div.style.top = start + "px";
+            div.style.height = dur + "px";
+
+            // Breedte en positie
+            let width = 90 / columns.length;
+            let left = 5 + i*width;
+            div.style.left = left + "%";
+            div.style.width = (width-2) + "%";
+
+            // Kleur behouden voor print
+            div.style.background = e.color;
+
+            // Iconen + titel
+            let icons = iconsForEvent(e);
+            let html = "";
+            icons.forEach(i => {
+                html += `<img src="icons/${i}.png" class="picto"> `;
+            });
+            html += `<div>${time(e.start)} ${e.title}</div>`;
+            div.innerHTML = html;
+
+            container.appendChild(div);
+            
+            //pagina herladen omdat hij anders gek doet
+            location.reload();
+            
+        });
+    });
+}
+
+
 
 
