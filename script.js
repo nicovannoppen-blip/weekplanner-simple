@@ -427,7 +427,7 @@ let width=90/columns.length
 let left=5 + i*width
 div.style.left=left+"%"
 div.style.width=(width-2)+"%"
-div.style.background=e.color
+div.style.background = e.color; // gebruik altijd dezelfde kleur als op de website
 
 let icons=iconsForEvent(e)
 let html=""
@@ -625,6 +625,22 @@ function printWeek() {
         }
 
         // Events renderen in print mode
+        let width = 90 / columns.length;
+        let left = 5 + i * width;
+        div.style.left = left + "%";
+        div.style.width = (width - 2) + "%";
+        
+        // Kleur behouden voor print
+        div.style.background = e.color;
+        
+        // content
+        let icons = iconsForEvent(e);
+        let html = "";
+        icons.forEach(i => { html += `<img src="icons/${i}.png" class="picto"> `; });
+        html += `<div>${time(e.start)} ${e.title}</div>`;
+        div.innerHTML = html;
+
+        
         layoutEvents(dayEvents, dayContainer, true); // true = printMode
 
         printContainer.appendChild(dayDiv);
