@@ -482,7 +482,6 @@ function next(){dayMode?currentDate.setDate(currentDate.getDate()+1)
 :currentDate.setDate(currentDate.getDate()+7)
 init()}
 function today(){currentDate=new Date(); init()}
-function toggleIcons(){bigIcons=!bigIcons; render()}
 function toggleView(){dayMode=!dayMode; render()}
 function selectAll(){document.querySelectorAll("#filters input").forEach(c=>c.checked=true); render()}
 function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.checked=false); render()}
