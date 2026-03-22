@@ -129,9 +129,24 @@ font-size:18px;
 }
 
 @media print {
-    body * { display:none; }
-    #printContainer, #printContainer * { display:block; }
-
+    body * { 
+        display:none; 
+        visibility: hidden; /* Alles verbergen */
+           }
+    #printContainer, #printContainer * { 
+        display:block; 
+        visibility: visible; /* Alleen de print-container zichtbaar */
+    }
+    #printContainer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .event.printEvent {
+        -webkit-print-color-adjust: exact; /* kleuren forceren */
+        print-color-adjust: exact;
+    }
     .printDay {
         page-break-after: always;
         position: relative;
@@ -179,6 +194,10 @@ font-size:18px;
         width:28px;
         height:28px;
         margin-bottom:2px;
+    }
+    img.picto {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     /* Grotere pictogrammen als bigIcons aanstaat */
