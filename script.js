@@ -433,12 +433,15 @@ function layoutEvents(list, col, printMode=false){
             div.style.background = e.color;
 
             // Pictogrammen en tekst
-            let icons = iconsForEvent(e);
+let icons = iconsForEvent(e)
 
-
+// ICONS met support voor smallicon & bigicon
+            let iconHTML = `<div class="icons">`
             
-            let html = `<div class="iconContainer">`;
-            icons.forEach(ic => {
+            icons.forEach(i => {
+            
+                let extraClass = ""
+            
             if(ic === "steffifamilie"|| ic === "IrenaGezin"|| ic === "kindjeshalen"|| ic === "kindjesnaar"
                || ic === "Jana_en_Vinny"|| ic === "SylvieEnKids"|| ic === "Vansenne"|| ic === "AnthonyEnkids"
                || ic === "IrenaEnJulian"|| ic === "vannoppen"){
@@ -447,6 +450,19 @@ function layoutEvents(list, col, printMode=false){
             else{
             extraClass = " smallIcon";   
             }
+            
+                iconHTML += `<img src="icons/${i}.png" class="picto ${extraClass}">`
+            })
+            
+            iconHTML += `</div>`
+            
+            // Tekst onder iconen
+            let html = iconHTML + `<div class="eventText">${time(e.start)} ${e.title}</div>`
+            
+            div.innerHTML = html
+
+                
+
             html += `<img src="icons/${ic}.png" class="picto${extraClass}">`;
            
             });
