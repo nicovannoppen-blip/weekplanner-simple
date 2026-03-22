@@ -435,14 +435,7 @@ function layoutEvents(list, col, printMode=false){
             // Pictogrammen en tekst
             let icons = iconsForEvent(e);
 
-let iconHTML = `<div class="icons">`
-icons.forEach(i=>{
-    iconHTML += `<img src="icons/${i}.png" class="picto">`
-})
-iconHTML += `</div>`
 
-let html = iconHTML + `<div>${time(e.start)} ${e.title}</div>`
-div.innerHTML = html
             
             let html = `<div class="iconContainer">`;
             icons.forEach(ic => {
