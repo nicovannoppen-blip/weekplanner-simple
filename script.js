@@ -395,79 +395,64 @@ block:"nearest"
 
 // LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
 function layoutEvents(list, col, printMode=false){
+    list.sort((a,b)=>a.start-b.start);
+    let columns=[];
 
-list.sort((a,b)=>a.start-b.start)
-let columns=[]
+    // Overlappende kolommen berekenen
+    list.forEach(e=>{
+        let placed=false;
+        for(let i=0;i<columns.length;i++){
+            if(columns[i][columns[i].length-1].end<=e.start){
+                columns[i].push(e);
+                placed=true;
+                break;
+            }
+        }
+        if(!placed){
+            columns.push([e]);
+        }
+    });
 
-list.forEach(e=>{
-let placed=false
-for(let i=0;i<columns.length;i++){
-if(columns[i][columns[i].length-1].end<=e.start){
-columns[i].push(e)
-placed=true
-break
-}
-}
-if(!placed){
-columns.push([e])
-}
-})
+    // Render events
+    columns.forEach((colEvents,i)=>{
+        colEvents.forEach(e=>{
+            let start=(e.start.getHours()-7)*60+e.start.getMinutes();
+            let dur=(e.end-e.start)/60000;
 
-// Render events
-columns.forEach((colEvents,i)=>{
-colEvents.forEach(e=>{
-let start=(e.start.getHours()-7)*60+e.start.getMinutes()
-let dur=(e.end-e.start)/60000
-let div=document.createElement("div")
-div.className = printMode ? "event printEvent" : "event"
-div.style.top=start+"px"
-div.style.height=dur+"px"
+            let div=document.createElement("div");
+            div.className = printMode ? "event printEvent" : "event";
+            div.style.top=start+"px";
+            div.style.height=dur+"px";
 
-// Breedte en positie afhankelijk van aantal overlappende kolommen
-let width=90/columns.length
-let left=5 + i*width
-div.style.left=left+"%"
-div.style.width=(width-2)+"%"
-div.style.background = e.color; // gebruik altijd dezelfde kleur als op de website
+            // Breedte en positie afhankelijk van aantal overlappende kolommen
+            let width=90/columns.length;
+            let left=5 + i*width;
+            div.style.left=left+"%";
+            div.style.width=(width-2)+"%";
 
-let icons=iconsForEvent(e)
-let html=""
-icons.forEach(i=>{ html += `<img src="icons/${i}.png" class="picto">` })
-html += `<div>${time(e.start)} ${e.title}</div>`
-div.innerHTML = html
+            // Achtergrondkleur behouden zoals op website
+            div.style.background = e.color;
 
-div.onclick=(ev)=>{
+            // Pictogrammen en tekst
+            let icons = iconsForEvent(e);
+            let html = `<div class="iconContainer">`;
+            icons.forEach(ic => {
+                html += `<img src="icons/${ic}.png" class="picto">`;
+            });
+            html += `</div><div>${time(e.start)} ${e.title}</div>`;
+            div.innerHTML = html;
 
-ev.stopPropagation()
+            // Klik voor spraak
+            div.onclick = (ev) => {
+                ev.stopPropagation();
+                let dag = e.start.toLocaleDateString("nl-BE",{weekday:"long"});
+                let text = dag+". "+e.title+". Van "+time(e.start)+" tot "+time(e.end);
+                speak(text);
+            }
 
-let dag=e.start.toLocaleDateString(
-"nl-BE",
-{weekday:"long"}
-)
-
-let html = `<div class="iconContainer">`;
-icons.forEach(i => { 
-    html += `<img src="icons/${i}.png" class="picto">`; 
-});
-html += `</div><div>${time(e.start)} ${e.title}</div>`;
-div.innerHTML = html;    
-    
-let text=
-dag+
-". "+
-e.title+
-". Van "+
-time(e.start)+
-" tot "+
-time(e.end)
-
-speak(text)
-
-}
-
-col.appendChild(div)
-})
-})
+            col.appendChild(div);
+        });
+    });
 }
 
 // HELPERS
