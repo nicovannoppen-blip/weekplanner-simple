@@ -175,19 +175,15 @@ font-size:18px;
 
 @media print {
 
-    body * { 
-        display:none; 
+    /* Alles verbergen */
+    body * {
         visibility: hidden;
     }
 
-    #printContainer, #printContainer * { 
-        display:block; 
+    /* Print container zichtbaar maken */
+    #printContainer, 
+    #printContainer * {
         visibility: visible;
-
-
-
-
-
     }
 
     #printContainer {
@@ -197,7 +193,7 @@ font-size:18px;
         width: 100%;
     }
 
-    /* Events */
+    /* ================= EVENTS ================= */
     .event.printEvent {
         position: absolute;
         border-radius: 6px;
@@ -209,29 +205,27 @@ font-size:18px;
         color: #000;
 
         display: flex;
-        flex-direction: column;   /* 🔥 tekst onder iconen */
+        flex-direction: column;   /* tekst onder iconen */
         align-items: center;
 
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
-    /* Container van iconen */
+    /* 🔥 ICONEN naast elkaar */
     .event.printEvent .icons {
         display: flex;
-        flex-direction: row;   /* 🔥 iconen naast elkaar */
+        flex-direction: row;
         justify-content: center;
+        align-items: center;
         gap: 4px;
         margin-bottom: 2px;
-
-
     }
 
-    /* Pictogrammen */
-    .printEvent .picto {
-
-        width:28px;
-        height:28px;
+    .event.printEvent .picto {
+        display: inline-block;
+        width: 28px;
+        height: 28px;
     }
 
     img.picto {
@@ -239,42 +233,42 @@ font-size:18px;
         print-color-adjust: exact;
     }
 
-    /* Dagen */
+    /* ================= DAGEN ================= */
     .printDay {
         page-break-after: always;
         position: relative;
         width: 100%;
         height: 960px;
-        margin:0;
-        padding:20px;
-        background:white; /* beter leesbaar dan zwart */
-        font-family:Arial,sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: white;
+        font-family: Arial, sans-serif;
     }
 
     .printDay h2 {
-        font-size:24px;
-        text-align:center;
-        margin-bottom:10px;
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 10px;
     }
 
     .printDayContainer {
         position: relative;
         height: 960px;
-        border:1px solid #ddd;
+        border: 1px solid #ddd;
     }
 
     .printHour {
-        position:absolute;
-        left:0;
-        right:0;
-        border-top:1px solid #eee;
-        font-size:10px;
-        color:#888;
-        padding-left:4px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        border-top: 1px solid #eee;
+        font-size: 10px;
+        color: #888;
+        padding-left: 4px;
     }
 
-    @page { size:A4; margin:15mm; }
-
-
-
+    @page {
+        size: A4;
+        margin: 15mm;
+    }
 }
