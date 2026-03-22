@@ -633,7 +633,15 @@ function printWeek() {
     window.print();
 }
 
-window.onafterprint = function() {
-    alert("Hello");
-    window.location.reload(true);
-};
+window.matchMedia('print').addListener(function (media) {
+
+      if(media.matches){
+
+      }
+      else{
+           window.location.reload(true);
+            //location.reload();
+      }
+   });
+}
+
