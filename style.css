@@ -158,48 +158,73 @@ font-size:18px;
     max-height: 40px;
 }
 
-/* Print-specifiek */
 @media print {
-    .event.printEvent {
-        color: #000;
-        page-break-inside: avoid;
-    }
-}
 
-/* Optioneel: container voor pictogrammen + titel */
-.event div {
-    display: flex;
-    align-items: center;  /* pictogrammen en tekst verticaal gecentreerd */
-    gap: 2px;             /* kleine ruimte tussen pictogrammen en tekst */
-}
-
-@media print {
     body * { 
         display:none; 
-        visibility: hidden; /* Alles verbergen */
-           }
+        visibility: hidden;
+    }
+
     #printContainer, #printContainer * { 
         display:block; 
-        visibility: visible; /* Alleen de print-container zichtbaar */
+        visibility: visible;
     }
+
     #printContainer {
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
     }
+
+    /* Events */
     .event.printEvent {
-        -webkit-print-color-adjust: exact; /* kleuren forceren */
+        position: absolute;
+        border-radius: 6px;
+        font-size: 12px;
+        padding: 4px;
+        box-sizing: border-box;
+        overflow: hidden;
+
+        color: #000;
+
+        display: flex;
+        flex-direction: column;   /* 🔥 tekst onder iconen */
+        align-items: center;
+
+        -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
+
+    /* Container van iconen */
+    .event.printEvent .icons {
+        display: flex;
+        flex-direction: row;   /* 🔥 iconen naast elkaar */
+        justify-content: center;
+        gap: 4px;
+        margin-bottom: 2px;
+    }
+
+    /* Pictogrammen */
+    .printEvent .picto {
+        width:28px;
+        height:28px;
+    }
+
+    img.picto {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Dagen */
     .printDay {
         page-break-after: always;
         position: relative;
         width: 100%;
-        height: 960px; /* match je digitale agenda */
+        height: 960px;
         margin:0;
         padding:20px;
-        background:black;
+        background:white; /* beter leesbaar dan zwart */
         font-family:Arial,sans-serif;
     }
 
@@ -210,39 +235,19 @@ font-size:18px;
     }
 
     .printDayContainer {
-      position: relative;
-      height: 16*60px; /* 16 uur van 7-23, 60px per uur */
-      border-bottom: 1px solid #74b9cf;
+        position: relative;
+        height: 960px;
+        border:1px solid #ddd;
     }
 
     .printHour {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      font-size: 10px;
-      color: #d90b0b;
-      border-top: 1px dotted #ccc;
-    }
-
-    .printEvent {
-        position: absolute;
-        border-radius: 4px;
-        font-size: 12px;
-        padding: 2px;
-        box-sizing: border-box;
-        overflow: hidden;
-        color: #000;
-        background-color:#800080;
-    }
-
-    .printEvent .picto {
-        width:28px;
-        height:28px;
-        margin-bottom:2px;
-    }
-    img.picto {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        position:absolute;
+        left:0;
+        right:0;
+        border-top:1px solid #eee;
+        font-size:10px;
+        color:#888;
+        padding-left:4px;
     }
 
     @page { size:A4; margin:15mm; }
