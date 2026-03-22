@@ -632,12 +632,12 @@ function printWeek() {
 
         // Header
         let h2 = document.createElement("h2");
-        h2.innerText = 
+        h2.innerText =
             dayIcons[weekday] + " " +
             d.toLocaleDateString("nl-BE", {
-            weekday:"long",
-            day:"2-digit",
-            month:"2-digit"
+                weekday:"long",
+                day:"2-digit",
+                month:"2-digit"
         });
         dayDiv.appendChild(h2);
 
