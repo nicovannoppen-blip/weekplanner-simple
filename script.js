@@ -637,58 +637,6 @@ function printWeek() {
     location.reload();
 }
 
-/* ---------------- LAYOUT EVENTS ---------------- */
-function layoutEvents(list, container, printMode=false){
-    list.sort((a,b) => a.start - b.start);
-    let columns = [];
-
-    // Kolommen bepalen
-    list.forEach(e => {
-        let placed = false;
-        for(let i=0; i<columns.length; i++){
-            if(columns[i][columns[i].length-1].end <= e.start){
-                columns[i].push(e);
-                placed = true;
-                break;
-            }
-        }
-        if(!placed) columns.push([e]);
-    });
-
-    // Render events
-    columns.forEach((colEvents, i) => {
-        colEvents.forEach(e => {
-            let start = (e.start.getHours()-7)*60 + e.start.getMinutes();
-            let dur = (e.end - e.start)/60000;
-
-            let div = document.createElement("div");
-            div.className = printMode ? "event printEvent" : "event";
-            div.style.top = start + "px";
-            div.style.height = dur + "px";
-
-            // Breedte en positie
-            let width = 90 / columns.length;
-            let left = 5 + i*width;
-            div.style.left = left + "%";
-            div.style.width = (width-2) + "%";
-
-            // Kleur behouden voor print
-            div.style.background = e.color;
-
-            // Iconen + titel
-            let icons = iconsForEvent(e);
-            let html = "";
-            icons.forEach(i => {
-                html += `<img src="icons/${i}.png" class="picto"> `;
-            });
-            html += `<div>${time(e.start)} ${e.title}</div>`;
-            div.innerHTML = html;
-
-            container.appendChild(div);
-            
-        });
-    });
-}
 
 
 
