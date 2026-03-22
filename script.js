@@ -631,6 +631,8 @@ function printWeek() {
     }
 
     window.print();
+
+    //pagina herladen omdat hij anders gek doet
     location.reload();
 }
 
