@@ -632,6 +632,9 @@ function printWeek() {
     }
 
     window.print();
+
+    //pagina herladen omdat hij anders gek doet
+    location.reload();
 }
 
 /* ---------------- LAYOUT EVENTS ---------------- */
@@ -682,9 +685,6 @@ function layoutEvents(list, container, printMode=false){
             div.innerHTML = html;
 
             container.appendChild(div);
-            
-            //pagina herladen omdat hij anders gek doet
-            location.reload();
             
         });
     });
