@@ -155,7 +155,7 @@ font-size:18px;
 
 .picto.bigIcon {
     max-width: 100px;
-    max-height: 50px;
+    max-height: 40px;
 }
 
 /* Print-specifiek */
@@ -247,9 +247,3 @@ font-size:18px;
 
     @page { size:A4; margin:15mm; }
 }
-
-    /* Grotere pictogrammen als bigIcons aanstaat */
-    body.large #printContainer .printEvent .picto {
-        width:64px;
-        height:64px;
-    }
