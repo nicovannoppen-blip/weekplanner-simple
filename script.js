@@ -415,6 +415,7 @@ function layoutEvents(list, col, printMode=false){
     // Render events
     columns.forEach((colEvents,i)=>{
         colEvents.forEach(e=>{
+
             let start=(e.start.getHours()-7)*60+e.start.getMinutes();
             let dur=(e.end-e.start)/60000;
 
@@ -423,60 +424,67 @@ function layoutEvents(list, col, printMode=false){
             div.style.top=start+"px";
             div.style.height=dur+"px";
 
-            // Breedte en positie afhankelijk van aantal overlappende kolommen
+            // Breedte/positie
             let width=90/columns.length;
             let left=5 + i*width;
             div.style.left=left+"%";
             div.style.width=(width-2)+"%";
 
-            // Achtergrondkleur behouden zoals op website
+            // Kleur
             div.style.background = e.color;
 
-            // Pictogrammen en tekst
-let icons = iconsForEvent(e)
+            // ================= ICONS =================
+            let icons = iconsForEvent(e);
 
-// ICONS met support voor smallicon & bigicon
-            let iconHTML = `<div class="icons">`
-            
-            icons.forEach(i => {
-            
-                let extraClass = ""
-            
-            if(ic === "steffifamilie"|| ic === "IrenaGezin"|| ic === "kindjeshalen"|| ic === "kindjesnaar"
-               || ic === "Jana_en_Vinny"|| ic === "SylvieEnKids"|| ic === "Vansenne"|| ic === "AnthonyEnkids"
-               || ic === "IrenaEnJulian"|| ic === "vannoppen"){
-            extraClass = " bigIcon";
-            }
-            else{
-            extraClass = " smallIcon";   
-            }
-            
-                iconHTML += `<img src="icons/${i}.png" class="picto ${extraClass}">`
-            })
-            
-            iconHTML += `</div>`
-            
-            // Tekst onder iconen
-            let html = iconHTML + `<div class="eventText">${time(e.start)} ${e.title}</div>`
-            
-            div.innerHTML = html
+            let iconHTML = `<div class="icons">`;
 
-                
+            icons.forEach(ic => {
 
-            html += `<img src="icons/${ic}.png" class="picto${extraClass}">`;
-           
+                let extraClass = "";
+
+                if(
+                    ic === "steffifamilie" ||
+                    ic === "IrenaGezin" ||
+                    ic === "kindjeshalen" ||
+                    ic === "kindjesnaarrita" ||
+                    ic === "Jana_en_Vinny" ||
+                    ic === "SylvieEnKids" ||
+                    ic === "Vansenne" ||
+                    ic === "AnthonyEnkids" ||
+                    ic === "IrenaEnJulian" ||
+                    ic === "vannoppen"
+                ){
+                    extraClass = "bigicon";
+                } else {
+                    extraClass = "smallicon";
+                }
+
+                iconHTML += `<img src="icons/${ic}.png" class="picto ${extraClass}">`;
             });
-                        
-            html += `</div><div>${time(e.start)} ${e.title}</div>`;
+
+            iconHTML += `</div>`;
+
+            // ================= TEKST =================
+            let html = iconHTML + `<div class="eventText">${time(e.start)} ${e.title}</div>`;
+
             div.innerHTML = html;
 
             // Klik voor spraak
             div.onclick = (ev) => {
                 ev.stopPropagation();
+
                 let dag = e.start.toLocaleDateString("nl-BE",{weekday:"long"});
-                let text = dag+". "+e.title+". Van "+time(e.start)+" tot "+time(e.end);
+
+                let text =
+                    dag + ". " +
+                    e.title +
+                    ". Van " +
+                    time(e.start) +
+                    " tot " +
+                    time(e.end);
+
                 speak(text);
-            }
+            };
 
             col.appendChild(div);
         });
