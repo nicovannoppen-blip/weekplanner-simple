@@ -175,12 +175,12 @@ font-size:18px;
 
 @media print {
 
-    /* Alles verbergen */
+    /* ================= BASIS ================= */
+
     body * {
         visibility: hidden;
     }
 
-    /* Print container zichtbaar maken */
     #printContainer, 
     #printContainer * {
         visibility: visible;
@@ -194,6 +194,7 @@ font-size:18px;
     }
 
     /* ================= EVENTS ================= */
+
     .event.printEvent {
         position: absolute;
         border-radius: 6px;
@@ -207,25 +208,45 @@ font-size:18px;
         display: flex;
         flex-direction: column;   /* tekst onder iconen */
         align-items: center;
+        justify-content: flex-start;
 
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
-    /* 🔥 ICONEN naast elkaar */
+    /* 🔥 ICONEN naast elkaar (BELANGRIJKSTE FIX) */
     .event.printEvent .icons {
-        display: flex;
-        flex-direction: row;
+        display: flex !important;
+        flex-direction: row !important;
         justify-content: center;
         align-items: center;
-        gap: 4px;
-        margin-bottom: 2px;
+        gap: 6px;
+        margin-bottom: 4px;
+        width: 100%;
     }
 
+    /* 🔥 PIC TO SIZE = zelfde als website */
     .event.printEvent .picto {
-        display: inline-block;
-        width: 28px;
-        height: 28px;
+        display: inline-block !important;
+        object-fit: contain;
+    }
+
+    /* 🔥 grootte zoals website */
+    .event.printEvent .picto.smallicon {
+        max-width: 40px;
+        max-height: 40px;
+    }
+
+    .event.printEvent .picto.bigicon {
+        max-width: 100px;
+        max-height: 40px;
+    }
+
+    /* 🔥 tekst onder iconen */
+    .event.printEvent .eventText {
+        text-align: center;
+        width: 100%;
+        font-size: 12px;
     }
 
     img.picto {
@@ -234,6 +255,7 @@ font-size:18px;
     }
 
     /* ================= DAGEN ================= */
+
     .printDay {
         page-break-after: always;
         position: relative;
@@ -245,10 +267,20 @@ font-size:18px;
         font-family: Arial, sans-serif;
     }
 
+    /* 🔥 HEADER met icoon + tekst naast elkaar */
     .printDay h2 {
-        font-size: 24px;
+        font-size: 22px;
         text-align: center;
         margin-bottom: 10px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .dayIcon {
+        font-size: 26px;
     }
 
     .printDayContainer {
