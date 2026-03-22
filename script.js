@@ -395,6 +395,7 @@ block:"nearest"
 
 // LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
 function layoutEvents(list, col, printMode=false){
+
 list.sort((a,b)=>a.start-b.start)
 let columns=[]
 
@@ -444,6 +445,13 @@ let dag=e.start.toLocaleDateString(
 {weekday:"long"}
 )
 
+let html = `<div class="iconContainer">`;
+icons.forEach(i => { 
+    html += `<img src="icons/${i}.png" class="picto">`; 
+});
+html += `</div><div>${time(e.start)} ${e.title}</div>`;
+div.innerHTML = html;    
+    
 let text=
 dag+
 ". "+
