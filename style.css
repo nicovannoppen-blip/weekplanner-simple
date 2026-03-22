@@ -177,69 +177,74 @@ font-size:18px;
 
     body * { 
         display:none; 
-        visibility: hidden;
+        visibility:hidden;
     }
 
-    #printContainer, #printContainer * { 
-        display:block; 
-        visibility: visible;
-    }
-
+    /* ✅ NIET meer alles block maken */
     #printContainer {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
+        display:block;
+        visibility:visible;
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
     }
 
-    /* Events */
+    #printContainer * {
+        visibility:visible;
+    }
+
+    /* ================= EVENTS ================= */
     .event.printEvent {
-        position: absolute;
-        border-radius: 6px;
-        font-size: 12px;
-        padding: 4px;
-        box-sizing: border-box;
-        overflow: hidden;
+        position:absolute;
+        border-radius:6px;
+        font-size:12px;
+        padding:4px;
+        box-sizing:border-box;
+        overflow:hidden;
 
-        color: #000;
+        color:#000;
 
-        display: flex;
-        flex-direction: column;   /* 🔥 tekst onder iconen */
-        align-items: center;
+        display:flex;
+        flex-direction:column;   /* tekst onder iconen */
+        align-items:center;
 
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
     }
 
-    /* Container van iconen */
+    /* 🔥 ICONEN naast elkaar (FIX) */
     .event.printEvent .icons {
-        display: flex;
-        flex-direction: row;   /* 🔥 iconen naast elkaar */
-        justify-content: center;
-        gap: 4px;
-        margin-bottom: 2px;
+        display:flex !important;
+        flex-direction:row !important;
+        justify-content:center;
+        align-items:center;
+        gap:4px;
+        margin-bottom:2px;
+        width:100%;
     }
 
-    /* Pictogrammen */
-    .printEvent .picto {
+    /* Zorg dat iconen niet blokkeren */
+    .event.printEvent .picto {
+        display:inline-block !important;
         width:28px;
         height:28px;
     }
 
     img.picto {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
     }
 
-    /* Dagen */
+    /* ================= DAGEN ================= */
     .printDay {
-        page-break-after: always;
-        position: relative;
-        width: 100%;
-        height: 960px;
+        page-break-after:always;
+        position:relative;
+        width:100%;
+        height:960px;
         margin:0;
         padding:20px;
-        background:white; /* beter leesbaar dan zwart */
+        background:white;
         font-family:Arial,sans-serif;
     }
 
@@ -250,8 +255,8 @@ font-size:18px;
     }
 
     .printDayContainer {
-        position: relative;
-        height: 960px;
+        position:relative;
+        height:960px;
         border:1px solid #ddd;
     }
 
@@ -265,5 +270,8 @@ font-size:18px;
         padding-left:4px;
     }
 
-    @page { size:A4; margin:15mm; }
+    @page { 
+        size:A4; 
+        margin:15mm; 
+    }
 }
