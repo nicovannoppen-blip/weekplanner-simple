@@ -633,15 +633,6 @@ function printWeek() {
     window.print();
 }
 
-window.matchMedia('print').addListener(function (media) {
-
-      if(media.matches){
-
-      }
-      else{
-           window.location.reload(true);
-            //location.reload();
-      }
-   });
-}
-
+window.onafterprint = (event) => {
+  console.log("After print");
+};
