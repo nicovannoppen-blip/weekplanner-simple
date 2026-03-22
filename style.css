@@ -144,8 +144,10 @@ font-size:18px;
 .event .picto,
 .event.printEvent .picto {
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    max-width: 20px;       /* maximaal 20px breed */
+    max-height: 20px;      /* maximaal 20px hoog */
+    width: auto;           /* breedte schaalt automatisch */
+    height: auto;          /* hoogte schaalt automatisch */
     object-fit: contain;
 }
 
