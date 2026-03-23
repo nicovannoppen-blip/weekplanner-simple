@@ -251,8 +251,9 @@ font-size:18px;
         text-align: center;
         width: 100%;
         font-size: 12px;
-        color: white;
+        color: red;
         margin-top: 0px;
+        overflow: visible;   /* 🔥 NIET MEER AFKAPPEN */
     }
 
     img.picto {
@@ -282,7 +283,7 @@ font-size:18px;
         justify-content: center;
         align-items: center;
         gap: 10px;
-        background: #800080!important;  /* 🔥 paars forceren */
+        background: #a774cf!important;  /* 🔥 paars forceren */
         color: white !important;          /* tekst wit */
         padding: 8px;
         border-radius: 6px;
