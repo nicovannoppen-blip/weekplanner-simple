@@ -225,22 +225,35 @@ font-size:18px;
         width: 100%;
     }
 
-    /* 🔥 PIC TO SIZE = zelfde als website */
-    .event.printEvent .picto {
-        display: inline-block !important;
-        object-fit: contain;
-    }
+/* 🔥 basis pictogram */
+.event.printEvent .picto {
+    display: inline-block !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain;
+}
 
-    /* 🔥 grootte zoals website */
-    .event.printEvent .picto.smallicon {
-        max-width: 40px;
-        max-height: 40px;
-    }
+/* 🔥 kleine iconen */
+.event.printEvent .picto.smallicon {
+    width: 32px !important;
+    height: 32px !important;
+}
 
-    .event.printEvent .picto.bigicon {
-        max-width: 100px;
-        max-height: 40px;
-    }
+/* 🔥 GROTE iconen (FIX) */
+.event.printEvent .picto.bigicon {
+    width: 90px !important;
+    height: 36px !important;
+}
+
+.event.printEvent .picto.smallicon {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+.event.printEvent .picto.bigicon {
+    width: 100px !important;
+    height: 40px !important;
+}
 
     /* 🔥 tekst onder iconen */
     .event.printEvent .eventText {
