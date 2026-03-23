@@ -252,7 +252,7 @@ font-size:18px;
         width: 100%;
         font-size: 12px;
         color: white;
-        margin-top: 1px;
+        margin-top: 0px;
     }
 
     img.picto {
@@ -295,7 +295,6 @@ font-size:18px;
     .printDayContainer {
         position: relative;
         height: 960px;
-        border: 2px solid #800080;  /* paars kader rond dag */
     }
 
     .printHour {
