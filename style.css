@@ -78,7 +78,8 @@ font-size:12px;
 
 display:flex;
 flex-direction:column;
-align-items:center;
+justify-content: center;   /* 🔥 verticaal centreren */
+align-items: center;       /* horizontaal centreren */
 
 overflow:visible;
 }
@@ -147,7 +148,7 @@ font-size:18px;
     width: auto;           /* breedte schaalt automatisch */
     height: auto;          /* hoogte schaalt automatisch */
     object-fit: contain;
-    justify-content: center;   /* 🔥 VERTICAAL CENTREREN */
+    
 }
 .picto.smallicon {
     max-width: 40px;
@@ -165,6 +166,11 @@ font-size:18px;
     flex-direction: row;
     justify-content: center;
     gap: 4px;
+}
+.eventText {
+    text-align: center;
+    width: 100%;
+    text-transform: lowercase; //Voor Niel alle tekst in kleine letters
 }
 
 /* Tekst onder iconen */
