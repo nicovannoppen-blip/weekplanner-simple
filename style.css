@@ -57,7 +57,7 @@ position:relative;
 text-align:center;
 font-weight:bold;
 padding:6px;
-background: #a774cf;
+background: #4285F4;
 color: white;
 border-bottom:1px solid #ddd;
 }
@@ -292,7 +292,7 @@ font-size:18px;
         justify-content: center;
         align-items: center;
         gap: 10px;
-        background: #a774cf!important;  /* 🔥 paars forceren */
+        background: #4285F4!important;  /* 🔥 blauw forceren */
         color: white !important;          /* tekst wit */
         padding: 8px;
         border-radius: 6px;
@@ -313,9 +313,9 @@ font-size:18px;
         position: absolute;
         left: 0;
         right: 0;
-        border-top: 1px solid #a774cf; /* 🔥 duidelijke paarse lijn */
+        border-top: 1px solid #4285F4; /* 🔥 duidelijke blauwe lijn */
         font-size: 10px;
-        color: #a774cf;                  /* optioneel: uur ook paars */
+        color: #4285F4;                  /* optioneel: uur ook blauw */
         padding-left: 4px;
     }
 
