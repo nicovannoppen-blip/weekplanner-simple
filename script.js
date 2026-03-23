@@ -446,7 +446,7 @@ function layoutEvents(list, col, printMode=false){
                     ic === "steffifamilie" ||
                     ic === "IrenaGezin" ||
                     ic === "kindjeshalen" ||
-                    ic === "kindjesnaarrita" ||
+                    ic === "kindjesnaar" ||
                     ic === "Jana_en_Vinny" ||
                     ic === "SylvieEnKids" ||
                     ic === "Vansenne" ||
