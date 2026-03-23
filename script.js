@@ -418,6 +418,16 @@ function layoutEvents(list, col, printMode=false){
             let start=(e.start.getHours()-7)*60+e.start.getMinutes();
             let dur=(e.end-e.start)/60000;
 
+           /* // 🔥 MINIMUM HOOGTE (bv 80px)
+            let minHeight = 80;
+            
+            if(dur < minHeight){
+                dur = minHeight;
+            }
+            
+            div.style.height = dur + "px";
+            */
+
             let div=document.createElement("div");
             div.className = printMode ? "event printEvent" : "event";
             div.style.top=start+"px";
