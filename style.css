@@ -201,7 +201,7 @@ font-size:18px;
     font-size: 12px;
     padding: 4px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;   /* 🔥 NIET MEER AFKAPPEN */
 
     color: #000;
 
