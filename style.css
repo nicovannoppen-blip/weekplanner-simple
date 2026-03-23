@@ -147,6 +147,7 @@ font-size:18px;
     width: auto;           /* breedte schaalt automatisch */
     height: auto;          /* hoogte schaalt automatisch */
     object-fit: contain;
+    justify-content: center;   /* 🔥 VERTICAAL CENTREREN */
 }
 .picto.smallicon {
     max-width: 40px;
