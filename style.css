@@ -250,7 +250,7 @@ font-size:18px;
     .event.printEvent .eventText {
         text-align: center;
         width: 100%;
-        font-size: 12px;
+        font-size: 20px;
         color: #000000;
         margin-top: 0px;
         overflow: visible;   /* 🔥 NIET MEER AFKAPPEN */
@@ -304,9 +304,9 @@ font-size:18px;
         position: absolute;
         left: 0;
         right: 0;
-        border-top: 1px solid red; /* 🔥 duidelijke rode lijn */
+        border-top: 1px solid #a774cf; /* 🔥 duidelijke paarse lijn */
         font-size: 10px;
-        color: red;                  /* optioneel: uur ook rood */
+        color: #a774cf;                  /* optioneel: uur ook paars */
         padding-left: 4px;
     }
 
