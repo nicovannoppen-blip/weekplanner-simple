@@ -235,23 +235,13 @@ font-size:18px;
 
 /* 🔥 kleine iconen */
 .event.printEvent .picto.smallicon {
-    width: 32px !important;
-    height: 32px !important;
-}
-
-/* 🔥 GROTE iconen (FIX) */
-.event.printEvent .picto.bigicon {
-    width: 90px !important;
-    height: 36px !important;
-}
-
-.event.printEvent .picto.smallicon {
     width: 40px !important;
     height: 40px !important;
 }
 
+/* 🔥 GROTE iconen (FIX) */
 .event.printEvent .picto.bigicon {
-    width: 100px !important;
+    width: 120px !important;
     height: 40px !important;
 }
 
@@ -260,6 +250,8 @@ font-size:18px;
         text-align: center;
         width: 100%;
         font-size: 12px;
+        background-color: black;
+        color: white;
     }
 
     img.picto {
