@@ -196,23 +196,24 @@ font-size:18px;
     /* ================= EVENTS ================= */
 
     .event.printEvent {
-        position: absolute;
-        border-radius: 6px;
-        font-size: 12px;
-        padding: 4px;
-        box-sizing: border-box;
-        overflow: hidden;
+    position: absolute;
+    border-radius: 6px;
+    font-size: 12px;
+    padding: 4px;
+    box-sizing: border-box;
+    overflow: hidden;
 
-        color: #000;
+    color: #000;
 
-        display: flex;
-        flex-direction: column;   /* tekst onder iconen */
-        align-items: center;
-        justify-content: flex-start;
+    display: flex;
+    flex-direction: column;
 
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
+    justify-content: center;   /* 🔥 VERTICAAL CENTREREN */
+    align-items: center;
+
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
 
     /* 🔥 ICONEN naast elkaar (BELANGRIJKSTE FIX) */
     .event.printEvent .icons {
@@ -250,8 +251,8 @@ font-size:18px;
         text-align: center;
         width: 100%;
         font-size: 12px;
-        background-color: black;
         color: white;
+        margin-top: 4px;
     }
 
     img.picto {
@@ -274,33 +275,34 @@ font-size:18px;
 
     /* 🔥 HEADER met icoon + tekst naast elkaar */
     .printDay h2 {
-        font-size: 22px;
+        font-size: 30px;
         text-align: center;
         margin-bottom: 10px;
-
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 10px;
+        background-color: #795aa1;
     }
 
     .dayIcon {
-        font-size: 26px;
+        font-size: 35px;
     }
 
     .printDayContainer {
         position: relative;
         height: 960px;
-        border: 1px solid #ddd;
+        border: 1px solid #e6de09;
     }
 
     .printHour {
         position: absolute;
         left: 0;
         right: 0;
-        border-top: 1px solid #eee;
+        /*border-top: 1px solid #eee;*/
+        border-top: 1px solid #0d0d0d;
         font-size: 10px;
-        color: #888;
+        color: #fa1f02;
         padding-left: 4px;
     }
 
