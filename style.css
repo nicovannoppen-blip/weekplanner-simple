@@ -282,10 +282,12 @@ font-size:18px;
         justify-content: center;
         align-items: center;
         gap: 10px;
-        background: #800080;   /* 🔥 paars */
-        color: white;          /* tekst wit */
+        background: #800080!important;  /* 🔥 paars forceren */
+        color: white !important;          /* tekst wit */
         padding: 8px;
         border-radius: 6px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .dayIcon {
