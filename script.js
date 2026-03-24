@@ -198,33 +198,6 @@ buildFilters()
 }
 
 function buildFilters(){
-/*let f=document.getElementById("filters")
-f.innerHTML=""
-calendars.forEach(c=>{
-let label=document.createElement("label")
- // 🔥 pictogram naam (zelfde naam als kalender, lowercase)
-let iconName = rename(c.summary).toLowerCase()
-    
-label.innerHTML=`<input type="checkbox" checked value="${c.id}"> 
-
-<img src="icons/${iconName}.png" class="filterIcon">
-
-${rename(c.summary)}`
-
- // 🔥 achtergrondkleur van kalender
-label.style.background = c.backgroundColor
-label.style.color = getContrastColor(c.backgroundColor)
-
-// 🔥 styling
-label.style.padding = "6px"
-label.style.borderRadius = "6px"
-label.style.display = "flex"
-label.style.alignItems = "center"
-label.style.gap = "6px"
-    
-label.querySelector("input").addEventListener("change",render)
-f.appendChild(label)
-})*/
 let f=document.getElementById("filters")
     f.innerHTML=""
 
@@ -306,10 +279,6 @@ location:e.location||""
 // FILTER
 function activeCalendars(){
 let list=[]
-/*document.querySelectorAll("#filters input").forEach(c=>{
-if(c.checked) list.push(c.value)
-})*/
-
 document.querySelectorAll(".filterBtn.active").forEach(b=>{
         list.push(b.dataset.id)
     })
@@ -487,17 +456,6 @@ function layoutEvents(list, col, printMode=false){
 
             let start=(e.start.getHours()-7)*60+e.start.getMinutes();
             let dur=(e.end-e.start)/60000;
-
-
-
-
-
-
-
-
-
-
-
             let div=document.createElement("div");
             div.className = printMode ? "event printEvent" : "event";
             div.style.top=start+"px";
@@ -598,8 +556,20 @@ function next(){dayMode?currentDate.setDate(currentDate.getDate()+1)
 init()}
 function today(){currentDate=new Date(); init()}
 function toggleView(){dayMode=!dayMode; render()}
-function selectAll(){document.querySelectorAll("#filters input").forEach(c=>c.checked=true); render()}
-function selectNone(){document.querySelectorAll("#filters input").forEach(c=>c.checked=false); render()}
+
+function selectAll(){
+    document.querySelectorAll(".filterBtn").forEach(b=>{
+        b.classList.add("active")
+    })
+    render()
+}
+
+function selectNone(){
+    document.querySelectorAll(".filterBtn").forEach(b=>{
+        b.classList.remove("active")
+    })
+    render()
+}
 
 // INIT
 parseToken()
