@@ -39,6 +39,11 @@ gap:10px;
 border-bottom:1px solid #ddd;
 }
 
+.filterIcon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
 .week{
 display:flex;
 height:960px;
