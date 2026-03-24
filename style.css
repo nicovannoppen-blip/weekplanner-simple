@@ -40,9 +40,58 @@ border-bottom:1px solid #ddd;
 }
 
 .filterIcon {
-    width: 60px;
-    height: 60px;
+    width: 100px;
+    height: 100px;
     object-fit: contain;
+}
+
+/* container */
+#filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+    gap: 10px;
+    padding: 10px;
+}
+
+/* knop */
+.filterBtn {
+    display: flex;
+    flex-direction: column;   /* 🔥 icoon boven tekst */
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+    padding: 10px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+    user-select: none;
+}
+
+/* pictogram */
+.filterIcon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
+/* tekst */
+.filterText {
+    font-size: 14px;
+    text-transform: lowercase;
+    margin-top: 4px;
+}
+
+/* hover */
+.filterBtn:hover {
+    transform: scale(1.05);
+}
+
+/* UITGESCHAKELD */
+.filterBtn:not(.active) {
+    opacity: 0.3;
+    filter: grayscale(100%);
 }
 
 #filters label {
