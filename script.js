@@ -156,7 +156,7 @@ client_id:CLIENT_ID,
 redirect_uri:window.location.origin,
 response_type:"token",
 scope:"https://www.googleapis.com/auth/calendar.readonly",
-prompt:"select_account"
+prompt:"none"
 }
 
 // PARSE TOKEN
