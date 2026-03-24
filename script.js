@@ -212,7 +212,7 @@ ${rename(c.summary)}`
 
  // 🔥 achtergrondkleur van kalender
 label.style.background = c.backgroundColor
-label.style.color = "white"
+label.style.color = getContrastColor(c.backgroundColor)
 
 // 🔥 styling
 label.style.padding = "6px"
@@ -226,6 +226,19 @@ f.appendChild(label)
 })
 }
 
+function getContrastColor(hex){
+    if(!hex) return "#000"
+
+    let c = hex.substring(1) // remove #
+    let rgb = parseInt(c, 16)
+    let r = (rgb >> 16) & 0xff
+    let g = (rgb >> 8) & 0xff
+    let b = (rgb >> 0) & 0xff
+
+    let luminance = (0.299*r + 0.587*g + 0.114*b)/255
+
+    return luminance > 0.6 ? "#000" : "#fff"
+}
 // LOAD EVENTS
 async function loadEvents(){
 events=[]
