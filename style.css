@@ -40,9 +40,16 @@ border-bottom:1px solid #ddd;
 }
 
 .filterIcon {
-    width: 20px;
-    height: 20px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
+}
+
+#filters label {
+    display: flex;
+    align-items: center;
+    gap: 10px;          /* iets meer ruimte */
+    padding: 8px;       /* iets groter klikvlak */
 }
 .week{
 display:flex;
