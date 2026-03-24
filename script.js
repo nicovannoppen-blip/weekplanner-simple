@@ -159,6 +159,11 @@ scope:"https://www.googleapis.com/auth/calendar.readonly",
 prompt:"none"
 }
 
+function logout(){
+    localStorage.removeItem("token")
+    location.reload()
+}
+
 // PARSE TOKEN
 function parseToken(){
 
