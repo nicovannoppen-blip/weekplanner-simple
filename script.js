@@ -160,8 +160,15 @@ prompt:"select_account"
 }
 
 function logout(){
-    localStorage.removeItem("token")
-    location.reload()
+
+    // token wissen
+    token = null;
+
+    // URL hash verwijderen (#access_token)
+    window.location.hash = "";
+
+    // pagina herladen (reset UI)
+    window.location.reload();
 }
 
 // PARSE TOKEN
