@@ -198,7 +198,7 @@ buildFilters()
 }
 
 function buildFilters(){
-let f=document.getElementById("filters")
+/*let f=document.getElementById("filters")
 f.innerHTML=""
 calendars.forEach(c=>{
 let label=document.createElement("label")
@@ -224,7 +224,38 @@ label.style.gap = "6px"
     
 label.querySelector("input").addEventListener("change",render)
 f.appendChild(label)
-})
+})*/
+let f=document.getElementById("filters")
+    f.innerHTML=""
+
+    calendars.forEach(c=>{
+
+        let btn=document.createElement("div")
+        btn.className="filterBtn active"
+        btn.dataset.id=c.id
+
+        let name = rename(c.summary)
+        let iconName = name.toLowerCase()
+
+        btn.innerHTML=`
+            <img src="icons/${iconName}.png" class="filterIcon">
+            <div class="filterText">${name}</div>
+        `
+
+        // kleur
+        btn.style.background = c.backgroundColor
+        btn.style.color = getContrastColor(c.backgroundColor)
+
+        // klik = toggle
+        btn.onclick=()=>{
+            btn.classList.toggle("active")
+            render()
+        }
+
+        f.appendChild(btn)
+    })
+
+    
 }
 
 function getContrastColor(hex){
@@ -275,9 +306,14 @@ location:e.location||""
 // FILTER
 function activeCalendars(){
 let list=[]
-document.querySelectorAll("#filters input").forEach(c=>{
+/*document.querySelectorAll("#filters input").forEach(c=>{
 if(c.checked) list.push(c.value)
-})
+})*/
+
+document.querySelectorAll(".filterBtn.active").forEach(b=>{
+        list.push(b.dataset.id)
+    })
+    
 return list
 }
 
