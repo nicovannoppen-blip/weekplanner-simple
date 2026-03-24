@@ -56,9 +56,9 @@ border-bottom:1px solid #ddd;
 /* knop */
 .filterBtn {
     display: flex;
-    flex-direction: column;   /* 🔥 icoon boven tekst */
+    flex-direction: row;   /* 🔥 icoon naast tekst */
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 
     border-radius: 12px;
     padding: 10px;
@@ -67,6 +67,7 @@ border-bottom:1px solid #ddd;
 
     transition: 0.2s;
     user-select: none;
+    gap: 10px;
 }
 
 /* pictogram */
@@ -76,11 +77,14 @@ border-bottom:1px solid #ddd;
     object-fit: contain;
 }
 
+.filterBtn.active {
+    outline: 3px solid #4285F4;
+}
+
 /* tekst */
 .filterText {
     font-size: 14px;
     text-transform: lowercase;
-    margin-top: 4px;
 }
 
 /* hover */
