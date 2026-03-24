@@ -60,7 +60,7 @@ camper:["camper"],
 camping_caravan:["camping caravan"],
 camping:["camping"],
 carnaval:["carnaval"],
-Elke:["elke","mama"],
+elke:["elke","mama"],
 fietsen:["fietsen"],
 Jana:["jana"],
 kasteel:["kasteel"],
@@ -70,16 +70,16 @@ kippen_eten_geven:["kippen eten geven"],
 koffer:["koffer"],
 logeren:["logeren","bij"],
 museum:["museum"],
-Nico:["nico","papa"],
-Niel:["niel"],
+nico:["nico","papa"],
+niel:["niel"],
 Niels:["niels"],
-Odin:["odin"],
+odin:["odin"],
 op_bezoek:["op bezoek","bezoeken"],
 orthodontist:["orthodontist","orthodont"],
 pedicure:["pedicure","myrthe"],
 pretpark:["pretpark"],
 psycholoog:["psycholoog","nele","karen","thuisbegeleiding"],
-Rita:["rita","moeke"],
+rita:["rita","moeke"],
 rolstoel:["rolstoel symbool"],
 spelen_binnen:["spelen binnen"],
 spelen_buiten:["spelen buiten"],
@@ -140,7 +140,8 @@ opzetten_tent:["opzetten"],
 safari:["safari","safaripark"],
 zeehond:["zeehond"],   
 reptiel:["reptiel","reptielen"], 
-dierenwinkel:["dierenwinkel","schoubben"],   
+dierenwinkel:["dierenwinkel","schoubben"],  
+gezin:["gezin"]
 }
 
 // LOGIN / LOGOUT
@@ -200,7 +201,26 @@ let f=document.getElementById("filters")
 f.innerHTML=""
 calendars.forEach(c=>{
 let label=document.createElement("label")
-label.innerHTML=`<input type="checkbox" checked value="${c.id}"> ${rename(c.summary)}`
+ // 🔥 pictogram naam (zelfde naam als kalender, lowercase)
+let iconName = rename(c.summary).toLowerCase()
+    
+label.innerHTML=`<input type="checkbox" checked value="${c.id}"> 
+
+<img src="icons/${iconName}.png" class="filterIcon">
+
+${rename(c.summary)}`
+
+ // 🔥 achtergrondkleur van kalender
+label.style.background = c.backgroundColor
+label.style.color = "white"
+
+// 🔥 styling
+label.style.padding = "6px"
+label.style.borderRadius = "6px"
+label.style.display = "flex"
+label.style.alignItems = "center"
+label.style.gap = "6px"
+    
 label.querySelector("input").addEventListener("change",render)
 f.appendChild(label)
 })
