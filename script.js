@@ -161,10 +161,24 @@ prompt:"none"
 
 // PARSE TOKEN
 function parseToken(){
-const hash=location.hash.substring(1)
-const params=new URLSearchParams(hash)
-token=params.get("access_token")
-if(token) init()
+
+    // 🔥 eerst kijken of token al bestaat
+    token = localStorage.getItem("token")
+
+    if(token){
+        init()
+        return
+    }
+
+    // anders uit URL halen
+    const hash=location.hash.substring(1)
+    const params=new URLSearchParams(hash)
+    token=params.get("access_token")
+
+    if(token){
+        localStorage.setItem("token", token)  // 🔥 opslaan
+        init()
+    }
 }
 
 // GOOGLE API
