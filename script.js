@@ -7,7 +7,7 @@ let bigIcons=false
 
 // Hernoem lange kalender namen
 function rename(name){
-    if(name.toLowerCase().includes("belgie feestdagen") || name.toLowerCase().includes("schoolvakanties") || name.toLowerCase().includes("www.feestdagen-belgie.be")){
+    if(name.toLowerCase().includes("belgie feestdagen") || name.toLowerCase().includes("schoolvakanties") || name.toLowerCase().includes("www.feestdagen-belgie.be")|| name.toLowerCase().includes("feestdagen in belgië") ){
         return "Feestdagen";
     }
     return name;
