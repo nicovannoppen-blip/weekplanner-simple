@@ -203,6 +203,10 @@ render()
 }
 
 async function loadCalendars(){
+
+    //tijdelijk!!!!
+    console.log(data.items.map(c => c.summary))
+    
 let r=await fetch(
 "https://www.googleapis.com/calendar/v3/users/me/calendarList",
 {headers:{Authorization:"Bearer "+token}}
@@ -221,8 +225,7 @@ if(ib==-1) ib=999
 
 return ia-ib
 
-    //tijdelijk!!!!
-    console.log(data.items.map(c => c.summary))
+    
 })
 buildFilters()
 }
