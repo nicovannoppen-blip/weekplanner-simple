@@ -162,16 +162,15 @@ prompt:"select_account"
 
 function logout(){
 
-    // Token wissen
+    // token wissen
     token = null;
+    localStorage.removeItem("token");
 
-    // URL volledig opschonen (BELANGRIJK)
+    // URL opschonen
     window.history.replaceState({}, document.title, window.location.pathname);
 
-    // Google account selector forceren bij volgende login
-    window.location.href =
-    "https://accounts.google.com/logout?continue=" +
-    encodeURIComponent(window.location.origin);
+    // gewoon refreshen
+    location.reload();
 }
 
 // PARSE TOKEN
@@ -203,17 +202,16 @@ await loadEvents()
 render()
 }
 
-async function loadCalendars(){
-
-    //tijdelijk!!!!
-    console.log(data.items.map(c => c.summary))
-    
+async function loadCalendars(){   
 let r=await fetch(
 "https://www.googleapis.com/calendar/v3/users/me/calendarList",
 {headers:{Authorization:"Bearer "+token}}
 )
 let data=await r.json()
 
+    //tijdelijk!!!!
+    console.log(data.items.map(c => c.summary))
+    
 calendars=data.items
 .filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
 .sort((a,b)=>{
