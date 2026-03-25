@@ -164,11 +164,13 @@ function logout(){
     // token wissen
     token = null;
 
-    // URL hash verwijderen (#access_token)
-    window.location.hash = "";
+    // URL volledig opschonen (BELANGRIJK)
+    window.history.replaceState({}, document.title, window.location.pathname);
 
-    // pagina herladen (reset UI)
-    window.location.reload();
+    // Google account selector forceren bij volgende login
+    window.location.href =
+    "https://accounts.google.com/logout?continue=" +
+    encodeURIComponent(window.location.origin);
 }
 
 // PARSE TOKEN
@@ -219,6 +221,8 @@ if(ib==-1) ib=999
 
 return ia-ib
 
+    //tijdelijk!!!!
+    console.log(data.items.map(c => c.summary))
 })
 buildFilters()
 }
