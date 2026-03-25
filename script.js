@@ -161,7 +161,7 @@ prompt:"select_account"
 
 function logout(){
 
-    // token wissen
+    // Token wissen
     token = null;
 
     // URL volledig opschonen (BELANGRIJK)
