@@ -535,42 +535,33 @@ function layoutEvents(list, col, printMode=false){
             iconHTML += `</div>`;
 
             // ================= TEKST =================
+            let displayText = e.title || ""; // alleen de titel voor de visuele agenda
             
-            let sentence = (
+            let speechText = (
                 "agenda " + e.calendarName +
                 ". " + e.title +
                 ". van " + time(e.start) +
                 " tot " + time(e.end)
-            ).toLowerCase()
+            ).toLowerCase();
             
-            let words = sentence.split(" ")
+            let words = displayText.split(" ");
             
-            let textHTML = `<div class="eventText">`
+            let textHTML = `<div class="eventText">`;
             
             words.forEach((w,i)=>{
                 textHTML += `<span class="speechWord" data-index="${i}">${w}</span> `
             })
             
-            textHTML += `</div>`
+            textHTML += `</div>`;
             
-            let html = iconHTML + textHTML
-
+            let html = iconHTML + textHTML;
+            
             div.innerHTML = html;
-
+            
             // Klik voor spraak
             div.onclick = (ev) => {
-            
-                ev.stopPropagation()
-            
-                let text =
-                    "agenda " + e.calendarName +
-                    ". " + e.title +
-                    ". van " +
-                    time(e.start) +
-                    " tot " +
-                    time(e.end)
-            
-                speak(text.toLowerCase(), div) // 🔥 element meegeven
+                ev.stopPropagation();
+                speak(speechText, div); // 🔥 element meegeven
             }
 
             col.appendChild(div);
