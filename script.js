@@ -846,14 +846,19 @@ document.querySelector("header").appendChild(clock);
 
 function updateClock() {
     let now = new Date();
+    
     let hours = now.getHours().toString().padStart(2,"0");
     let minutes = now.getMinutes().toString().padStart(2,"0");
+
+    // dag in woorden
+    let weekday = now.toLocaleDateString("nl-BE",{weekday:"long"});
+    // maand in woorden
     let day = now.getDate().toString().padStart(2,"0");
-    let month = (now.getMonth()+1).toString().padStart(2,"0");
+    let month = now.toLocaleDateString("nl-BE",{month:"long"});
     let year = now.getFullYear();
 
-    // Compact formaat: hh:mm dd-mm-yyyy
-    clock.innerText = `${hours}:${minutes} ${day}-${month}-${year}`;
+    // Formaat: hh:mm weekday dd month yyyy
+    clock.innerText = `${hours}:${minutes} ${weekday} ${day} ${month} ${year}`;
 }
 
 // Update elke seconde
@@ -865,15 +870,19 @@ clock.onclick = () => {
     let now = new Date();
     let hours = now.getHours();
     let minutes = now.getMinutes();
+    let weekday = now.toLocaleDateString("nl-BE",{weekday:"long"});
     let day = now.getDate();
-    let month = now.getMonth()+1;
+    let month = now.toLocaleDateString("nl-BE",{month:"long"});
     let year = now.getFullYear();
 
-    let speech = `Het is ${hours} uur en ${minutes} minuten. Vandaag is ${day} ${month} ${year}.`;
+    let speech = `Het is ${hours} uur en ${minutes} minuten. Vandaag is ${weekday} ${day} ${month} ${year}.`;
     let msg = new SpeechSynthesisUtterance(speech);
     msg.lang = "nl-BE";
     speechSynthesis.speak(msg);
 };
+
+
+
 
 // Update lijn elke minuut
 setInterval(updateCurrentTimeLine, 60000);
