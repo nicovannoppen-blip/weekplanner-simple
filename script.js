@@ -684,14 +684,14 @@ function showNextEvents(){
 
 /* ---------------- STEM ---------------- */
 
-function speak(text, element){
+function speak(text, lineDiv){
     speechSynthesis.cancel();
 
-    // Woorden voor spraak
     let speechWords = text.split(/\s+/);
-    // Spans in de visual
-    let spans = Array.from(element.querySelectorAll(".speechWord"));
+    let spans = Array.from(lineDiv.querySelectorAll(".speechWord"));
     let visualWords = spans.map(s => s.innerText.trim().toLowerCase());
+
+    let currentVisualIndex = 0;
 
     let msg = new SpeechSynthesisUtterance(text);
     msg.lang = "nl-BE";
@@ -700,10 +700,9 @@ function speak(text, element){
         if(event.name !== "word") return;
 
         let charIndex = event.charIndex;
-
-        // Vind het huidige woord in speechWords
         let total = 0;
         let currentWordIndex = 0;
+
         for(let i=0;i<speechWords.length;i++){
             total += speechWords[i].length + 1;
             if(total > charIndex){
@@ -712,18 +711,16 @@ function speak(text, element){
             }
         }
 
-        // Highlight alleen als woord exact overeenkomt
-        let wordBeingSpoken = speechWords[currentWordIndex].toLowerCase();
-        
-        // Zoek het index in de visual
-        let spanIndex = visualWords.indexOf(wordBeingSpoken);
+        let spokenWord = speechWords[currentWordIndex].toLowerCase();
 
-        // verwijder alle highlights
-        spans.forEach(s => s.classList.remove("active"));
-
-        // markeer alleen als match
-        if(spanIndex >= 0){
-            spans[spanIndex].classList.add("active");
+        // Highlight alleen **het volgende woord vanaf currentVisualIndex**
+        for(let i=currentVisualIndex; i<visualWords.length; i++){
+            if(visualWords[i] === spokenWord){
+                spans.forEach(s => s.classList.remove("active"));
+                spans[i].classList.add("active");
+                currentVisualIndex = i + 1; // volgende startpunt
+                break;
+            }
         }
     }
 
