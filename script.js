@@ -701,8 +701,7 @@ function speak(text, lineDiv){
 
         let charIndex = event.charIndex;
         let total = 0;
-        let currentWordIndex = 0;
-
+        let currentWordIndex = speechWords.length - 1; // default = laatste woord
         for(let i=0;i<speechWords.length;i++){
             total += speechWords[i].length + 1;
             if(total > charIndex){
