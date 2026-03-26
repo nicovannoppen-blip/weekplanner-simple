@@ -285,25 +285,23 @@ let end=new Date(currentDate)
 end.setDate(end.getDate()+7)
 
 for(let cal of calendars){
-let url=
-`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
-`timeMin=${start.toISOString()}&`+
-`timeMax=${end.toISOString()}&`+
-`singleEvents=true&orderBy=startTime`
+let url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`
+
 let r=await fetch(url,{headers:{Authorization:"Bearer "+token}})
 let data=await r.json()
+
 data.items.forEach(e=>{
 let s=e.start.dateTime||e.start.date
 let en=e.end.dateTime||e.end.date
-if(!s)return
+if(!s) return
+
 events.push({
 title:(e.summary||"").toLowerCase(),
 start:new Date(s),
 end:new Date(en),
 calendar:cal.id,
-calendarName: rename(cal.summary),
-color:cal.backgroundColor,
-location:e.location||""
+calendarName:rename(cal.summary),
+color:cal.backgroundColor
 })
 })
 }
@@ -494,11 +492,6 @@ function layoutEvents(list, col, printMode=false){
             let dur=(e.end-e.start)/60000
 
             let div=document.createElement("div")
-            let now = new Date()
-
-            if(e.start <= now && e.end >= now){
-                div.classList.add("currentEvent")
-            }
             div.className = printMode ? "event printEvent" : "event"
             div.style.top=start+"px"
             div.style.height=dur+"px"
@@ -511,6 +504,12 @@ function layoutEvents(list, col, printMode=false){
 
             // Kleur
             div.style.background = e.color
+
+            // 🔥 huidige afspraak vet
+            let now=new Date()
+            if(e.start<=now && e.end>=now){
+            div.classList.add("currentEvent")
+            }
 
             // ================= ICONS =================
             let icons = iconsForEvent(e)
@@ -544,35 +543,29 @@ function layoutEvents(list, col, printMode=false){
             iconHTML += `</div>`
 
             // ================= TEKST + HIGHLIGHT =================
-            let sentence = (
-                "agenda " + e.calendarName +
-                ". " + e.title +
-                ". van " + time(e.start) +
-                " tot " + time(e.end)
+            // tekst + speech spans
+            let sentence=(
+            "agenda "+e.calendarName+
+            ". "+e.title+
+            ". van "+time(e.start)+
+            " tot "+time(e.end)
             ).toLowerCase()
-
-            let words = sentence.split(" ")
-
-            let textHTML = `<div class="eventText">`
-
-            words.forEach((w,i)=>{
-                textHTML += `<span class="speechWord" data-index="${i}">${w}</span> `
+            
+            let words=sentence.split(" ")
+            
+            let html="<div class='eventText'>"
+            words.forEach(w=>{
+            html+=`<span class="speechWord">${w}</span> `
             })
-
-            textHTML += `</div>`
-
-            let html = iconHTML + textHTML
-
-            div.innerHTML = html
-
-            // ================= KLIK + SPRAAK =================
-            div.onclick = (ev) => {
-
-                ev.stopPropagation()
-
-                speak(sentence, div)
+            html+="</div>"
+            
+            div.innerHTML=html
+            
+            div.onclick=(ev)=>{
+            ev.stopPropagation()
+            speak(sentence,div)
             }
-
+            
             col.appendChild(div)
         })
     })
@@ -626,97 +619,67 @@ parseToken()
 
 /* ---------------- KOMENDE AFSPRAKEN ---------------- */
 function showNextEvents(){
-
-let now=new Date()
-
-let upcoming=events
-.filter(e=>{
-
-let dur=(e.end-e.start)/3600000
-
-if(dur>=15) return false
-
-return e.start>now
-
-})
-.sort((a,b)=>a.start-b.start)
-.slice(0,4)
-
-let text="Volgende afspraken:\n"
-
-upcoming.forEach(e=>{
-
-text+=
-"agenda " + e.calendarName + ": " +
-"van " +
-time(e.start)+
-" tot "+
-time(e.end)+
-" "+
-e.title+
-"\n"
-
-})
-
-document.getElementById("popupText").innerText=text
-document.getElementById("popup").style.display="flex"
-
-speak(text, element)
-
+    
+    let now=new Date()
+    
+    let upcoming=events
+    .filter(e=>e.start>now && (e.end-e.start)/3600000<15)
+    .sort((a,b)=>a.start-b.start)
+    .slice(0,4)
+    
+    let text="volgende afspraken "
+    
+    upcoming.forEach(e=>{
+    text+="agenda "+e.calendarName+" van "+time(e.start)+" tot "+time(e.end)+" "+e.title+" "
+    })
+    
+    let words=text.split(" ")
+    let html=""
+    
+    words.forEach(w=>{
+    html+=`<span class="speechWord">${w}</span> `
+    })
+    
+    let el=document.getElementById("popupText")
+    el.innerHTML=html
+    document.getElementById("popup").style.display="flex"
+    
+    speak(text,el)
 }
 
 
 /* ---------------- STEM ---------------- */
 
-function speak(text, element){
+function speak(text,element){
 
     speechSynthesis.cancel()
-
-    let words = text.split(" ")
-    let spans = element.querySelectorAll(".speechWord")
-
-    let msg = new SpeechSynthesisUtterance(text)
-    msg.lang = "nl-BE"
-
-    msg.onboundary = function(event){
-
-        if(event.name !== "word") return
-
-        let charIndex = event.charIndex
-
-        let currentWordIndex = 0
-        let total = 0
-
-        for(let i=0;i<words.length;i++){
-            total += words[i].length + 1
-
-            if(total > charIndex){
-                currentWordIndex = i
-                break
-            }
-        }
-
-        spans.forEach(s=>s.classList.remove("active"))
-
-        if(spans[currentWordIndex]){
-            spans[currentWordIndex].classList.add("active")
-        }
+    
+    let words=text.split(" ")
+    let spans=element.querySelectorAll(".speechWord")
+    
+    let msg=new SpeechSynthesisUtterance(text)
+    msg.lang="nl-BE"
+    
+    msg.onboundary=function(e){
+    
+    if(e.name && e.name!=="word") return
+    
+    let char=e.charIndex
+    let idx=0,total=0
+    
+    for(let i=0;i<words.length;i++){
+    total+=words[i].length+1
+    if(total>char){ idx=i; break }
     }
-
-    msg.onend = ()=>{
-        spans.forEach(s=>s.classList.remove("active"))
+    
+    spans.forEach(s=>s.classList.remove("active"))
+    if(spans[idx]) spans[idx].classList.add("active")
     }
-
+    
+    msg.onend=()=>spans.forEach(s=>s.classList.remove("active"))
+    
     speechSynthesis.speak(msg)
 }
-
-//popup
-function closePopup(){
-
-document.getElementById("popup").style.display="none"
-
-}
-
 
 
 // Swipe ondersteuning (gsm/tablet)
