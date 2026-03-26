@@ -246,6 +246,10 @@ font-size:18px;
     white-space: pre-line;
 }
 
+.popupLine {
+    margin-bottom: 5px; /* ruimte tussen afspraken */
+}
+
 /* Tekst onder iconen */
 .event {
     display: flex;
