@@ -535,27 +535,43 @@ function layoutEvents(list, col, printMode=false){
             iconHTML += `</div>`;
 
             // ================= TEKST =================
-            let html = iconHTML + `<div class="eventText">${time(e.start)} ${e.title}</div>`;
+            
+            let sentence = (
+                "agenda " + e.calendarName +
+                ". " + e.title +
+                ". van " + time(e.start) +
+                " tot " + time(e.end)
+            ).toLowerCase()
+            
+            let words = sentence.split(" ")
+            
+            let textHTML = `<div class="eventText">`
+            
+            words.forEach((w,i)=>{
+                textHTML += `<span class="speechWord" data-index="${i}">${w}</span> `
+            })
+            
+            textHTML += `</div>`
+            
+            let html = iconHTML + textHTML
 
             div.innerHTML = html;
 
             // Klik voor spraak
             div.onclick = (ev) => {
-                ev.stopPropagation();
-
-                let dag = e.start.toLocaleDateString("nl-BE",{weekday:"long"});
-
+            
+                ev.stopPropagation()
+            
                 let text =
-                    "agenda " + e.calendarName + ". " +
-                    dag + ". " +
-                    e.title +
-                    ". Van " +
+                    "agenda " + e.calendarName +
+                    ". " + e.title +
+                    ". van " +
                     time(e.start) +
                     " tot " +
-                    time(e.end);
-
-                speak(text);
-            };
+                    time(e.end)
+            
+                speak(text.toLowerCase(), div) // 🔥 element meegeven
+            }
 
             col.appendChild(div);
         });
@@ -649,14 +665,46 @@ speak(text)
 
 /* ---------------- STEM ---------------- */
 
-function speak(t){
+function speak(text, element){
 
-let msg=new SpeechSynthesisUtterance(t)
+    speechSynthesis.cancel()
 
-msg.lang="nl-BE"
+    let words = text.split(" ")
+    let spans = element.querySelectorAll(".speechWord")
 
-speechSynthesis.speak(msg)
+    let msg = new SpeechSynthesisUtterance(text)
+    msg.lang = "nl-BE"
 
+    msg.onboundary = function(event){
+
+        if(event.name !== "word") return
+
+        let charIndex = event.charIndex
+
+        let currentWordIndex = 0
+        let total = 0
+
+        for(let i=0;i<words.length;i++){
+            total += words[i].length + 1
+
+            if(total > charIndex){
+                currentWordIndex = i
+                break
+            }
+        }
+
+        spans.forEach(s=>s.classList.remove("active"))
+
+        if(spans[currentWordIndex]){
+            spans[currentWordIndex].classList.add("active")
+        }
+    }
+
+    msg.onend = ()=>{
+        spans.forEach(s=>s.classList.remove("active"))
+    }
+
+    speechSynthesis.speak(msg)
 }
 
 //popup
