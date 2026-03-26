@@ -378,38 +378,52 @@ return list
 
 // RENDER
 function render(){
-let agenda=document.getElementById("agenda")
-agenda.innerHTML=""
-let start=getMonday(currentDate)
-let days=dayMode?1:7
-let container=document.createElement("div")
-container.className="week"
-let active=activeCalendars()
-for(let i=0;i<days;i++){
-let d=new Date(dayMode?currentDate:start)
-if(!dayMode)d.setDate(start.getDate()+i)
+    let agenda=document.getElementById("agenda")
+    agenda.innerHTML=""
+    let start=getMonday(currentDate)
+    let days=dayMode?1:7
+    let container=document.createElement("div")
+    container.className="week"
+    let active=activeCalendars()
+    for(let i=0;i<days;i++){
+    let d=new Date(dayMode?currentDate:start)
+    if(!dayMode)d.setDate(start.getDate()+i)
+    
+    let col=document.createElement("div")
+    col.className="day"
+    
+    /* vandaag markeren */
+    let today=new Date()
+    
+    if(
+    d.getDate()==today.getDate() &&
+    d.getMonth()==today.getMonth() &&
+    d.getFullYear()==today.getFullYear()
+    ){
+    col.id="today"
+    }
 
-let col=document.createElement("div")
-col.className="day"
+    // Huidige tijdlijn toevoegen
+    let now = new Date();
+    if(!dayMode || sameDay(now, d)) { // alleen tonen in weekweergave of huidige dag
+        let line = document.createElement("div");
+        line.className = "currentTimeLine";
+    
+        // Bereken positie: 1px per minuut vanaf 7:00
+        let minutesSince7 = (now.getHours() - 7) * 60 + now.getMinutes();
+        line.style.top = minutesSince7 + "px";
+    
+        col.appendChild(line);
+    }
 
-/* vandaag markeren */
-let today=new Date()
-
-if(
-d.getDate()==today.getDate() &&
-d.getMonth()==today.getMonth() &&
-d.getFullYear()==today.getFullYear()
-){
-col.id="today"
-}
-
-/* klik ? dagweergave */
-
-col.onclick=()=>{
-
-currentDate=new Date(d)
-dayMode=true
-render()
+        
+    /* klik ? dagweergave */
+    
+    col.onclick=()=>{
+    
+    currentDate=new Date(d)
+    dayMode=true
+    render()
 
 }
 
