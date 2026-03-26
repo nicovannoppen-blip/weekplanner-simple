@@ -211,7 +211,7 @@ let data=await r.json()
 
     //tijdelijk!!!!
     console.log(data.items.map(c => c.summary))
-    
+
 calendars=data.items
 .filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
 .sort((a,b)=>{
@@ -224,7 +224,7 @@ if(ib==-1) ib=999
 
 return ia-ib
 
-    
+
 })
 buildFilters()
 }
@@ -260,7 +260,7 @@ let f=document.getElementById("filters")
         f.appendChild(btn)
     })
 
-    
+
 }
 
 function getContrastColor(hex){
@@ -285,23 +285,25 @@ let end=new Date(currentDate)
 end.setDate(end.getDate()+7)
 
 for(let cal of calendars){
-let url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${start.toISOString()}&timeMax=${end.toISOString()}&singleEvents=true&orderBy=startTime`
-
+let url=
+`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
+`timeMin=${start.toISOString()}&`+
+`timeMax=${end.toISOString()}&`+
+`singleEvents=true&orderBy=startTime`
 let r=await fetch(url,{headers:{Authorization:"Bearer "+token}})
 let data=await r.json()
-
 data.items.forEach(e=>{
 let s=e.start.dateTime||e.start.date
 let en=e.end.dateTime||e.end.date
-if(!s) return
-
+if(!s)return
 events.push({
-title:(e.summary||"").toLowerCase(),
+title:e.summary||"",
 start:new Date(s),
 end:new Date(en),
 calendar:cal.id,
-calendarName:rename(cal.summary),
-color:cal.backgroundColor
+calendarName: rename(cal.summary),
+color:cal.backgroundColor,
+location:e.location||""
 })
 })
 }
@@ -313,7 +315,7 @@ let list=[]
 document.querySelectorAll(".filterBtn.active").forEach(b=>{
         list.push(b.dataset.id)
     })
-    
+
 return list
 }
 
@@ -463,62 +465,52 @@ block:"nearest"
 
 // LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
 function layoutEvents(list, col, printMode=false){
-
-    if(!list || list.length === 0) return
-
-    list.sort((a,b)=>a.start-b.start)
-    let columns=[]
+    list.sort((a,b)=>a.start-b.start);
+    let columns=[];
 
     // Overlappende kolommen berekenen
     list.forEach(e=>{
-        let placed=false
+        let placed=false;
         for(let i=0;i<columns.length;i++){
             if(columns[i][columns[i].length-1].end<=e.start){
-                columns[i].push(e)
-                placed=true
-                break
+                columns[i].push(e);
+                placed=true;
+                break;
             }
         }
         if(!placed){
-            columns.push([e])
+            columns.push([e]);
         }
-    })
+    });
 
     // Render events
     columns.forEach((colEvents,i)=>{
         colEvents.forEach(e=>{
 
-            let start=(e.start.getHours()-7)*60+e.start.getMinutes()
-            let dur=(e.end-e.start)/60000
-
-            let div=document.createElement("div")
-            div.className = printMode ? "event printEvent" : "event"
-            div.style.top=start+"px"
-            div.style.height=dur+"px"
+            let start=(e.start.getHours()-7)*60+e.start.getMinutes();
+            let dur=(e.end-e.start)/60000;
+            let div=document.createElement("div");
+            div.className = printMode ? "event printEvent" : "event";
+            div.style.top=start+"px";
+            div.style.height=dur+"px";
 
             // Breedte/positie
-            let width=90/columns.length
-            let left=5 + i*width
-            div.style.left=left+"%"
-            div.style.width=(width-2)+"%"
+            let width=90/columns.length;
+            let left=5 + i*width;
+            div.style.left=left+"%";
+            div.style.width=(width-2)+"%";
 
             // Kleur
-            div.style.color = "#000"
-
-            // 🔥 huidige afspraak vet
-            let now=new Date()
-            if(e.start<=now && e.end>=now){
-            div.classList.add("currentEvent")
-            }
+            div.style.background = e.color;
 
             // ================= ICONS =================
-            let icons = iconsForEvent(e)
+            let icons = iconsForEvent(e);
 
-            let iconHTML = `<div class="icons">`
+            let iconHTML = `<div class="icons">`;
 
             icons.forEach(ic => {
 
-                let extraClass = ""
+                let extraClass = "";
 
                 if(
                     ic === "steffifamilie" ||
@@ -532,43 +524,42 @@ function layoutEvents(list, col, printMode=false){
                     ic === "IrenaEnJulian" ||
                     ic === "vannoppen"
                 ){
-                    extraClass = "bigicon"
+                    extraClass = "bigicon";
                 } else {
-                    extraClass = "smallicon"
+                    extraClass = "smallicon";
                 }
 
-                iconHTML += `<img src="icons/${ic}.png" class="picto ${extraClass}">`
-            })
+                iconHTML += `<img src="icons/${ic}.png" class="picto ${extraClass}">`;
+            });
 
-            iconHTML += `</div>`
+            iconHTML += `</div>`;
 
-            // ================= TEKST + HIGHLIGHT =================
-            // tekst + speech spans
-            let sentence=(
-            "agenda "+e.calendarName+
-            ". "+e.title+
-            ". van "+time(e.start)+
-            " tot "+time(e.end)
-            ).toLowerCase()
-            
-            let words=sentence.split(" ")
-            
-            let html="<div class='eventText'>"
-            words.forEach(w=>{
-            html+=`<span class="speechWord">${w}</span> `
-            })
-            html+="</div>"
-            
-            div.innerHTML=html
-            
-            div.onclick=(ev)=>{
-            ev.stopPropagation()
-            speak(sentence,div)
-            }
-            
-            col.appendChild(div)
-        })
-    })
+            // ================= TEKST =================
+            let html = iconHTML + `<div class="eventText">${time(e.start)} ${e.title}</div>`;
+
+            div.innerHTML = html;
+
+            // Klik voor spraak
+            div.onclick = (ev) => {
+                ev.stopPropagation();
+
+                let dag = e.start.toLocaleDateString("nl-BE",{weekday:"long"});
+
+                let text =
+                    "agenda " + e.calendarName + ". " +
+                    dag + ". " +
+                    e.title +
+                    ". Van " +
+                    time(e.start) +
+                    " tot " +
+                    time(e.end);
+
+                speak(text);
+            };
+
+            col.appendChild(div);
+        });
+    });
 }
 
 // HELPERS
@@ -619,68 +610,65 @@ parseToken()
 
 /* ---------------- KOMENDE AFSPRAKEN ---------------- */
 function showNextEvents(){
-    
-    let now=new Date()
-    
-    let upcoming=events
-    .filter(e=>e.start>now && (e.end-e.start)/3600000<15)
-    .sort((a,b)=>a.start-b.start)
-    .slice(0,4)
-    
-    let text="volgende afspraken "
-    
-    upcoming.forEach(e=>{
-    text+="agenda "+e.calendarName+" van "+time(e.start)+" tot "+time(e.end)+" "+e.title+" "
-    })
-    
-    let words=text.split(" ")
-    let html=""
-    
-    words.forEach(w=>{
-    html+=`<span class="speechWord">${w}</span> `
-    })
-    
-    let el=document.getElementById("popupText")
-    el.style.color = "#000"
-    el.innerHTML=html
-    document.getElementById("popup").style.display="flex"
-    
-    speak(text,el)
+
+let now=new Date()
+
+let upcoming=events
+.filter(e=>{
+
+let dur=(e.end-e.start)/3600000
+
+if(dur>=15) return false
+
+return e.start>now
+
+})
+.sort((a,b)=>a.start-b.start)
+.slice(0,4)
+
+let text="Volgende afspraken:\n"
+
+upcoming.forEach(e=>{
+
+text+=
+"agenda " + e.calendarName + ": " +
+"van " +
+time(e.start)+
+" tot "+
+time(e.end)+
+" "+
+e.title+
+"\n"
+
+})
+
+document.getElementById("popupText").innerText=text
+document.getElementById("popup").style.display="flex"
+
+speak(text)
+
 }
 
 
 /* ---------------- STEM ---------------- */
 
-function speak(text,element){
+function speak(t){
 
-    speechSynthesis.cancel()
-    
-    let words=text.split(" ")
-    let spans=element.querySelectorAll(".speechWord")
-    
-    let msg=new SpeechSynthesisUtterance(text)
-    msg.lang="nl-BE"
-    
-    msg.onboundary=function(e){
-    
-    if(e.name && e.name!=="word") return
-    
-    let char=e.charIndex
-    let idx=0,total=0
-    
-    for(let i=0;i<words.length;i++){
-    total+=words[i].length+1
-    if(total>char){ idx=i; break }
-    }
-    
-    spans.forEach(s=>s.classList.remove("active"))
-    if(spans[idx]) spans[idx].classList.add("active")
-    }
-    
-    msg.onend=()=>spans.forEach(s=>s.classList.remove("active"))
-    
-    speechSynthesis.speak(msg)
+let msg=new SpeechSynthesisUtterance(t)
+
+msg.lang="nl-BE"
+
+speechSynthesis.speak(msg)
+
 }
+
+//popup
+function closePopup(){
+
+document.getElementById("popup").style.display="none"
+
+}
+
 
 
 // Swipe ondersteuning (gsm/tablet)
