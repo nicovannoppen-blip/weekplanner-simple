@@ -695,19 +695,28 @@ function speak(text, lineDiv){
 
     let msg = new SpeechSynthesisUtterance(text);
     msg.lang = "nl-BE";
-
     msg.onboundary = function(event){
         if(event.name !== "word") return;
-
+    
         let charIndex = event.charIndex;
+    
+        // Vind huidige woord via lengte
         let total = 0;
         let currentWordIndex = speechWords.length - 1; // default = laatste woord
         for(let i=0;i<speechWords.length;i++){
-            total += speechWords[i].length + 1;
+            total += speechWords[i].length + 1; // +1 voor spatie
             if(total > charIndex){
                 currentWordIndex = i;
                 break;
             }
+        }
+    
+        // verwijder alle highlights
+        spans.forEach(s => s.classList.remove("active"));
+    
+        // Highlight span met dezelfde index
+        let span = spans[currentWordIndex];
+        if(span) span.classList.add("active");
         }
 
         let spokenWord = speechWords[currentWordIndex].toLowerCase();
