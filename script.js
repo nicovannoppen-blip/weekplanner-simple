@@ -535,11 +535,12 @@ function layoutEvents(list, col, printMode=false){
             iconHTML += `</div>`;
 
             // ================= TEKST =================
-            let displayText = e.title || ""; // alleen de titel voor de visuele agenda
-            
+            // Voor visuele agenda: titel + begintijd
+            let displayText = time(e.start) + " " + (e.title || "");
+            // Voor spraak: kalendernaam + titel + start + eind
             let speechText = (
                 "agenda " + e.calendarName +
-                ". " + e.title +
+                ": " + e.title +
                 ". van " + time(e.start) +
                 " tot " + time(e.end)
             ).toLowerCase();
