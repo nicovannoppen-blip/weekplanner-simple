@@ -203,7 +203,7 @@ font-size:18px;
     gap: 4px;              /* ruimte tussen pictogrammen en tekst */
     padding: 2px 4px;
     border-radius: 4px;
-    color: #FFFFFF;           /* tekstkleur */
+    color: inherit;           /* tekstkleur */
     font-size: 12px;
     box-sizing: border-box;
 }
@@ -235,10 +235,10 @@ font-size:18px;
     gap: 4px;
 }
 .eventText {
+    color: #000;
     text-align: center;
     width: 100%;
-    text-transform: lowercase; /*Voor Niel alle tekst in kleine letters*/
-    color: #000 !important;
+    text-transform: lowercase;
 }
 
 #popupText {
@@ -253,7 +253,7 @@ font-size:18px;
 }
 
 .speechWord {
-    opacity: 0.3;
+    opacity: 1;
     transition: all 0.2s ease;
 }
 
@@ -262,9 +262,13 @@ font-size:18px;
     background: yellow;
     border-radius: 4px;
     padding: 1px 3px;
+    font-weight: bold;
 }
 .currentEvent .eventText {
     font-weight: bold;
+}
+.currentEvent {
+    outline: 3px solid red;
 }
 
 @media print {
