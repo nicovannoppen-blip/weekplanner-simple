@@ -645,7 +645,7 @@ function showNextEvents(){
             "agenda " + (e.calendarName || "") +
             ": van " + time(e.start) +
             " tot " + time(e.end) +
-            " " + (e.title || "")
+            " " + (e.title || ".")
         ).toLowerCase();
 
         // Splits woorden
