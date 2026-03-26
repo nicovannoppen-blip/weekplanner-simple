@@ -617,41 +617,51 @@ function selectNone(){
 parseToken()
 
 /* ---------------- KOMENDE AFSPRAKEN ---------------- */
+
 function showNextEvents(){
 
-let now=new Date()
+    let now = new Date();
 
-let upcoming=events
-.filter(e=>{
+    let upcoming = events
+    .filter(e=>{
+        let dur = (e.end - e.start) / 3600000;
+        if(dur >= 15) return false;
+        return e.start > now;
+    })
+    .sort((a,b)=>a.start - b.start)
+    .slice(0,4);
 
-let dur=(e.end-e.start)/3600000
+    // 1️⃣ Maak de tekst
+    let text = "";
+    upcoming.forEach(e=>{
+        text += (
+            "agenda " + (e.calendarName || "") +
+            ": van " + time(e.start) +
+            " tot " + time(e.end) +
+            " " + (e.title || "")
+        ).toLowerCase() + "\n";
+    });
 
-if(dur>=15) return false
+    // 2️⃣ Pop-up element
+    let popup = document.getElementById("popup");
+    let popupText = document.getElementById("popupText");
 
-return e.start>now
+    // ✅ splits tekst in woorden en maak spans
+    let words = text.trim().split(/\s+/);
+    popupText.innerHTML = ""; // leegmaken
+    words.forEach((w,i)=>{
+        let span = document.createElement("span");
+        span.className = "speechWord";
+        span.dataset.index = i;
+        span.innerText = w + " "; // spatie na elk woord
+        popupText.appendChild(span);
+    });
 
-})
-.sort((a,b)=>a.start-b.start)
-.slice(0,4)
+    // 3️⃣ Toon de popup
+    popup.style.display = "flex";
 
-let text="Volgende afspraken:\n"
-
-upcoming.forEach(e=>{
-
-text += (
-    "agenda " + (e.calendarName || "") +
-    ": van " + time(e.start) +
-    " tot " + time(e.end) +
-    " " + (e.title || "")
-).toLowerCase() + "\n"
-
-})
-
-document.getElementById("popupText").innerText=text
-document.getElementById("popup").style.display="flex"
-
-speak(text)
-
+    // 4️⃣ Spreek de tekst uit en highlight de woorden
+    speak(text, popupText);
 }
 
 
