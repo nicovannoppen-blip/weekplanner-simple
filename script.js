@@ -646,7 +646,7 @@ function showNextEvents(){
             ": van " + time(e.start) +
             " tot " + time(e.end) +
             " " + (e.title || " ")+
-            " ."
+            "."
         ).toLowerCase();
 
         // Splits woorden
