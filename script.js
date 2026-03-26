@@ -841,8 +841,8 @@ let clockContainer = document.createElement("div");
 clockContainer.id = "liveClock";
 clockContainer.style.display = "inline-flex";
 clockContainer.style.alignItems = "center";
-clockContainer.style.marginLeft = "10px";
-clockContainer.style.gap = "10px"; // ruimte tussen tijd en datum
+clockContainer.style.marginLeft = "100px";
+clockContainer.style.gap = "30px"; // ruimte tussen tijd en datum
 document.querySelector("header").appendChild(clockContainer);
 
 // Tijd
