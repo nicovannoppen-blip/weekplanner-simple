@@ -464,7 +464,6 @@ block:"nearest"
 }
 
 // LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
-// LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
 function layoutEvents(list, col, printMode=false){
 
     if(!list || list.length === 0) return
@@ -495,6 +494,11 @@ function layoutEvents(list, col, printMode=false){
             let dur=(e.end-e.start)/60000
 
             let div=document.createElement("div")
+            let now = new Date()
+
+            if(e.start <= now && e.end >= now){
+                div.classList.add("currentEvent")
+            }
             div.className = printMode ? "event printEvent" : "event"
             div.style.top=start+"px"
             div.style.height=dur+"px"
@@ -657,7 +661,7 @@ e.title+
 document.getElementById("popupText").innerText=text
 document.getElementById("popup").style.display="flex"
 
-speak(text)
+speak(text, element)
 
 }
 
