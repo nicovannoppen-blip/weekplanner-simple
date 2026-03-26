@@ -630,15 +630,12 @@ let text="Volgende afspraken:\n"
 
 upcoming.forEach(e=>{
 
-text+=
-"agenda " + e.calendarName + ": " +
-"van " +
-time(e.start)+
-" tot "+
-time(e.end)+
-" "+
-e.title+
-". \n"
+text += (
+    "agenda " + (e.calendarName || "") +
+    ": van " + time(e.start) +
+    " tot " + time(e.end) +
+    " " + (e.title || "")
+).toLowerCase() + "\n"
 
 })
 
