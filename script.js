@@ -638,7 +638,7 @@ time(e.start)+
 time(e.end)+
 " "+
 e.title+
-"\n"
+". \n"
 
 })
 
