@@ -464,53 +464,58 @@ block:"nearest"
 }
 
 // LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
+// LAYOUT EVENTS MET OVERLAPPENDE BREEDTE
 function layoutEvents(list, col, printMode=false){
-    list.sort((a,b)=>a.start-b.start);
-    let columns=[];
+
+    if(!list || list.length === 0) return
+
+    list.sort((a,b)=>a.start-b.start)
+    let columns=[]
 
     // Overlappende kolommen berekenen
     list.forEach(e=>{
-        let placed=false;
+        let placed=false
         for(let i=0;i<columns.length;i++){
             if(columns[i][columns[i].length-1].end<=e.start){
-                columns[i].push(e);
-                placed=true;
-                break;
+                columns[i].push(e)
+                placed=true
+                break
             }
         }
         if(!placed){
-            columns.push([e]);
+            columns.push([e])
         }
-    });
+    })
 
     // Render events
     columns.forEach((colEvents,i)=>{
         colEvents.forEach(e=>{
 
-            let start=(e.start.getHours()-7)*60+e.start.getMinutes();
-            let dur=(e.end-e.start)/60000;
-            let div=document.createElement("div");
-            div.className = printMode ? "event printEvent" : "event";
-            div.style.top=start+"px";
-            div.style.height=dur+"px";
+            let start=(e.start.getHours()-7)*60+e.start.getMinutes()
+            let dur=(e.end-e.start)/60000
+
+            let div=document.createElement("div")
+            div.className = printMode ? "event printEvent" : "event"
+            div.style.top=start+"px"
+            div.style.height=dur+"px"
 
             // Breedte/positie
-            let width=90/columns.length;
-            let left=5 + i*width;
-            div.style.left=left+"%";
-            div.style.width=(width-2)+"%";
+            let width=90/columns.length
+            let left=5 + i*width
+            div.style.left=left+"%"
+            div.style.width=(width-2)+"%"
 
             // Kleur
-            div.style.background = e.color;
+            div.style.background = e.color
 
             // ================= ICONS =================
-            let icons = iconsForEvent(e);
+            let icons = iconsForEvent(e)
 
-            let iconHTML = `<div class="icons">`;
+            let iconHTML = `<div class="icons">`
 
             icons.forEach(ic => {
 
-                let extraClass = "";
+                let extraClass = ""
 
                 if(
                     ic === "steffifamilie" ||
@@ -524,55 +529,49 @@ function layoutEvents(list, col, printMode=false){
                     ic === "IrenaEnJulian" ||
                     ic === "vannoppen"
                 ){
-                    extraClass = "bigicon";
+                    extraClass = "bigicon"
                 } else {
-                    extraClass = "smallicon";
+                    extraClass = "smallicon"
                 }
 
-                iconHTML += `<img src="icons/${ic}.png" class="picto ${extraClass}">`;
-            });
+                iconHTML += `<img src="icons/${ic}.png" class="picto ${extraClass}">`
+            })
 
-            iconHTML += `</div>`;
+            iconHTML += `</div>`
 
-            // ================= TEKST =================
-                let sentence = (
-                    "agenda " + e.calendarName +
-                    ". " + e.title +
-                    ". van " + time(e.start) +
-                    " tot " + time(e.end)
-                ).toLowerCase()
-                
-                let words = sentence.split(" ")
-                
-                let textHTML = `<div class="eventText">`
-                
-                words.forEach((w,i)=>{
-                    textHTML += `<span class="speechWord" data-index="${i}">${w}</span> `
-                })
-                
-                textHTML += `</div>`
-                
-                let html = iconHTML + textHTML
+            // ================= TEKST + HIGHLIGHT =================
+            let sentence = (
+                "agenda " + e.calendarName +
+                ". " + e.title +
+                ". van " + time(e.start) +
+                " tot " + time(e.end)
+            ).toLowerCase()
 
-            // Klik voor spraak
+            let words = sentence.split(" ")
+
+            let textHTML = `<div class="eventText">`
+
+            words.forEach((w,i)=>{
+                textHTML += `<span class="speechWord" data-index="${i}">${w}</span> `
+            })
+
+            textHTML += `</div>`
+
+            let html = iconHTML + textHTML
+
+            div.innerHTML = html
+
+            // ================= KLIK + SPRAAK =================
             div.onclick = (ev) => {
-            
+
                 ev.stopPropagation()
-            
-                let text =
-                    "agenda " + e.calendarName +
-                    ". " + e.title +
-                    ". van " +
-                    time(e.start) +
-                    " tot " +
-                    time(e.end)
-            
-                speak(text.toLowerCase(), div) // 🔥 element meegeven
+
+                speak(sentence, div)
             }
 
-            col.appendChild(div);
-        });
-    });
+            col.appendChild(div)
+        })
+    })
 }
 
 // HELPERS
