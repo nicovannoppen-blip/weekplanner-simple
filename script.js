@@ -622,6 +622,7 @@ function showNextEvents(){
 
     let now = new Date();
 
+    // Filter korte komende afspraken
     let upcoming = events
     .filter(e=>{
         let dur = (e.end - e.start) / 3600000;
@@ -631,37 +632,52 @@ function showNextEvents(){
     .sort((a,b)=>a.start - b.start)
     .slice(0,4);
 
-    // 1️⃣ Maak de tekst
-    let text = "";
+    let popup = document.getElementById("popup");
+    let popupText = document.getElementById("popupText");
+
+    // Maak de popup leeg
+    popupText.innerHTML = "";
+
+    // Voor elke afspraak, maak een <div> met spans per woord
     upcoming.forEach(e=>{
-        text += (
+        // Tekst voor visueel + spraak
+        let lineText = (
             "agenda " + (e.calendarName || "") +
             ": van " + time(e.start) +
             " tot " + time(e.end) +
             " " + (e.title || "")
-        ).toLowerCase() + "\n";
+        ).toLowerCase();
+
+        // Splits woorden
+        let words = lineText.split(/\s+/);
+
+        let lineDiv = document.createElement("div");
+        lineDiv.className = "popupLine"; // voor eventueel styling
+
+        words.forEach((w,i)=>{
+            let span = document.createElement("span");
+            span.className = "speechWord";
+            span.dataset.index = i;
+            span.innerText = w + " ";
+            lineDiv.appendChild(span);
+        });
+
+        popupText.appendChild(lineDiv);
     });
 
-    // 2️⃣ Pop-up element
-    let popup = document.getElementById("popup");
-    let popupText = document.getElementById("popupText");
-
-    // ✅ splits tekst in woorden en maak spans
-    let words = text.trim().split(/\s+/);
-    popupText.innerHTML = ""; // leegmaken
-    words.forEach((w,i)=>{
-        let span = document.createElement("span");
-        span.className = "speechWord";
-        span.dataset.index = i;
-        span.innerText = w + " "; // spatie na elk woord
-        popupText.appendChild(span);
-    });
-
-    // 3️⃣ Toon de popup
+    // Toon de popup
     popup.style.display = "flex";
 
-    // 4️⃣ Spreek de tekst uit en highlight de woorden
-    speak(text, popupText);
+    // Spraakfunctie
+    speak(
+        upcoming.map(e => 
+            "agenda " + (e.calendarName || "") +
+            ": van " + time(e.start) +
+            " tot " + time(e.end) +
+            " " + (e.title || "")
+        ).join(". "), 
+        popupText
+    );
 }
 
 
