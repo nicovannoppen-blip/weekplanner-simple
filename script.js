@@ -833,3 +833,56 @@ function printWeek() {
     //pagina herladen omdat hij anders gek doet
     location.reload();
 }
+
+
+/* ---------------- Update live klok ---------------- */
+function updateLiveClock() {
+    let now = new Date();
+    let clock = document.getElementById("liveClock");
+    let hours = now.getHours().toString().padStart(2, "0");
+    let minutes = now.getMinutes().toString().padStart(2, "0");
+    let seconds = now.getSeconds().toString().padStart(2, "0");
+    let dateStr = now.toLocaleDateString("nl-BE", {weekday:"long", day:"2-digit", month:"2-digit", year:"numeric"});
+
+    clock.innerText = `${hours}:${minutes}:${seconds} | ${dateStr}`;
+}
+
+// Spraak bij klik op klok
+document.getElementById("liveClock").onclick = () => {
+    let now = new Date();
+    let timeStr = now.toLocaleTimeString("nl-BE", {hour:"2-digit", minute:"2-digit"});
+    let dateStr = now.toLocaleDateString("nl-BE", {weekday:"long", day:"2-digit", month:"2-digit", year:"numeric"});
+    speakText(`Het is nu ${timeStr} op ${dateStr}`);
+}
+
+function speakText(text){
+    speechSynthesis.cancel();
+    let msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "nl-BE";
+    speechSynthesis.speak(msg);
+}
+
+// Start de klok en update elke seconde
+setInterval(updateLiveClock, 1000);
+updateLiveClock(); // meteen tonen
+
+function updateCurrentTimeLine() {
+    let now = new Date();
+    let todayCol = document.getElementById("today");
+    if(!todayCol) return;
+
+    // Verwijder oude lijnen
+    todayCol.querySelectorAll(".currentTimeLine").forEach(l => l.remove());
+
+    let line = document.createElement("div");
+    line.className = "currentTimeLine";
+
+    let minutesSince7 = (now.getHours() - 7) * 60 + now.getMinutes();
+    line.style.top = minutesSince7 + "px";
+
+    todayCol.appendChild(line);
+}
+
+// Update lijn elke minuut
+setInterval(updateCurrentTimeLine, 60000);
+updateCurrentTimeLine(); // direct tonen
