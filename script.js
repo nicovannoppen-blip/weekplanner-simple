@@ -687,9 +687,13 @@ function showNextEvents(){
 function speak(text, element){
     speechSynthesis.cancel();
 
-    let speechWords = text.split(/\s+/);
     let spans = Array.from(element.querySelectorAll(".speechWord"));
     let visualWords = spans.map(s => s.innerText.trim().toLowerCase());
+
+    // Bereid spraaktekst voor: lowercase + splitsen
+    let speechWords = text.toLowerCase().split(/\s+/);
+
+    let currentVisualIndex = 0;
 
     let msg = new SpeechSynthesisUtterance(text);
     msg.lang = "nl-BE";
@@ -697,35 +701,39 @@ function speak(text, element){
     msg.onboundary = function(event){
         if(event.name !== "word") return;
 
+        // het woord dat uitgesproken wordt
         let charIndex = event.charIndex;
-
         let total = 0;
-        let currentWordIndex = 0;
-        for(let i=0;i<speechWords.length;i++){
+        let spokenWordIndex = 0;
+        for(let i=0; i<speechWords.length; i++){
             total += speechWords[i].length + 1;
             if(total > charIndex){
-                currentWordIndex = i;
+                spokenWordIndex = i;
                 break;
             }
         }
+        let spokenWord = speechWords[spokenWordIndex];
 
-        let wordBeingSpoken = speechWords[currentWordIndex].toLowerCase();
-        let spanIndex = visualWords.indexOf(wordBeingSpoken);
-
-        spans.forEach(s => s.classList.remove("active"));
-        if(spanIndex >= 0){
-            spans[spanIndex].classList.add("active");
+        // Synchroniseer: highlight het volgende woord in visual dat overeenkomt
+        while(currentVisualIndex < visualWords.length){
+            if(visualWords[currentVisualIndex] === spokenWord){
+                // highlight
+                spans.forEach(s => s.classList.remove("active"));
+                spans[currentVisualIndex].classList.add("active");
+                currentVisualIndex++;
+                break;
+            } else {
+                // skip words die in speech zitten maar niet in visual
+                currentVisualIndex++;
+            }
         }
     }
 
-    // Zorg dat laatste woord nog even fluo blijft
     msg.onend = ()=>{
+        // highlight laatste woord kort, ook bij lange tekst
+        spans.forEach(s => s.classList.remove("active"));
         if(spans.length > 0){
-            spans.forEach(s => s.classList.remove("active"));
-            // highlight het laatste woord in de visual (indien aanwezig)
-            let lastSpanIndex = visualWords.length - 1;
-            if(lastSpanIndex >= 0) spans[lastSpanIndex].classList.add("active");
-            // verwijder na korte delay
+            spans[spans.length - 1].classList.add("active");
             setTimeout(()=>spans.forEach(s => s.classList.remove("active")), 300);
         }
     }
