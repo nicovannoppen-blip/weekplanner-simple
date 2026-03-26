@@ -836,35 +836,41 @@ function printWeek() {
 
 
 /* ---------------- Update live klok ---------------- */
-// Live klok in header - container
+// Live klok in header - widget-stijl
 let clockContainer = document.createElement("div");
 clockContainer.id = "liveClock";
-clockContainer.style.display = "inline-flex";
+clockContainer.style.display = "flex";
+clockContainer.style.flexDirection = "column"; // tijd boven datum
 clockContainer.style.alignItems = "center";
-clockContainer.style.marginLeft = "50px";
-clockContainer.style.gap = "10px"; // ruimte tussen tijd en datum
+clockContainer.style.justifyContent = "center";
+clockContainer.style.marginLeft = "20px"; // ruimte van buttons
+clockContainer.style.padding = "4px 8px";
+clockContainer.style.border = "1px solid #4285F4";
+clockContainer.style.borderRadius = "6px";
+clockContainer.style.backgroundColor = "#f0f8ff";
+clockContainer.style.cursor = "pointer";
 document.querySelector("header").appendChild(clockContainer);
 
 // Tijd
 let clockTime = document.createElement("div");
 clockTime.id = "liveClockTime";
-clockTime.style.cursor = "pointer";
 clockTime.style.fontWeight = "bold";
-clockTime.style.fontSize = "3em"; // <-- groter
+clockTime.style.fontSize = "1.8em"; // groot
+clockTime.style.lineHeight = "1em";
 clockContainer.appendChild(clockTime);
 
 // Datum
 let clockDate = document.createElement("div");
 clockDate.id = "liveClockDate";
-clockDate.style.cursor = "pointer";
 clockDate.style.fontWeight = "bold";
-clockDate.style.fontSize = "1em"; // normaal formaat
+clockDate.style.fontSize = "0.9em"; // normaal
+clockDate.style.lineHeight = "1em";
 clockContainer.appendChild(clockDate);
 
 // Update functie
 function updateClock() {
     let now = new Date();
-    
+
     // Tijd: hh:mm
     let hours = now.getHours().toString().padStart(2,"0");
     let minutes = now.getMinutes().toString().padStart(2,"0");
@@ -882,30 +888,21 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
-// Klik = zeg tijd
-clockTime.onclick = () => {
+// Klik = zeg tijd en datum
+clockContainer.onclick = () => {
     let now = new Date();
     let hours = now.getHours();
     let minutes = now.getMinutes();
-    let speech = `Het is ${hours} uur en ${minutes} minuten.`;
-    let msg = new SpeechSynthesisUtterance(speech);
-    msg.lang = "nl-BE";
-    speechSynthesis.speak(msg);
-};
-
-// Klik = zeg datum
-clockDate.onclick = () => {
-    let now = new Date();
     let weekday = now.toLocaleDateString("nl-BE",{weekday:"long"});
     let day = now.getDate();
     let month = now.toLocaleDateString("nl-BE",{month:"long"});
     let year = now.getFullYear();
-    let speech = `Vandaag is ${weekday} ${day} ${month} ${year}.`;
+
+    let speech = `Het is ${hours} uur en ${minutes} minuten. Vandaag is ${weekday} ${day} ${month} ${year}.`;
     let msg = new SpeechSynthesisUtterance(speech);
     msg.lang = "nl-BE";
     speechSynthesis.speak(msg);
 };
-
 
 // Update lijn elke minuut
 setInterval(updateCurrentTimeLine, 60000);
