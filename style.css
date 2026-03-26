@@ -247,6 +247,18 @@ font-size:18px;
     align-items: center;
 }
 
+.speechWord {
+    opacity: 0.3;
+    transition: all 0.2s ease;
+}
+
+.speechWord.active {
+    opacity: 1;
+    background: yellow;
+    border-radius: 4px;
+    padding: 1px 3px;
+}
+
 @media print {
 
     /* ================= BASIS ================= */
