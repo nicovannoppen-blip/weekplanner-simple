@@ -685,45 +685,53 @@ function showNextEvents(){
 /* ---------------- STEM ---------------- */
 
 function speak(text, element){
+    speechSynthesis.cancel();
 
-    speechSynthesis.cancel()
+    // Woorden voor spraak
+    let speechWords = text.split(/\s+/);
+    // Spans in de visual
+    let spans = Array.from(element.querySelectorAll(".speechWord"));
+    let visualWords = spans.map(s => s.innerText.trim().toLowerCase());
 
-    let words = text.split(" ")
-    let spans = element.querySelectorAll(".speechWord")
-
-    let msg = new SpeechSynthesisUtterance(text)
-    msg.lang = "nl-BE"
+    let msg = new SpeechSynthesisUtterance(text);
+    msg.lang = "nl-BE";
 
     msg.onboundary = function(event){
+        if(event.name !== "word") return;
 
-        if(event.name !== "word") return
+        let charIndex = event.charIndex;
 
-        let charIndex = event.charIndex
-
-        let currentWordIndex = 0
-        let total = 0
-
-        for(let i=0;i<words.length;i++){
-            total += words[i].length + 1
-
+        // Vind het huidige woord in speechWords
+        let total = 0;
+        let currentWordIndex = 0;
+        for(let i=0;i<speechWords.length;i++){
+            total += speechWords[i].length + 1;
             if(total > charIndex){
-                currentWordIndex = i
-                break
+                currentWordIndex = i;
+                break;
             }
         }
 
-        spans.forEach(s=>s.classList.remove("active"))
+        // Highlight alleen als woord exact overeenkomt
+        let wordBeingSpoken = speechWords[currentWordIndex].toLowerCase();
+        
+        // Zoek het index in de visual
+        let spanIndex = visualWords.indexOf(wordBeingSpoken);
 
-        if(spans[currentWordIndex]){
-            spans[currentWordIndex].classList.add("active")
+        // verwijder alle highlights
+        spans.forEach(s => s.classList.remove("active"));
+
+        // markeer alleen als match
+        if(spanIndex >= 0){
+            spans[spanIndex].classList.add("active");
         }
     }
 
     msg.onend = ()=>{
-        spans.forEach(s=>s.classList.remove("active"))
+        spans.forEach(s=>s.classList.remove("active"));
     }
 
-    speechSynthesis.speak(msg)
+    speechSynthesis.speak(msg);
 }
 
 //popup
