@@ -196,6 +196,28 @@ text-align:center;
 font-size:18px;
 }
 
+#popup {
+  display: flex;
+  flex-direction: column; /* stapel de inhoud verticaal */
+  align-items: center;    /* centreer horizontaal */
+  justify-content: center; /* centreer ook verticaal binnen de popup */
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 2px solid #333;
+  padding: 20px;
+  z-index: 9999;
+}
+
+#popup button {
+  margin-top: 15px;   /* afstand van de tekst erboven */
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 /* Pictogrammen naast elkaar voor scherm en print */
 .event, .event.printEvent {
     display: flex;
