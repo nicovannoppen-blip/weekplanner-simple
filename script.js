@@ -687,9 +687,7 @@ function showNextEvents(){
 function speak(text, element){
     speechSynthesis.cancel();
 
-    // Woorden voor spraak
     let speechWords = text.split(/\s+/);
-    // Spans in de visual
     let spans = Array.from(element.querySelectorAll(".speechWord"));
     let visualWords = spans.map(s => s.innerText.trim().toLowerCase());
 
@@ -701,7 +699,6 @@ function speak(text, element){
 
         let charIndex = event.charIndex;
 
-        // Vind het huidige woord in speechWords
         let total = 0;
         let currentWordIndex = 0;
         for(let i=0;i<speechWords.length;i++){
@@ -712,23 +709,25 @@ function speak(text, element){
             }
         }
 
-        // Highlight alleen als woord exact overeenkomt
         let wordBeingSpoken = speechWords[currentWordIndex].toLowerCase();
-        
-        // Zoek het index in de visual
         let spanIndex = visualWords.indexOf(wordBeingSpoken);
 
-        // verwijder alle highlights
         spans.forEach(s => s.classList.remove("active"));
-
-        // markeer alleen als match
         if(spanIndex >= 0){
             spans[spanIndex].classList.add("active");
         }
     }
 
+    // Zorg dat laatste woord nog even fluo blijft
     msg.onend = ()=>{
-        spans.forEach(s=>s.classList.remove("active"));
+        if(spans.length > 0){
+            spans.forEach(s => s.classList.remove("active"));
+            // highlight het laatste woord in de visual (indien aanwezig)
+            let lastSpanIndex = visualWords.length - 1;
+            if(lastSpanIndex >= 0) spans[lastSpanIndex].classList.add("active");
+            // verwijder na korte delay
+            setTimeout(()=>spans.forEach(s => s.classList.remove("active")), 300);
+        }
     }
 
     speechSynthesis.speak(msg);
