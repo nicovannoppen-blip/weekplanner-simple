@@ -836,24 +836,30 @@ function printWeek() {
 
 
 /* ---------------- Update live klok ---------------- */
-// Live klok in header
+// Live klok in header - container
+let clockContainer = document.createElement("div");
+clockContainer.id = "liveClock";
+clockContainer.style.display = "inline-flex";
+clockContainer.style.alignItems = "center";
+clockContainer.style.marginLeft = "10px";
+clockContainer.style.gap = "8px"; // ruimte tussen tijd en datum
+document.querySelector("header").appendChild(clockContainer);
+
+// Tijd
 let clockTime = document.createElement("div");
 clockTime.id = "liveClockTime";
-clockTime.style.cursor = "pointer"; // klikbaar voor spraak
+clockTime.style.cursor = "pointer";
 clockTime.style.fontWeight = "bold";
-clockTime.style.display = "inline-block";
-clockTime.style.marginLeft = "10px";
+clockContainer.appendChild(clockTime);
 
+// Datum
 let clockDate = document.createElement("div");
 clockDate.id = "liveClockDate";
-clockDate.style.cursor = "pointer"; // klikbaar voor spraak
+clockDate.style.cursor = "pointer";
 clockDate.style.fontWeight = "bold";
-clockDate.style.display = "inline-block";
-clockDate.style.marginLeft = "10px";
+clockContainer.appendChild(clockDate);
 
-document.querySelector("header").appendChild(clockTime);
-document.querySelector("header").appendChild(clockDate);
-
+// Update functie
 function updateClock() {
     let now = new Date();
     
