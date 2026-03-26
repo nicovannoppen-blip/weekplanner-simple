@@ -842,7 +842,7 @@ clockContainer.id = "liveClock";
 clockContainer.style.display = "inline-flex";
 clockContainer.style.alignItems = "center";
 clockContainer.style.marginLeft = "10px";
-clockContainer.style.gap = "8px"; // ruimte tussen tijd en datum
+clockContainer.style.gap = "10px"; // ruimte tussen tijd en datum
 document.querySelector("header").appendChild(clockContainer);
 
 // Tijd
@@ -850,6 +850,7 @@ let clockTime = document.createElement("div");
 clockTime.id = "liveClockTime";
 clockTime.style.cursor = "pointer";
 clockTime.style.fontWeight = "bold";
+clockTime.style.fontSize = "1.5em"; // <-- groter
 clockContainer.appendChild(clockTime);
 
 // Datum
@@ -857,6 +858,7 @@ let clockDate = document.createElement("div");
 clockDate.id = "liveClockDate";
 clockDate.style.cursor = "pointer";
 clockDate.style.fontWeight = "bold";
+clockDate.style.fontSize = "1em"; // normaal formaat
 clockContainer.appendChild(clockDate);
 
 // Update functie
