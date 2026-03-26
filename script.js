@@ -844,7 +844,7 @@ function updateLiveClock() {
     let seconds = now.getSeconds().toString().padStart(2, "0");
     let dateStr = now.toLocaleDateString("nl-BE", {weekday:"long", day:"2-digit", month:"2-digit", year:"numeric"});
 
-    clock.innerText = `${hours}:${minutes}:${seconds} | ${dateStr}`;
+    clock.innerText = `${hours}:${minutes} ${dateStr}`;
 }
 
 // Spraak bij klik op klok
