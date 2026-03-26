@@ -837,51 +837,66 @@ function printWeek() {
 
 /* ---------------- Update live klok ---------------- */
 // Live klok in header
-let clock = document.createElement("div");
-clock.id = "liveClock";
-clock.style.cursor = "pointer"; // klikbaar voor spraak
-clock.style.marginLeft = "10px";
-clock.style.fontWeight = "bold";
-document.querySelector("header").appendChild(clock);
+let clockTime = document.createElement("div");
+clockTime.id = "liveClockTime";
+clockTime.style.cursor = "pointer"; // klikbaar voor spraak
+clockTime.style.fontWeight = "bold";
+clockTime.style.display = "inline-block";
+clockTime.style.marginLeft = "10px";
+
+let clockDate = document.createElement("div");
+clockDate.id = "liveClockDate";
+clockDate.style.cursor = "pointer"; // klikbaar voor spraak
+clockDate.style.fontWeight = "bold";
+clockDate.style.display = "inline-block";
+clockDate.style.marginLeft = "10px";
+
+document.querySelector("header").appendChild(clockTime);
+document.querySelector("header").appendChild(clockDate);
 
 function updateClock() {
     let now = new Date();
     
+    // Tijd: hh:mm
     let hours = now.getHours().toString().padStart(2,"0");
     let minutes = now.getMinutes().toString().padStart(2,"0");
+    clockTime.innerText = `${hours}:${minutes}`;
 
-    // dag in woorden
+    // Datum: weekday dd month yyyy
     let weekday = now.toLocaleDateString("nl-BE",{weekday:"long"});
-    // maand in woorden
     let day = now.getDate().toString().padStart(2,"0");
     let month = now.toLocaleDateString("nl-BE",{month:"long"});
     let year = now.getFullYear();
-
-    // Formaat: hh:mm weekday dd month yyyy
-    clock.innerText = `${hours}:${minutes} ${weekday} ${day} ${month} ${year}`;
+    clockDate.innerText = `${weekday} ${day} ${month} ${year}`;
 }
 
 // Update elke seconde
 setInterval(updateClock, 1000);
 updateClock();
 
-// Klik = zeg tijd en datum
-clock.onclick = () => {
+// Klik = zeg tijd
+clockTime.onclick = () => {
     let now = new Date();
     let hours = now.getHours();
     let minutes = now.getMinutes();
-    let weekday = now.toLocaleDateString("nl-BE",{weekday:"long"});
-    let day = now.getDate();
-    let month = now.toLocaleDateString("nl-BE",{month:"long"});
-    let year = now.getFullYear();
-
-    let speech = `Het is ${hours} uur en ${minutes} minuten. Vandaag is ${weekday} ${day} ${month} ${year}.`;
+    let speech = `Het is ${hours} uur en ${minutes} minuten.`;
     let msg = new SpeechSynthesisUtterance(speech);
     msg.lang = "nl-BE";
     speechSynthesis.speak(msg);
 };
 
-
+// Klik = zeg datum
+clockDate.onclick = () => {
+    let now = new Date();
+    let weekday = now.toLocaleDateString("nl-BE",{weekday:"long"});
+    let day = now.getDate();
+    let month = now.toLocaleDateString("nl-BE",{month:"long"});
+    let year = now.getFullYear();
+    let speech = `Vandaag is ${weekday} ${day} ${month} ${year}.`;
+    let msg = new SpeechSynthesisUtterance(speech);
+    msg.lang = "nl-BE";
+    speechSynthesis.speak(msg);
+};
 
 
 // Update lijn elke minuut
