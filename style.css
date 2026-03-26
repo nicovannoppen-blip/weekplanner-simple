@@ -237,7 +237,12 @@ font-size:18px;
 .eventText {
     text-align: center;
     width: 100%;
-    text-transform: lowercase; //Voor Niel alle tekst in kleine letters
+    text-transform: lowercase; /*Voor Niel alle tekst in kleine letters*/
+    color: #000 !important;
+}
+
+#popupText {
+    color: #000 !important;
 }
 
 /* Tekst onder iconen */
