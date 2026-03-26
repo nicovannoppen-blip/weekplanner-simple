@@ -297,7 +297,7 @@ let s=e.start.dateTime||e.start.date
 let en=e.end.dateTime||e.end.date
 if(!s)return
 events.push({
-title:e.summary||"",
+title:(e.summary||"").toLowerCase(),
 start:new Date(s),
 end:new Date(en),
 calendar:cal.id,
@@ -535,26 +535,24 @@ function layoutEvents(list, col, printMode=false){
             iconHTML += `</div>`;
 
             // ================= TEKST =================
-            let htmlet sentence = (
-                "agenda " + e.calendarName +
-                ". " + e.title +
-                ". van " + time(e.start) +
-                " tot " + time(e.end)
-            ).toLowerCase()
-            
-            let words = sentence.split(" ")
-            
-            let textHTML = `<div class="eventText">`
-            
-            words.forEach((w,i)=>{
-                textHTML += `<span class="speechWord" data-index="${i}">${w}</span> `
-            })
-            
-            textHTML += `</div>`
-            
-            let html = iconHTML + textHTMLl = iconHTML + `<div class="eventText">${time(e.start)} ${e.title}</div>`;
-
-            div.innerHTML = html;
+                let sentence = (
+                    "agenda " + e.calendarName +
+                    ". " + e.title +
+                    ". van " + time(e.start) +
+                    " tot " + time(e.end)
+                ).toLowerCase()
+                
+                let words = sentence.split(" ")
+                
+                let textHTML = `<div class="eventText">`
+                
+                words.forEach((w,i)=>{
+                    textHTML += `<span class="speechWord" data-index="${i}">${w}</span> `
+                })
+                
+                textHTML += `</div>`
+                
+                let html = iconHTML + textHTML
 
             // Klik voor spraak
             div.onclick = (ev) => {
