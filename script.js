@@ -688,10 +688,9 @@ function speak(text, element){
     speechSynthesis.cancel();
 
     let spans = Array.from(element.querySelectorAll(".speechWord"));
-    let visualWords = spans.map(s => s.innerText.trim().toLowerCase());
+    let visualWords = spans.map(s => s.innerText.replace(/[.,!?;:]/g,"").trim().toLowerCase());
 
-    // Bereid spraaktekst voor: lowercase + splitsen
-    let speechWords = text.toLowerCase().split(/\s+/);
+    let speechWords = text.toLowerCase().replace(/[.,!?;:]/g,"").split(/\s+/);
 
     let currentVisualIndex = 0;
 
@@ -701,7 +700,6 @@ function speak(text, element){
     msg.onboundary = function(event){
         if(event.name !== "word") return;
 
-        // het woord dat uitgesproken wordt
         let charIndex = event.charIndex;
         let total = 0;
         let spokenWordIndex = 0;
@@ -714,23 +712,20 @@ function speak(text, element){
         }
         let spokenWord = speechWords[spokenWordIndex];
 
-        // Synchroniseer: highlight het volgende woord in visual dat overeenkomt
+        // Highlight het **volgende woord in visual dat overeenkomt**
         while(currentVisualIndex < visualWords.length){
             if(visualWords[currentVisualIndex] === spokenWord){
-                // highlight
                 spans.forEach(s => s.classList.remove("active"));
                 spans[currentVisualIndex].classList.add("active");
                 currentVisualIndex++;
                 break;
             } else {
-                // skip words die in speech zitten maar niet in visual
                 currentVisualIndex++;
             }
         }
     }
 
     msg.onend = ()=>{
-        // highlight laatste woord kort, ook bij lange tekst
         spans.forEach(s => s.classList.remove("active"));
         if(spans.length > 0){
             spans[spans.length - 1].classList.add("active");
