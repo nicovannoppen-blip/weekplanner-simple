@@ -258,6 +258,9 @@ font-size:18px;
     border-radius: 4px;
     padding: 1px 3px;
 }
+.currentEvent .eventText {
+    font-weight: bold;
+}
 
 @media print {
 
