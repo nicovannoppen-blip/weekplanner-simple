@@ -503,7 +503,7 @@ function layoutEvents(list, col, printMode=false){
             div.style.width=(width-2)+"%"
 
             // Kleur
-            div.style.background = e.color
+            div.style.color = "#000"
 
             // 🔥 huidige afspraak vet
             let now=new Date()
@@ -641,6 +641,7 @@ function showNextEvents(){
     })
     
     let el=document.getElementById("popupText")
+    el.style.color = "#000"
     el.innerHTML=html
     document.getElementById("popup").style.display="flex"
     
