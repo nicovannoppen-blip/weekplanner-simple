@@ -698,39 +698,26 @@ function speak(text, lineDiv){
 
     msg.onboundary = function(event){
         if(event.name !== "word") return;
-
+    
         let charIndex = event.charIndex;
-
-
+    
+        // Vind huidige woord via lengte
         let total = 0;
         let currentWordIndex = speechWords.length - 1; // default = laatste woord
         for(let i=0;i<speechWords.length;i++){
-            total += speechWords[i].length + 1;
+            total += speechWords[i].length + 1; // +1 voor spatie
             if(total > charIndex){
                 currentWordIndex = i;
                 break;
             }
         }
-
-
-
-
-
-
-
-
-
-        let spokenWord = speechWords[currentWordIndex].toLowerCase();
-
-        // Highlight alleen **het volgende woord vanaf currentVisualIndex**
-        for(let i=currentVisualIndex; i<visualWords.length; i++){
-            if(visualWords[i] === spokenWord){
-                spans.forEach(s => s.classList.remove("active"));
-                spans[i].classList.add("active");
-                currentVisualIndex = i + 1; // volgende startpunt
-                break;
-            }
-        }
+    
+        // verwijder alle highlights
+        spans.forEach(s => s.classList.remove("active"));
+    
+        // Highlight span met dezelfde index
+        let span = spans[currentWordIndex];
+        if(span) span.classList.add("active");
     }
 
     msg.onend = ()=>{
