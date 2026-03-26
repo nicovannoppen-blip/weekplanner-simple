@@ -687,12 +687,11 @@ function showNextEvents(){
 function speak(text, element){
     speechSynthesis.cancel();
 
+    // Woorden voor spraak
+    let speechWords = text.split(/\s+/);
+    // Spans in de visual
     let spans = Array.from(element.querySelectorAll(".speechWord"));
-    let visualWords = spans.map(s => s.innerText.replace(/[.,!?;:]/g,"").trim().toLowerCase());
-
-    let speechWords = text.toLowerCase().replace(/[.,!?;:]/g,"").split(/\s+/);
-
-    let currentVisualIndex = 0;
+    let visualWords = spans.map(s => s.innerText.trim().toLowerCase());
 
     let msg = new SpeechSynthesisUtterance(text);
     msg.lang = "nl-BE";
@@ -701,36 +700,35 @@ function speak(text, element){
         if(event.name !== "word") return;
 
         let charIndex = event.charIndex;
+
+        // Vind het huidige woord in speechWords
         let total = 0;
-        let spokenWordIndex = 0;
-        for(let i=0; i<speechWords.length; i++){
+        let currentWordIndex = 0;
+        for(let i=0;i<speechWords.length;i++){
             total += speechWords[i].length + 1;
             if(total > charIndex){
-                spokenWordIndex = i;
+                currentWordIndex = i;
                 break;
             }
         }
-        let spokenWord = speechWords[spokenWordIndex];
 
-        // Highlight het **volgende woord in visual dat overeenkomt**
-        while(currentVisualIndex < visualWords.length){
-            if(visualWords[currentVisualIndex] === spokenWord){
-                spans.forEach(s => s.classList.remove("active"));
-                spans[currentVisualIndex].classList.add("active");
-                currentVisualIndex++;
-                break;
-            } else {
-                currentVisualIndex++;
-            }
+        // Highlight alleen als woord exact overeenkomt
+        let wordBeingSpoken = speechWords[currentWordIndex].toLowerCase();
+        
+        // Zoek het index in de visual
+        let spanIndex = visualWords.indexOf(wordBeingSpoken);
+
+        // verwijder alle highlights
+        spans.forEach(s => s.classList.remove("active"));
+
+        // markeer alleen als match
+        if(spanIndex >= 0){
+            spans[spanIndex].classList.add("active");
         }
     }
 
     msg.onend = ()=>{
-        spans.forEach(s => s.classList.remove("active"));
-        if(spans.length > 0){
-            spans[spans.length - 1].classList.add("active");
-            setTimeout(()=>spans.forEach(s => s.classList.remove("active")), 300);
-        }
+        spans.forEach(s=>s.classList.remove("active"));
     }
 
     speechSynthesis.speak(msg);
