@@ -301,6 +301,7 @@ title:e.summary||"",
 start:new Date(s),
 end:new Date(en),
 calendar:cal.id,
+calendarName: rename(cal.summary),
 color:cal.backgroundColor,
 location:e.location||""
 })
@@ -545,6 +546,7 @@ function layoutEvents(list, col, printMode=false){
                 let dag = e.start.toLocaleDateString("nl-BE",{weekday:"long"});
 
                 let text =
+                    "agenda " + e.calendarName + ". " +
                     dag + ". " +
                     e.title +
                     ". Van " +
@@ -629,6 +631,7 @@ let text="Volgende afspraken:\n"
 upcoming.forEach(e=>{
 
 text+=
+"agenda " + e.calendarName + ". " +
 "van " +
 time(e.start)+
 " tot "+
