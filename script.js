@@ -546,7 +546,7 @@ function layoutEvents(list, col, printMode=false){
                 let dag = e.start.toLocaleDateString("nl-BE",{weekday:"long"});
 
                 let text =
-                    "agenda " + e.calendarName + ". " +
+                    "agenda " + e.calendarName + ": " +
                     dag + ". " +
                     e.title +
                     ". Van " +
@@ -631,7 +631,7 @@ let text="Volgende afspraken:\n"
 upcoming.forEach(e=>{
 
 text+=
-"agenda " + e.calendarName + ". " +
+"agenda " + e.calendarName + ": " +
 "van " +
 time(e.start)+
 " tot "+
