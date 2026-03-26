@@ -243,6 +243,7 @@ font-size:18px;
 
 #popupText {
     color: #000 !important;
+    white-space: pre-line;
 }
 
 /* Tekst onder iconen */
