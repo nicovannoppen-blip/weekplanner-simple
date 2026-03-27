@@ -4,7 +4,7 @@ margin:0;
 background:#f2f2f2;
 }
 
-header{
+/*header{
 background:#4285F4;
 color:white;
 padding:10px;
@@ -12,6 +12,71 @@ padding:10px;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
 gap:8px;
+}*/
+
+header{
+    background:#4285F4;
+    color:white;
+    padding:10px;
+
+    display:flex;
+    flex-wrap:wrap;              /* 🔥 belangrijk */
+    align-items:center;
+    gap:8px;
+}
+header button{
+    flex:1 1 auto;              /* groeit mee */
+    min-width:90px;             /* voorkomt te klein */
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:white;
+    cursor:pointer;
+}
+#liveClock{
+    margin-left:auto;           /* rechts uitlijnen op desktop */
+}
+@media (max-width: 900px){
+
+    header{
+        justify-content:center;
+    }
+
+    #liveClock{
+        order:-1;               /* 🔥 klok bovenaan */
+        width:100%;
+        margin-left:0;
+    }
+
+    #liveClockTime{
+        font-size:1.6em;
+    }
+
+    #liveClockDate{
+        font-size:0.9em;
+    }
+}
+@media (max-width: 600px){
+
+    header button{
+        flex:1 1 45%;           /* 2 knoppen per rij */
+        font-size:14px;
+        padding:8px;
+    }
+
+    #liveClock{
+        width:100%;
+        padding:6px;
+    }
+
+    #liveClockTime{
+        font-size:1.4em;
+    }
+
+    #liveClockDate{
+        font-size:0.8em;
+        text-align:center;
+    }
 }
 
 button{
