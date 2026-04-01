@@ -4,5 +4,6 @@ const HIDDEN_CALENDARS=[
 "Weeknummers",
 "Agenda",
 "Borgloon Weather",
-"agenda website","johnny"
+"agenda website",
+"Johnny"
 ]
