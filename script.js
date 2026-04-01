@@ -143,7 +143,8 @@ safari:["safari","safaripark"],
 zeehond:["zeehond"],   
 reptiel:["reptiel","reptielen"], 
 dierenwinkel:["dierenwinkel","schoubben"],  
-gezin:["gezin"]
+gezin:["gezin"],
+Johnny:["johnny","papa"]
 }
 
 // LOGIN / LOGOUT
