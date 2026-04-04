@@ -144,7 +144,8 @@ zeehond:["zeehond"],
 reptiel:["reptiel","reptielen"], 
 dierenwinkel:["dierenwinkel","schoubben"],  
 gezin:["gezin"],
-Johnny:["johnny","papa"]
+Johnny:["johnny","papa"],
+verhuizen:["verhuizen","tent opruimen"]
 }
 
 // LOGIN / LOGOUT
