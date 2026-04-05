@@ -829,7 +829,7 @@ function printWeek() {
 
         printContainer.appendChild(dayDiv);
     }
-
+    alert("Tip: zet je printer op enkelzijdig voor beste resultaat");
     window.print();
 
     //pagina herladen omdat hij anders gek doet
