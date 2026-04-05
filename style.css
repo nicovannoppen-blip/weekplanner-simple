@@ -488,3 +488,29 @@ font-size:18px;
         margin: 15mm;
     }
 }
+@media print {
+
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+
+        /* 🔥 FORCEERT enkelzijdig gedrag */
+        break-after: page;
+    }
+
+    .printDay {
+        page-break-after: always;
+
+        /* 🔥 BELANGRIJK: voorkomt dubbelzijdig pairing */
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+}
+.printDay:nth-child(odd) {
+    page-break-after: always;
+}
+
+.printDay:nth-child(even) {
+    page-break-after: always;
+}
