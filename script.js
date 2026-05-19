@@ -145,7 +145,8 @@ reptiel:["reptiel","reptielen"],
 dierenwinkel:["dierenwinkel","schoubben"],  
 gezin:["gezin"],
 Johnny:["johnny","papa"],
-verhuizen:["verhuizen","tent opruimen"]
+verhuizen:["verhuizen","tent opruimen"],
+tattoo: ["tattoo","tatoo","tatoe"]
 }
 
 // LOGIN / LOGOUT
