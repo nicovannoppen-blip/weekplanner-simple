@@ -146,7 +146,9 @@ dierenwinkel:["dierenwinkel","schoubben"],
 gezin:["gezin"],
 Johnny:["johnny","papa"],
 verhuizen:["verhuizen","tent opruimen"],
-tattoo: ["tattoo","tatoo","tatoe"]
+tattoo: ["tattoo","tatoo","tatoe"],
+luchtballon: ["luchtballon"],
+schoolreis: ["schoolreis"]
 }
 
 // LOGIN / LOGOUT
