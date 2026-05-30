@@ -147,7 +147,7 @@ gezin:["gezin"],
 Johnny:["johnny","papa"],
 verhuizen:["verhuizen","tent opruimen"],
 tattoo: ["tattoo","tatoo","tatoe"],
-luchtballon: ["luchtballon"],
+luchtballon: ["luchtballon","ballonvaart"],
 schoolreis: ["schoolreis"]
 }
 
