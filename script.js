@@ -148,7 +148,8 @@ Johnny:["johnny","papa"],
 verhuizen:["verhuizen","tent opruimen"],
 tattoo: ["tattoo","tatoo","tatoe"],
 luchtballon: ["luchtballon","ballonvaart"],
-schoolreis: ["schoolreis"]
+schoolreis: ["schoolreis"],
+sauna: ["sauna", "welness"]
 }
 
 // LOGIN / LOGOUT
