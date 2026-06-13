@@ -165,11 +165,12 @@ knutselen: ["knutselen"],
 volksspelen: ["volksspelen"],
 dansen: ["dansen"],
 huifkar: ["huifkar"],
-pannenkoek: ["pannenkoek"],
+pannenkoek: ["pannenkoek","pannenkoeken"],
 efteling: ["efteling"],
 boerenontbijt: ["boerenontbijt"],
 bowlen: ["bowlen"],
 golf: ["golf"],
+etensamen: ["samen eten", "eten samen"]
 }
 
 // LOGIN / LOGOUT
