@@ -170,7 +170,17 @@ efteling: ["efteling"],
 boerenontbijt: ["boerenontbijt"],
 bowlen: ["bowlen"],
 golf: ["golf"],
-etensamen: ["samen eten", "eten samen"]
+etensamen: ["samen eten", "eten samen"],
+dolfinarium: ["dolfinarium"],
+winkelcentrum: ["winkelcentrum"],
+markt: ["markt"],
+toonmoment: ["toonmoment"],
+parking: ["parking"],
+wekker: ["wekker"],
+vissen: ["vissen","aquarium"],
+vuurtoren: ["vuurtoren"],
+Hunebed: ["hunebed"],
+bunker: ["bunker","bunkers"]
 }
 
 // LOGIN / LOGOUT
