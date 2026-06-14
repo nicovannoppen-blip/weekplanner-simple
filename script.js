@@ -180,7 +180,8 @@ wekker: ["wekker"],
 vissen: ["vissen","aquarium"],
 vuurtoren: ["vuurtoren"],
 Hunebed: ["hunebed"],
-bunker: ["bunker","bunkers"]
+bunker: ["bunker","bunkers"],
+orca: ["orca","orka"]  
 }
 
 // LOGIN / LOGOUT
