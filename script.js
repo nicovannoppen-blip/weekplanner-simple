@@ -361,6 +361,33 @@ return list
 function iconsForEvent(e){
 
 let text=(e.title).toLowerCase()
+
+// PRIORITEIT: vervoer overschrijft alles
+if(text.includes("rijden van") || text.includes("rijden naar")){
+    return ["auto"];
+}
+if(text.includes("fietsen van") || text.includes("fietsen naar")){
+    return ["fietsen"];
+}
+if(text.includes("wandelen van") || text.includes("wandelen naar") || text.includes("lopen van") || text.includes("lopen naar")){
+    return ["wandelen_rugzak"];
+}
+if(text.includes("trein van") || text.includes("trein naar")){
+    return ["trein"];
+}
+if(text.includes("bus van") || text.includes("bus naar")|| text.includes("openbaar vervoer van") || text.includes("openbaar vervoer naar")){
+    return ["bus"];
+}
+if(text.includes("metro van") || text.includes("metro naar")){
+    return ["metro"];
+}
+if(text.includes("tram van") || text.includes("tram naar")){
+    return ["tram"];
+}
+if(text.includes("vliegtuig van") || text.includes("vliegtuig naar")){
+    return ["vliegtuig"];
+}
+    
 let found=[]
 
 for(let icon in ICON_AI){
@@ -413,30 +440,6 @@ list.push({...e,start:start,end:end})
 })
 return list
 }
-
-function getIcons(text) {
-    text = text.toLowerCase();
-
-    // PRIORITEIT: vervoer overschrijft alles
-if (text.includes("rijden")) return ["auto"];
-if (text.includes("fietsen")) return ["fietsen"];
-if (text.includes("wandelen")) return ["wandelen_rugzak"];
-if (text.includes("trein")) return ["trein"];
-if (text.includes("vliegtuig")) return ["vliegtuig"];
-if (text.includes("openbaar vervoer")) return ["bus"];
-if (text.includes("bus")) return ["bus"];
-
-    const icons = [];
-
-    for (const [icon, keywords] of Object.entries(ICON_AI)) {
-        if (keywords.some(keyword => text.includes(keyword.toLowerCase()))) {
-            icons.push(icon);
-        }
-    }
-
-    return icons;
-}
-
 
 // RENDER
 function render(){
