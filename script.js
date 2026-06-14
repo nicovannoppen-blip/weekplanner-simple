@@ -375,7 +375,7 @@ if(text.includes("wandelen van") || text.includes("wandelen naar") || text.inclu
 if(text.includes("trein van") || text.includes("trein naar")){
     return ["trein"];
 }
-if(text.includes("bus van") || text.includes("bus naar")|| text.includes("openbaar vervoer van") || text.includes("openbaar vervoer naar")){
+if(text.includes("bus van") || text.includes("bus naar")|| text.includes("openbaar vervoer nemen")|| text.includes("openbaar vervoer van") || text.includes("openbaar vervoer naar")){
     return ["bus"];
 }
 if(text.includes("metro van") || text.includes("metro naar")){
