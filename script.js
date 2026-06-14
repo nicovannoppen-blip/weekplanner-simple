@@ -414,6 +414,30 @@ list.push({...e,start:start,end:end})
 return list
 }
 
+function getIcons(text) {
+    text = text.toLowerCase();
+
+    // PRIORITEIT: vervoer overschrijft alles
+if (text.includes("rijden")) return ["auto"];
+if (text.includes("fietsen")) return ["fietsen"];
+if (text.includes("wandelen")) return ["wandelen_rugzak"];
+if (text.includes("trein")) return ["trein"];
+if (text.includes("vliegtuig")) return ["vliegtuig"];
+if (text.includes("openbaar vervoer")) return ["bus"];
+if (text.includes("bus")) return ["bus"];
+
+    const icons = [];
+
+    for (const [icon, keywords] of Object.entries(ICON_AI)) {
+        if (keywords.some(keyword => text.includes(keyword.toLowerCase()))) {
+            icons.push(icon);
+        }
+    }
+
+    return icons;
+}
+
+
 // RENDER
 function render(){
     let agenda=document.getElementById("agenda")
