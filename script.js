@@ -181,6 +181,7 @@ vissen: ["vissen","aquarium"],
 vuurtoren: ["vuurtoren"],
 Hunebed: ["hunebed"],
 bunker: ["bunker","bunkers"],
+ster: ["ster"],
 orca: ["orca","orka"]  
 }
 
