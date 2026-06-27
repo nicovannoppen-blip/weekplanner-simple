@@ -182,7 +182,8 @@ vuurtoren: ["vuurtoren"],
 Hunebed: ["hunebed"],
 bunker: ["bunker","bunkers"],
 ster: ["ster","sterren"],
-orca: ["orca","orka"]  
+orca: ["orca","orka"],
+cinema: ["cinema","kinepolis","euroscoop"]
 }
 
 // LOGIN / LOGOUT
