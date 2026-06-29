@@ -183,7 +183,8 @@ Hunebed: ["hunebed"],
 bunker: ["bunker","bunkers"],
 ster: ["ster","sterren"],
 orca: ["orca","orka"],
-cinema: ["cinema","kinepolis","euroscoop"]
+cinema: ["cinema","kinepolis","euroscoop"],
+medicatie_druppels: ["druppeltjes"]
 }
 
 // LOGIN / LOGOUT
