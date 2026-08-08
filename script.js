@@ -161,7 +161,7 @@ speeltuin: ["speeltuin"],
 verkennen: ["verkennen"],
 welkomstspel: ["welkomstspel"],
 dierenspeurtocht: ["dierenspeurtocht"],
-knutselen: ["knutselen"],
+knutselen: ["knutselen", "workshop"],
 volksspelen: ["volksspelen"],
 dansen: ["dansen"],
 huifkar: ["huifkar"],
@@ -184,7 +184,10 @@ bunker: ["bunker","bunkers"],
 ster: ["ster","sterren"],
 orca: ["orca","orka"],
 cinema: ["cinema","kinepolis","euroscoop"],
-medicatie_druppels: ["druppeltjes"]
+medicatie_druppels: ["druppeltjes"],
+gezelschapsspel: ["gezelschapsspel"],
+kamp: ["kamp","bivak"],
+camper: ["camper","mobilhome"],
 }
 
 // LOGIN / LOGOUT
