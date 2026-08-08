@@ -188,6 +188,7 @@ medicatie_druppels: ["druppeltjes"],
 gezelschapsspel: ["gezelschapsspel"],
 kamp: ["kamp","bivak"],
 camper: ["camper","mobilhome"],
+fotograaf: ["fotograaf","fotoshoot","photoshoot"],
 }
 
 // LOGIN / LOGOUT
