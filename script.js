@@ -191,7 +191,7 @@ fotograaf: ["fotograaf","fotoshoot","photoshoot"],
 Sanne:["sanne"],
 koken:["koken"],
 kampvuur:["kampvuur"],
-oogarts:["oogarts"],
+oogarts:["oogarts"]
 }
 
 // LOGIN / LOGOUT
