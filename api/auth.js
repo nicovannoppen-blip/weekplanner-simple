@@ -91,7 +91,7 @@ export default async function handler(req, res) {
         response_type: "code",
         scope: "https://www.googleapis.com/auth/calendar.readonly",
         access_type: "offline",
-        prompt: "consent",
+        prompt: "select_account",
         state
     });
 
