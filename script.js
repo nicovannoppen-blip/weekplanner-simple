@@ -188,6 +188,10 @@ gezelschapsspel: ["gezelschapsspel"],
 kamp: ["kamp","bivak"],
 camper: ["camper","mobilhome"],
 fotograaf: ["fotograaf","fotoshoot","photoshoot"],
+Sanne:["sanne"],
+koken:["koken"],
+kampvuur:["kampvuur"],
+oogarts:["oogarts"],
 }
 
 // LOGIN / LOGOUT
