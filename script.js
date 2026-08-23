@@ -196,59 +196,116 @@ oogarts:["oogarts"],
 
 // LOGIN / LOGOUT
 function login(){
-const url="https://accounts.google.com/o/oauth2/v2/auth"
-
-window.location=url+"?"+new URLSearchParams(params)
+    window.location.href = "/api/auth";
 }
-const params={
-client_id:CLIENT_ID,
-redirect_uri:window.location.origin,
-response_type:"token",
-scope:"https://www.googleapis.com/auth/calendar.readonly",
-prompt:"select_account"
-}
+async function logout(){
 
-function logout(){
+    try {
+        await fetch("/api/logout");
+    } catch(e) {
+        console.error("Logout fout:", e);
+    }
 
-    // token wissen
     token = null;
+
     localStorage.removeItem("token");
 
-    // URL opschonen
-    window.history.replaceState({}, document.title, window.location.pathname);
-
-    // gewoon refreshen
     location.reload();
 }
+async function parseToken(){
+
+    try {
+
+        const response = await fetch("/api/token");
+
+        if(!response.ok){
+
+            token = null;
+
+            console.log("Niet ingelogd");
+
+            return;
+        }
+
+        const data = await response.json();
+
+        token = data.access_token;
+
+        console.log("Automatisch ingelogd");
+
+        await init();
+
+    } catch(error){
+
+        console.error("Authenticatie fout:", error);
+
+        token = null;
+    }
+}
+async function init(){
+
+    if(!token){
+        return;
+    }
+
+    await loadCalendars();
+    await loadEvents();
+    render();
+}
+//function login(){
+//const url="https://accounts.google.com/o/oauth2/v2/auth"
+
+//window.location=url+"?"+new URLSearchParams(params)
+//}
+//const params={
+//client_id:CLIENT_ID,
+//redirect_uri:window.location.origin,
+//response_type:"token",
+//scope:"https://www.googleapis.com/auth/calendar.readonly",
+//prompt:"select_account"
+//}
+
+//function logout(){
+
+    // token wissen
+    //token = null;
+    //localStorage.removeItem("token");
+
+    // URL opschonen
+  //  window.history.replaceState({}, document.title, window.location.pathname);
+
+    // gewoon refreshen
+//    location.reload();
+//}
 
 // PARSE TOKEN
-function parseToken(){
+//function parseToken(){
 
     // 🔥 eerst kijken of token al bestaat
-    token = localStorage.getItem("token")
+   // token = localStorage.getItem("token")
 
-    if(token){
-        init()
-        return
-    }
+   // if(token){
+    //    init()
+    //    return
+  //  }
 
     // anders uit URL halen
-    const hash=location.hash.substring(1)
-    const params=new URLSearchParams(hash)
-    token=params.get("access_token")
+  //  const hash=location.hash.substring(1)
+ //   const params=new URLSearchParams(hash)
+  //  token=params.get("access_token")
 
-    if(token){
-        localStorage.setItem("token", token)  // 🔥 opslaan
-        init()
+  //  if(token){
+     //   localStorage.setItem("token", token)  // 🔥 opslaan
+    //    init()
     }
-}
+//}
 
 // GOOGLE API
-async function init(){
-await loadCalendars()
-await loadEvents()
-render()
-}
+//async function init(){
+//await loadCalendars()
+//await loadEvents()
+//render()
+//}
 
 async function loadCalendars(){   
 let r=await fetch(
