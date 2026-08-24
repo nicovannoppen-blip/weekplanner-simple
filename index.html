@@ -2,7 +2,9 @@
 <html lang="nl">
 
 <head>
+
 <meta charset="UTF-8">
+
 <title>❤️Agenda Vannoppekes❤️</title>
 
 <link rel="icon" href="favicon.ico">
@@ -31,31 +33,37 @@
 
 </head>
 
+
 <body>
+
 
 <header>
 
 <button onclick="login()">🔐 login</button>
+
 <button onclick="logout()">🚪 logout</button>
 
 <button onclick="prev()">⬅ vorige</button>
+
 <button onclick="today()">📅 vandaag</button>
+
 <button onclick="next()">➡ volgende</button>
 
 <button onclick="toggleView()">🗓 dag/week</button>
 
 <button onclick="selectAll()">✅ alles</button>
+
 <button onclick="selectNone()">❌ niets</button>
 
 <button onclick="printWeek()">🖨 print week</button>
 
-<!-- Toon en lees komende 4 agendapunten -->
 <button onclick="showNextEvents()">🔊 afspraken</button>
 
-<!-- NIEUW -->
-<button onclick="makeTomorrowImage()">💬 verhaaltje</button>
+<button onclick="makeTomorrowImage()">
+    🧙‍♂️ Verhaaltje
+</button>
 
-<div id="liveClock" style="font-weight:bold; cursor:pointer;"></div>
+<div id="liveClock"></div>
 
 </header>
 
@@ -65,57 +73,176 @@
 <div id="agenda"></div>
 
 
-<!-- Overlay voor spraaktekst -->
-<div id="speechOverlay" style="display:none;"></div>
+<!-- =====================================================
+     OVERLAY VOOR SPRAAK
+     ===================================================== -->
+
+<div
+    id="speechOverlay"
+    style="display:none;"
+></div>
 
 
 <script src="config.js"></script>
+
 <script src="script.js"></script>
 
 
-<div id="popup" class="popup">
+<!-- =====================================================
+     NORMALE POPUP
+     ===================================================== -->
+
+<div
+    id="popup"
+    class="popup"
+>
 
     <div class="popupContent">
 
         <div id="popupText"></div>
 
-        <button onclick="closePopup()">OK</button>
+        <button onclick="closePopup()">
+            OK
+        </button>
 
     </div>
 
 </div>
 
 
-<!-- NIEUW: popup voor afbeelding -->
-<div id="imagePopup" class="imagePopup">
+<!-- =====================================================
+     POPUP AFBEELDING MORGEN
+     ===================================================== -->
+
+<div
+    id="imagePopup"
+    class="imagePopup"
+>
 
     <div class="imagePopupContent">
 
+
+        <!-- KNOPPEN BOVENAAN -->
+
         <div class="imagePopupButtons">
 
-            <button onclick="shareTomorrowImage()">
-                💬 naar ChatGPT
-            </button>
-            <button onclick="makeTomorrowStory()">
+            <button
+                onclick="makeTomorrowStory()"
+            >
                 🧙‍♂️ Verhaaltje maken
             </button>
-            <button onclick="downloadTomorrowImage()">
+
+
+            <button
+                onclick="downloadTomorrowImage()"
+            >
                 ⬇️ afbeelding opslaan
             </button>
 
-            <button onclick="closeImagePopup()">
+
+            <button
+                onclick="closeImagePopup()"
+            >
                 ❌ sluiten
             </button>
 
         </div>
 
-        <h2>🖼️ Dagplanning morgen</h2>
+
+        <h2>
+            🖼️ Dagplanning morgen
+        </h2>
+
 
         <div id="imageStatus">
             Afbeelding wordt gemaakt...
         </div>
 
-        <canvas id="tomorrowCanvas"></canvas>
+
+        <canvas
+            id="tomorrowCanvas"
+        ></canvas>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     POPUP VOOR PC - OPDRACHT
+     ===================================================== -->
+
+<div
+    id="storyInstructionsPopup"
+    class="storyInstructionsPopup"
+>
+
+    <div class="storyInstructionsContent">
+
+        <h2>
+            🧙‍♂️ Verhaaltje voor Odin en Niel
+        </h2>
+
+
+        <p class="storyInstructionIntro">
+
+            De afbeelding van morgen staat op het klembord
+            en het gesprek <strong>Verhaaltjes</strong>
+            wordt geopend.
+
+        </p>
+
+
+        <p>
+
+            <strong>Stap 1:</strong>
+            ga naar het gesprek Verhaaltjes.
+
+        </p>
+
+
+        <p>
+
+            <strong>Stap 2:</strong>
+            druk op <strong>Ctrl + V</strong>
+            om de afbeelding te plakken.
+
+        </p>
+
+
+        <p>
+
+            <strong>Stap 3:</strong>
+            kopieer onderstaande opdracht en plak die
+            onder de afbeelding.
+
+        </p>
+
+
+        <textarea
+            id="storyPromptText"
+            readonly
+        ></textarea>
+
+
+        <div class="storyInstructionButtons">
+
+            <button
+                onclick="copyStoryPrompt()"
+            >
+                📋 opdracht kopiëren
+            </button>
+
+
+            <button
+                onclick="closeStoryInstructions()"
+            >
+                ✅ klaar
+            </button>
+
+        </div>
+
 
     </div>
 
