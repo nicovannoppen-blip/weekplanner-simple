@@ -1,4 +1,3 @@
-```javascript
 import crypto from "crypto";
 
 export default async function handler(req, res) {
@@ -12,42 +11,40 @@ export default async function handler(req, res) {
         });
     }
 
-    const redirectUri =
-        `${req.headers["x-forwarded-proto"] || "https"}://${req.headers.host}/api/auth`;
+    const protocol = req.headers["x-forwarded-proto"] || "https";
+    const host = req.headers.host;
+    const redirectUri = protocol + "://" + host + "/api/auth";
 
     const cookies = parseCookies(req);
 
-    // =========================
-    // CALLBACK VAN GOOGLE
-    // =========================
+    // ==========================================
+    // GOOGLE CALLBACK
+    // ==========================================
 
     if (req.query.code) {
 
         const code = req.query.code;
 
-        // -------------------------
-        // State controleren
-        // -------------------------
-
+        // OAuth state controleren
         const savedState = cookies.oauth_state;
 
         if (!savedState || savedState !== req.query.state) {
             return res.status(400).send("Ongeldige OAuth state.");
         }
 
-        // -------------------------
-        // Code omwisselen voor tokens
-        // -------------------------
-
+        // Code omwisselen voor Google tokens
         const tokenResponse = await fetch(
             "https://oauth2.googleapis.com/token",
             {
                 method: "POST",
+
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
                 },
+
                 body: new URLSearchParams({
-                    code,
+                    code: code,
                     client_id: clientId,
                     client_secret: clientSecret,
                     redirect_uri: redirectUri,
@@ -60,86 +57,104 @@ export default async function handler(req, res) {
 
         if (!tokenResponse.ok) {
 
-            console.error("Google token fout:", tokens);
+            console.error(
+                "Google token fout:",
+                tokens
+            );
 
             return res.status(500).send(
                 "Google kon de login niet voltooien."
             );
         }
 
-        // =====================================================
-        // BELANGRIJK:
-        // Google geeft niet altijd opnieuw een refresh_token.
-        //
-        // Als er al een bestaande refresh token is,
-        // behouden we die.
-        // =====================================================
+        console.log(
+            "Google token antwoord:",
+            {
+                access_token: !!tokens.access_token,
+                refresh_token: !!tokens.refresh_token,
+                expires_in: tokens.expires_in
+            }
+        );
+
+        // ==========================================
+        // REFRESH TOKEN
+        // ==========================================
 
         let refreshToken = tokens.refresh_token;
 
+        // Google geeft soms geen nieuwe refresh token.
+        // Als er al één bestaat in de cookie, behouden we die.
         if (!refreshToken && cookies.refresh_token) {
             refreshToken = cookies.refresh_token;
+
+            console.log(
+                "Bestaande refresh token behouden."
+            );
         }
 
+        // Als er helemaal geen refresh token beschikbaar is,
+        // kunnen we de agenda niet langdurig blijven gebruiken.
         if (!refreshToken) {
 
             console.error(
-                "Google gaf geen refresh token en er is geen bestaande refresh token."
+                "Geen refresh token ontvangen en geen bestaande refresh token beschikbaar."
             );
 
             return res.status(500).send(
-                "Google gaf geen refresh token terug. Meld de app eventueel opnieuw aan via Google."
+                "Google gaf geen refresh token terug. De Google-autorisatie moet één keer opnieuw worden verleend."
             );
         }
 
-        // =========================
-        // COOKIES INSTELLEN
-        // =========================
+        // ==========================================
+        // LOGIN COOKIE INSTELLEN
+        // ==========================================
 
-        const secure = process.env.NODE_ENV === "production"
-            ? " Secure;"
-            : "";
+        const secure =
+            process.env.NODE_ENV === "production"
+                ? " Secure;"
+                : "";
 
-        const cookieHeaders = [
+        const refreshCookie =
+            "refresh_token=" +
+            encodeURIComponent(refreshToken) +
+            "; HttpOnly; Path=/; SameSite=Lax;" +
+            secure;
 
-            // Refresh token bewaren
-            `refresh_token=${encodeURIComponent(refreshToken)}; HttpOnly; Path=/; SameSite=Lax;${secure}`,
+        const stateCookie =
+            "oauth_state=; Max-Age=0; Path=/; SameSite=Lax;" +
+            secure;
 
-            // OAuth state verwijderen
-            `oauth_state=; Max-Age=0; Path=/; SameSite=Lax;${secure}`,
-
-            // Eventuele lokale logout-status verwijderen
-            `logged_out=; Max-Age=0; Path=/; SameSite=Lax;${secure}`
-        ];
-
-        res.setHeader("Set-Cookie", cookieHeaders);
-
-        console.log(
-            tokens.refresh_token
-                ? "Nieuwe Google refresh token ontvangen."
-                : "Bestaande Google refresh token behouden."
+        res.setHeader(
+            "Set-Cookie",
+            [
+                refreshCookie,
+                stateCookie
+            ]
         );
 
         return res.redirect("/");
     }
 
-    // =========================
+    // ==========================================
     // START LOGIN
-    // =========================
+    // ==========================================
 
     const state = crypto.randomUUID();
 
-    const secure = process.env.NODE_ENV === "production"
-        ? " Secure;"
-        : "";
+    const secure =
+        process.env.NODE_ENV === "production"
+            ? " Secure;"
+            : "";
 
-    // Bij opnieuw inloggen mag de lokale logout-status verdwijnen.
+    const stateCookie =
+        "oauth_state=" +
+        state +
+        "; HttpOnly; Max-Age=600; Path=/; SameSite=Lax;" +
+        secure;
+
     res.setHeader(
         "Set-Cookie",
-        [
-            `oauth_state=${state}; HttpOnly; Max-Age=600; Path=/; SameSite=Lax;${secure}`,
-            `logged_out=; Max-Age=0; Path=/; SameSite=Lax;${secure}`
-        ]
+        stateCookie
     );
 
     const params = new URLSearchParams({
@@ -153,14 +168,13 @@ export default async function handler(req, res) {
         scope:
             "https://www.googleapis.com/auth/calendar.readonly",
 
-        // Wij willen een refresh token kunnen gebruiken
-        // wanneer de gebruiker niet aanwezig is.
         access_type: "offline",
 
-        // Google toont opnieuw toestemming wanneer nodig.
+        // Google moet opnieuw toestemming vragen.
+        // Dit is belangrijk om een refresh token te kunnen verkrijgen.
         prompt: "consent",
 
-        state
+        state: state
     });
 
     const googleUrl =
@@ -171,9 +185,9 @@ export default async function handler(req, res) {
 }
 
 
-// =========================
+// ==========================================
 // COOKIE PARSER
-// =========================
+// ==========================================
 
 function parseCookies(req) {
 
@@ -181,18 +195,23 @@ function parseCookies(req) {
 
     const cookies = {};
 
-    header.split(";").forEach(cookie => {
+    header.split(";").forEach(function(cookie) {
 
         const index = cookie.indexOf("=");
 
-        if (index === -1) return;
+        if (index === -1) {
+            return;
+        }
 
-        const key = cookie.substring(0, index).trim();
-        const value = cookie.substring(index + 1).trim();
+        const key =
+            cookie.substring(0, index).trim();
 
-        cookies[key] = decodeURIComponent(value);
+        const value =
+            cookie.substring(index + 1).trim();
+
+        cookies[key] =
+            decodeURIComponent(value);
     });
 
     return cookies;
 }
-```
