@@ -1,0 +1,534 @@
+export default async function handler(req, res) {
+
+    // =====================================================
+    // ALLEEN POST
+    // =====================================================
+
+    if (req.method !== "POST") {
+
+        return res.status(405).json({
+            error: "Alleen POST is toegestaan."
+        });
+
+    }
+
+
+    // =====================================================
+    // API KEY
+    // =====================================================
+
+    const apiKey =
+        process.env.OPENAI_API_KEY;
+
+
+    if (!apiKey) {
+
+        console.error(
+            "OPENAI_API_KEY ontbreekt."
+        );
+
+        return res.status(500).json({
+
+            error:
+                "De OpenAI API-key is niet ingesteld op de server."
+
+        });
+
+    }
+
+
+    // =====================================================
+    // INPUT
+    // =====================================================
+
+    const body =
+        req.body || {};
+
+
+    const agenda =
+        typeof body.agenda === "string"
+            ? body.agenda.trim()
+            : "";
+
+
+    const previousStory =
+        typeof body.previousStory === "string"
+            ? body.previousStory.trim()
+            : "";
+
+
+    const date =
+        typeof body.date === "string"
+            ? body.date
+            : "";
+
+
+    if (!agenda) {
+
+        return res.status(400).json({
+
+            error:
+                "Er zijn geen agenda-afspraken ontvangen."
+
+        });
+
+    }
+
+
+    // =====================================================
+    // VORIG VERHAAL
+    // =====================================================
+
+    let continuityText="";
+
+
+    if(previousStory){
+
+        continuityText=`
+
+HIERONDER STAAT HET EINDE VAN HET VORIGE VERHAAL.
+
+Gebruik dit uitsluitend om de sfeer,
+personages en eventuele lopende kleine verhaallijnen
+te herkennen.
+
+Kopieer het vorige verhaal NIET.
+
+Herhaal geen grote stukken tekst.
+
+Vervolg het verhaal alsof Odin en Niel
+dezelfde wereld en dezelfde vrienden blijven kennen.
+
+--- VORIG VERHAAL ---
+
+${previousStory}
+
+--- EINDE VORIG VERHAAL ---
+
+`;
+
+    }else{
+
+        continuityText=`
+
+Dit is het eerste verhaal dat met deze nieuwe functie
+wordt gemaakt.
+
+Introduceer de wereld van Odin en Niel rustig,
+alsof dit het eerste hoofdstuk van een lange
+reeks nachtelijke avonturen is.
+
+`;
+
+    }
+
+
+    // =====================================================
+    // SYSTEEMPROMPT / INSTRUCTIES
+    // =====================================================
+
+    const instructions=`
+
+Je bent een ervaren Nederlandse kinderboekenschrijver
+die gespecialiseerd is in rustige verhalen voor het slapengaan.
+
+Je schrijft verhalen voor twee kinderen:
+
+KABOUTER ODIN
+KABOUTER NIEL
+
+Zij zijn de hoofdpersonen van een doorlopende reeks.
+
+VASTE VRIENDEN:
+
+- een vriendelijke schildpad
+- een wijze uil
+- een nieuwsgierig egeltje
+
+Deze dieren mogen regelmatig terugkomen wanneer dat
+natuurlijk past bij het verhaal.
+
+DE WERELD:
+
+Odin en Niel wonen in een warme, veilige fantasiewereld
+met een kabouterhuisje, bos, paadjes, bomen, kleine dieren,
+een rustige tuin en andere herkenbare plaatsen.
+
+De wereld mag verder groeien.
+
+Gebruik terugkerende plaatsen en personages zodat het
+voor kinderen voelt alsof ze terugkeren naar een vertrouwde wereld.
+
+BELANGRIJK:
+
+De agenda is GEEN lijst die moet worden voorgelezen.
+
+De afspraken van morgen zijn inspiratie voor het avontuur.
+
+Als er bijvoorbeeld staat:
+
+"zwemmen"
+
+dan mogen Odin en Niel op avontuur gaan bij een
+glinsterend meer.
+
+Als er staat:
+
+"school"
+
+dan kan er bijvoorbeeld een brief van de bosmeester
+of een bijzondere opdracht zijn.
+
+Als er staat:
+
+"winkel"
+
+dan kunnen ze naar het kleine kabouterwinkeltje.
+
+Als er staat:
+
+"binnenspeeltuin"
+
+dan kan een magische speelhal onderdeel zijn van het avontuur.
+
+Gebruik de concrete activiteit dus als onderdeel van het verhaal,
+maar zeg NIET:
+
+"Om 14 uur gaan Odin en Niel naar de binnenspeeltuin."
+
+Het moet voelen als een echt avontuur.
+
+DE PLANNING MOET WEL HERKENBAAR BLIJVEN.
+
+Een kind dat morgen weet wat er gaat gebeuren,
+moet na het luisteren kunnen denken:
+
+"Dat gaat morgen gebeuren!"
+
+VERWERK DE AFSPRAKEN IN CHRONOLOGISCHE VOLGORDE.
+
+Als er meerdere afspraken zijn,
+laat het verhaal op natuurlijke wijze van de ene activiteit
+naar de volgende bewegen.
+
+DAGSTRUCTUUR:
+
+Gebruik waar mogelijk een rustige overgang:
+
+ochtend → activiteit → middag → volgende activiteit → avond → slapen.
+
+Laat niet iedere agenda-afspraak een apart hoofdstuk worden.
+
+Combineer activiteiten wanneer dat mooier leest.
+
+STIJL:
+
+- warm
+- rustig
+- veilig
+- liefdevol
+- fantasierijk
+- licht grappig
+- voorspelbaar
+- geschikt voor kinderen
+- geschikt om vlak voor het slapen te lezen
+
+VERMIJD:
+
+- geweld
+- monsters die echt gevaarlijk zijn
+- nachtmerries
+- dood
+- verdriet dat lang blijft duren
+- enge spanning
+- harde conflicten
+- gevaarlijke situaties
+- schrikmomenten
+- cliffhangers die kinderen wakker houden
+
+Als er in een agenda-afspraak iets voorkomt dat
+mogelijk spannend is, maak daar een veilige,
+vriendelijke versie van.
+
+DE SCHILDPAD:
+
+De schildpad is langzaam, rustig en wijs.
+Hij zegt soms iets grappigs omdat hij alles op zijn eigen tempo doet.
+
+DE UIL:
+
+De uil is rustig en wijs.
+Hij kan vanuit een boom meekijken en Odin en Niel helpen.
+
+HET EGELTJE:
+
+Het egeltje is nieuwsgierig en soms een beetje ondeugend.
+Hij kan kleine grappige momenten veroorzaken.
+
+ODIN EN NIEL:
+
+Laat Odin en Niel samen problemen oplossen.
+
+Laat ze elkaar helpen.
+
+Geef beide kabouters een actieve rol.
+
+Maak de personages warm en herkenbaar.
+
+TAAL:
+
+Schrijf in natuurlijk Vlaams/Nederlands.
+
+Gebruik geen moeilijke woorden als een eenvoudig woord
+hetzelfde betekent.
+
+Gebruik dialogen.
+
+Gebruik zintuiglijke beschrijvingen:
+
+zachte wind,
+warme dekens,
+ruisende bladeren,
+kleine voetstapjes,
+maanlicht,
+sterren,
+geur van gras,
+etc.
+
+Maar overdrijf niet.
+
+LENGTE:
+
+Het verhaal moet ongeveer 8 tot 10 minuten duren
+wanneer het rustig wordt voorgelezen.
+
+Schrijf ongeveer 1100 tot 1400 woorden.
+
+Maak het verhaal volledig af.
+
+Het einde moet rustig zijn.
+
+Aan het einde gaan Odin en Niel slapen.
+
+Laat de laatste alinea bijzonder kalm zijn.
+
+Bijvoorbeeld met maanlicht,
+sterren,
+een zacht briesje,
+de schildpad die slaapt,
+het egeltje dat zich oprolt
+of de uil die zachtjes over het bos waakt.
+
+GEEN:
+
+"Wordt vervolgd!"
+
+Geen spannende cliffhanger.
+
+Het verhaal mag wel de indruk geven
+dat er morgen opnieuw een klein avontuur kan zijn.
+
+TITEL:
+
+Geef eerst een korte mooie titel.
+
+Daarna het verhaal.
+
+Gebruik geen markdown-koppen met #.
+
+Gebruik gewoon:
+
+Titel
+
+Verhaal...
+
+`;
+
+
+
+    // =====================================================
+    // USER PROMPT
+    // =====================================================
+
+    const input=`
+
+Schrijf nu het slaapverhaal voor morgen.
+
+Datum:
+${date}
+
+De agenda van morgen:
+
+${agenda}
+
+${continuityText}
+
+Maak van deze agenda een warm,
+rustig en fantasierijk avontuur
+van Odin en Niel.
+
+De gebeurtenissen moeten in dezelfde volgorde
+als de agenda terugkomen,
+maar nooit als een letterlijke agenda.
+
+Begin rustig.
+
+Laat het avontuur langzaam groeien.
+
+Laat de vaste vrienden verschijnen wanneer dat past.
+
+Eindig zeer rustig zodat kinderen daarna
+gemakkelijk kunnen gaan slapen.
+
+`;
+
+
+
+    // =====================================================
+    // OPENAI RESPONSES API
+    // =====================================================
+
+    try {
+
+        const response =
+            await fetch(
+                "https://api.openai.com/v1/responses",
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            `Bearer ${apiKey}`
+                    },
+
+                    body:JSON.stringify({
+
+                        model:"gpt-5.6-luna",
+
+                        instructions:
+                            instructions,
+
+                        input:
+                            input,
+
+                        max_output_tokens:
+                            5000
+
+                    })
+
+                }
+            );
+
+
+        const data=
+            await response.json();
+
+
+        if(!response.ok){
+
+            console.error(
+                "OpenAI API fout:",
+                data
+            );
+
+
+            return res.status(
+                response.status
+            ).json({
+
+                error:
+                    data?.error?.message ||
+                    "OpenAI kon geen verhaal maken."
+
+            });
+
+        }
+
+
+        // =================================================
+        // OUTPUT TEXT
+        // =================================================
+
+        let story=
+            data.output_text || "";
+
+
+        // Extra fallback voor het geval output_text
+        // niet rechtstreeks aanwezig is.
+        if(!story){
+
+            try{
+
+                story=
+                    data.output
+                        ?.filter(
+                            item=>
+                                item.type==="message"
+                        )
+                        ?.flatMap(
+                            item=>
+                                item.content || []
+                        )
+                        ?.filter(
+                            content=>
+                                content.type==="output_text"
+                        )
+                        ?.map(
+                            content=>
+                                content.text
+                        )
+                        ?.join("\n\n") || "";
+
+            }catch(e){
+
+                console.error(
+                    "Output parsing fout:",
+                    e
+                );
+
+            }
+
+        }
+
+
+        if(!story){
+
+            return res.status(500).json({
+
+                error:
+                    "OpenAI heeft geen tekst teruggestuurd."
+
+            });
+
+        }
+
+
+        return res.status(200).json({
+
+            story:story.trim()
+
+        });
+
+
+    }catch(error){
+
+        console.error(
+            "OpenAI verbinding mislukt:",
+            error
+        );
+
+
+        return res.status(500).json({
+
+            error:
+                "Er kon geen verbinding worden gemaakt met de OpenAI API."
+
+        });
+
+    }
+
+}
