@@ -672,20 +672,19 @@ font-size:18px;
 
 
 .imagePopupButtons button{
-
     background:#4285F4;
-
     color:white;
-
     min-width:180px;
+}
 
+
+.imagePopupButtons button:first-child{
+    background:#34A853;
 }
 
 
 .imagePopupButtons button:last-child{
-
     background:#777;
-
 }
 
 
