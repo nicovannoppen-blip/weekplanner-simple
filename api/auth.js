@@ -1,3 +1,4 @@
+```javascript
 import crypto from "crypto";
 
 export default async function handler(req, res) {
@@ -14,21 +15,29 @@ export default async function handler(req, res) {
     const redirectUri =
         `${req.headers["x-forwarded-proto"] || "https"}://${req.headers.host}/api/auth`;
 
+    const cookies = parseCookies(req);
+
     // =========================
-    // CALLBACK
+    // CALLBACK VAN GOOGLE
     // =========================
 
     if (req.query.code) {
 
         const code = req.query.code;
 
+        // -------------------------
         // State controleren
-        const cookies = parseCookies(req);
+        // -------------------------
+
         const savedState = cookies.oauth_state;
 
         if (!savedState || savedState !== req.query.state) {
             return res.status(400).send("Ongeldige OAuth state.");
         }
+
+        // -------------------------
+        // Code omwisselen voor tokens
+        // -------------------------
 
         const tokenResponse = await fetch(
             "https://oauth2.googleapis.com/token",
@@ -49,24 +58,67 @@ export default async function handler(req, res) {
 
         const tokens = await tokenResponse.json();
 
-        if (!tokenResponse.ok || !tokens.refresh_token) {
+        if (!tokenResponse.ok) {
 
-            console.error(tokens);
+            console.error("Google token fout:", tokens);
 
             return res.status(500).send(
-                "Google gaf geen refresh token terug. Controleer de OAuth instellingen."
+                "Google kon de login niet voltooien."
             );
         }
 
-        // Refresh token veilig bewaren in httpOnly cookie
+        // =====================================================
+        // BELANGRIJK:
+        // Google geeft niet altijd opnieuw een refresh_token.
+        //
+        // Als er al een bestaande refresh token is,
+        // behouden we die.
+        // =====================================================
+
+        let refreshToken = tokens.refresh_token;
+
+        if (!refreshToken && cookies.refresh_token) {
+            refreshToken = cookies.refresh_token;
+        }
+
+        if (!refreshToken) {
+
+            console.error(
+                "Google gaf geen refresh token en er is geen bestaande refresh token."
+            );
+
+            return res.status(500).send(
+                "Google gaf geen refresh token terug. Meld de app eventueel opnieuw aan via Google."
+            );
+        }
+
+        // =========================
+        // COOKIES INSTELLEN
+        // =========================
+
         const secure = process.env.NODE_ENV === "production"
             ? " Secure;"
             : "";
 
-        res.setHeader("Set-Cookie", [
-            `refresh_token=${encodeURIComponent(tokens.refresh_token)}; HttpOnly; Path=/; SameSite=Lax;${secure}`,
-            `oauth_state=; Max-Age=0; Path=/; SameSite=Lax;${secure}`
-        ]);
+        const cookieHeaders = [
+
+            // Refresh token bewaren
+            `refresh_token=${encodeURIComponent(refreshToken)}; HttpOnly; Path=/; SameSite=Lax;${secure}`,
+
+            // OAuth state verwijderen
+            `oauth_state=; Max-Age=0; Path=/; SameSite=Lax;${secure}`,
+
+            // Eventuele lokale logout-status verwijderen
+            `logged_out=; Max-Age=0; Path=/; SameSite=Lax;${secure}`
+        ];
+
+        res.setHeader("Set-Cookie", cookieHeaders);
+
+        console.log(
+            tokens.refresh_token
+                ? "Nieuwe Google refresh token ontvangen."
+                : "Bestaande Google refresh token behouden."
+        );
 
         return res.redirect("/");
     }
@@ -81,17 +133,33 @@ export default async function handler(req, res) {
         ? " Secure;"
         : "";
 
-    res.setHeader("Set-Cookie",
-        `oauth_state=${state}; HttpOnly; Max-Age=600; Path=/; SameSite=Lax;${secure}`
+    // Bij opnieuw inloggen mag de lokale logout-status verdwijnen.
+    res.setHeader(
+        "Set-Cookie",
+        [
+            `oauth_state=${state}; HttpOnly; Max-Age=600; Path=/; SameSite=Lax;${secure}`,
+            `logged_out=; Max-Age=0; Path=/; SameSite=Lax;${secure}`
+        ]
     );
 
     const params = new URLSearchParams({
+
         client_id: clientId,
+
         redirect_uri: redirectUri,
+
         response_type: "code",
-        scope: "https://www.googleapis.com/auth/calendar.readonly",
+
+        scope:
+            "https://www.googleapis.com/auth/calendar.readonly",
+
+        // Wij willen een refresh token kunnen gebruiken
+        // wanneer de gebruiker niet aanwezig is.
         access_type: "offline",
-        prompt: "select_account",
+
+        // Google toont opnieuw toestemming wanneer nodig.
+        prompt: "consent",
+
         state
     });
 
@@ -127,3 +195,4 @@ function parseCookies(req) {
 
     return cookies;
 }
+```
