@@ -1,28 +1,13 @@
-```javascript
 export default function handler(req, res) {
 
-    const secure = process.env.NODE_ENV === "production"
-        ? " Secure;"
-        : "";
-
-    // =====================================================
-    // BELANGRIJK:
+    // We verwijderen bewust NIET de refresh_token.
     //
-    // We verwijderen de refresh_token NIET.
+    // Google geeft bij een volgende login niet gegarandeerd
+    // opnieuw een refresh token.
     //
-    // Google geeft bij een volgende OAuth-login namelijk
-    // niet gegarandeerd opnieuw een refresh token.
-    //
-    // We markeren de gebruiker lokaal als uitgelogd.
-    // =====================================================
-
-    res.setHeader(
-        "Set-Cookie",
-        `logged_out=true; Max-Age=31536000; Path=/; SameSite=Lax;${secure}`
-    );
+    // De bestaande refresh token moet daarom behouden blijven.
 
     return res.status(200).json({
         success: true
     });
 }
-```
