@@ -1,23 +1,6 @@
-```javascript
 export default async function handler(req, res) {
 
     const cookies = parseCookies(req);
-
-    // =====================================================
-    // Als de gebruiker bewust heeft uitgelogd:
-    // geen automatisch opnieuw inloggen.
-    // =====================================================
-
-    if (cookies.logged_out === "true") {
-
-        return res.status(401).json({
-            error: "logged_out"
-        });
-    }
-
-    // =========================
-    // Refresh token ophalen
-    // =========================
 
     const refreshToken = cookies.refresh_token;
 
@@ -28,12 +11,11 @@ export default async function handler(req, res) {
         });
     }
 
-    // =========================
-    // Google instellingen
-    // =========================
+    const clientId =
+        process.env.GOOGLE_CLIENT_ID;
 
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const clientSecret =
+        process.env.GOOGLE_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
 
@@ -42,9 +24,9 @@ export default async function handler(req, res) {
         });
     }
 
-    // =========================
-    // Nieuw access token ophalen
-    // =========================
+    // ==========================================
+    // NIEUW ACCESS TOKEN OPHALEN
+    // ==========================================
 
     const response = await fetch(
         "https://oauth2.googleapis.com/token",
@@ -71,72 +53,55 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // =========================
-    // Google fout
-    // =========================
-
     if (!response.ok) {
 
         console.error(
-            "Google refresh token fout:",
+            "Google refresh fout:",
             data
         );
-
-        // Als Google zegt dat de refresh token ongeldig
-        // of ingetrokken is, is opnieuw aanmelden nodig.
 
         return res.status(401).json({
             error: "refresh_failed"
         });
     }
 
-    // =====================================================
-    // Google kan eventueel een nieuwe refresh token
-    // terugsturen. Als dat gebeurt, bewaren we die.
-    // =====================================================
-
-    if (data.refresh_token) {
-
-        const secure = process.env.NODE_ENV === "production"
-            ? " Secure;"
-            : "";
-
-        res.setHeader(
-            "Set-Cookie",
-            `refresh_token=${encodeURIComponent(data.refresh_token)}; HttpOnly; Path=/; SameSite=Lax;${secure}`
-        );
-    }
-
-    // =========================
-    // Access token teruggeven
-    // =========================
+    // ==========================================
+    // ACCESS TOKEN TERUGSTUREN
+    // ==========================================
 
     return res.status(200).json({
 
-        access_token: data.access_token,
+        access_token:
+            data.access_token,
 
-        expires_in: data.expires_in
+        expires_in:
+            data.expires_in
     });
 }
 
 
-// =========================
+// ==========================================
 // COOKIE PARSER
-// =========================
+// ==========================================
 
 function parseCookies(req) {
 
-    const header = req.headers.cookie || "";
+    const header =
+        req.headers.cookie || "";
 
     const cookies = {};
 
-    header.split(";").forEach(cookie => {
+    header.split(";").forEach(function(cookie) {
 
-        const index = cookie.indexOf("=");
+        const index =
+            cookie.indexOf("=");
 
-        if (index === -1) return;
+        if (index === -1) {
+            return;
+        }
 
-        const key = cookie.substring(0, index).trim();
+        const key =
+            cookie.substring(0, index).trim();
 
         const value =
             cookie.substring(index + 1).trim();
@@ -147,4 +112,3 @@ function parseCookies(req) {
 
     return cookies;
 }
-```
