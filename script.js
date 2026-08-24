@@ -6,34 +6,19 @@ let dayMode=false
 let bigIcons=false
 
 
-// =========================================================
-// HERNOEM LANGE KALENDER NAMEN
-// =========================================================
-
+// Hernoem lange kalender namen
 function rename(name){
-
-    if(
-        name.toLowerCase().includes("belgie feestdagen") ||
-        name.toLowerCase().includes("schoolvakanties") ||
-        name.toLowerCase().includes("www.feestdagen-belgie.be") ||
-        name.toLowerCase().includes("feestdagen in belgië")
-    ){
-
+    if(name.toLowerCase().includes("belgie feestdagen") || name.toLowerCase().includes("schoolvakanties") || name.toLowerCase().includes("www.feestdagen-belgie.be")
+       || name.toLowerCase().includes("feestdagen in belgië") ){
         return "Feestdagen";
-
     }
 
     return name;
-
 }
 
 
-// =========================================================
-// VOLGORDE FILTER
-// =========================================================
-
+// volgorde filter
 const CALENDAR_ORDER=[
-
 "Gezin",
 "Nico",
 "Elke",
@@ -42,18 +27,14 @@ const CALENDAR_ORDER=[
 "Rifter",
 "Rita",
 "Feestdagen"
-
 ]
 
 
-// =========================================================
 // SMART PICTO AI
-// =========================================================
-
 const ICON_AI={
 
 school:["school","klas","les"],
-thuis:["thuis","huis"],
+thuis:["thuis","huis"],    
 kunstschool:["beeldatelier"],
 bus:["bus"],
 zwemmen:["zwem","zwembad","zwemmen","plopsaqua"],
@@ -161,58 +142,58 @@ steffifamilie:["steffie","steffi"],
 Koen:["koen","koentje"],
 Bhodi:["bhodi","bodi","bohdi"],
 concert:["concert","festival","optreden"],
-inpakken:["inpakken"],
-opzetten_tent:["opzetten"],
+inpakken:["inpakken"],   
+opzetten_tent:["opzetten"],   
 safari:["safari","safaripark"],
-zeehond:["zeehond"],
-reptiel:["reptiel","reptielen"],
-dierenwinkel:["dierenwinkel","schoubben"],
+zeehond:["zeehond"],   
+reptiel:["reptiel","reptielen"], 
+dierenwinkel:["dierenwinkel","schoubben"],  
 gezin:["gezin"],
 Johnny:["johnny","papa"],
 verhuizen:["verhuizen","tent opruimen"],
-tattoo:["tattoo","tatoo","tatoe"],
-luchtballon:["luchtballon","ballonvaart"],
-schoolreis:["schoolreis"],
-sauna:["sauna","welness"],
-geit:["geit"],
-geit_eten_geven:["geit eten geven","geit_voederen"],
-kameel:["kameel","kamelen"],
-OmieEnOpie:["omie en opie","opie en omie"],
-paard_rijden:["paard rijden","ponyrijden"],
-pony:["pony"],
-binnenspeeltuin:["binnenspeeltuin"],
-speeltuin:["speeltuin"],
-verkennen:["verkennen"],
-welkomstspel:["welkomstspel"],
-dierenspeurtocht:["dierenspeurtocht"],
-knutselen:["knutselen","workshop"],
-volksspelen:["volksspelen"],
-dansen:["dansen"],
-huifkar:["huifkar"],
-pannenkoek:["pannenkoek","pannenkoeken"],
-efteling:["efteling"],
-boerenontbijt:["boerenontbijt"],
-bowlen:["bowlen"],
-golf:["golf"],
-etensamen:["samen eten","eten samen"],
-dolfinarium:["dolfinarium"],
-winkelcentrum:["winkelcentrum"],
-markt:["markt"],
-toonmoment:["toonmoment"],
-parking:["parking"],
-wekker:["wekker"],
-vissen:["vissen","aquarium"],
-vuurtoren:["vuurtoren"],
-Hunebed:["hunebed"],
-bunker:["bunker","bunkers"],
-ster:["ster","sterren"],
-orca:["orca","orka"],
-cinema:["cinema","kinepolis","euroscoop"],
-medicatie_druppels:["druppeltjes"],
-gezelschapsspel:["gezelschapsspel"],
-kamp:["kamp","bivak"],
-camper:["camper","mobilhome"],
-fotograaf:["fotograaf","fotoshoot","photoshoot"],
+tattoo: ["tattoo","tatoo","tatoe"],
+luchtballon: ["luchtballon","ballonvaart"],
+schoolreis: ["schoolreis"],
+sauna: ["sauna", "welness"],
+geit: ["geit"],
+geit_eten_geven: ["geit eten geven","geit_voederen"],
+kameel: ["kameel", "kamelen"],
+OmieEnOpie: ["omie en opie","opie en omie"],
+paard_rijden: ["paard rijden","ponyrijden"],
+pony: ["pony"],
+binnenspeeltuin: ["binnenspeeltuin"],
+speeltuin: ["speeltuin"],
+verkennen: ["verkennen"],
+welkomstspel: ["welkomstspel"],
+dierenspeurtocht: ["dierenspeurtocht"],
+knutselen: ["knutselen", "workshop"],
+volksspelen: ["volksspelen"],
+dansen: ["dansen"],
+huifkar: ["huifkar"],
+pannenkoek: ["pannenkoek","pannenkoeken"],
+efteling: ["efteling"],
+boerenontbijt: ["boerenontbijt"],
+bowlen: ["bowlen"],
+golf: ["golf"],
+etensamen: ["samen eten", "eten samen"],
+dolfinarium: ["dolfinarium"],
+winkelcentrum: ["winkelcentrum"],
+markt: ["markt"],
+toonmoment: ["toonmoment"],
+parking: ["parking"],
+wekker: ["wekker"],
+vissen: ["vissen","aquarium"],
+vuurtoren: ["vuurtoren"],
+Hunebed: ["hunebed"],
+bunker: ["bunker","bunkers"],
+ster: ["ster","sterren"],
+orca: ["orca","orka"],
+cinema: ["cinema","kinepolis","euroscoop"],
+medicatie_druppels: ["druppeltjes"],
+gezelschapsspel: ["gezelschapsspel"],
+kamp: ["kamp","bivak"],
+camper: ["camper","mobilhome"],
+fotograaf: ["fotograaf","fotoshoot","photoshoot"],
 sanne:["sanne"],
 koken:["koken"],
 kampvuur:["kampvuur"],
@@ -227,24 +208,24 @@ oogarts:["oogarts"]
 
 function login(){
 
-    window.location.href="/api/auth";
+    window.location.href = "/api/auth";
 
 }
 
 
 async function logout(){
 
-    try{
+    try {
 
         await fetch("/api/logout");
 
-    }catch(e){
+    } catch(e) {
 
-        console.error("Logout fout:",e);
+        console.error("Logout fout:", e);
 
     }
 
-    token=null;
+    token = null;
 
     localStorage.removeItem("token");
 
@@ -255,13 +236,13 @@ async function logout(){
 
 async function parseToken(){
 
-    try{
+    try {
 
-        const response=await fetch("/api/token");
+        const response = await fetch("/api/token");
 
         if(!response.ok){
 
-            token=null;
+            token = null;
 
             console.log("Niet ingelogd");
 
@@ -269,19 +250,19 @@ async function parseToken(){
 
         }
 
-        const data=await response.json();
+        const data = await response.json();
 
-        token=data.access_token;
+        token = data.access_token;
 
         console.log("Automatisch ingelogd");
 
         await init();
 
-    }catch(error){
+    } catch(error){
 
-        console.error("Authenticatie fout:",error);
+        console.error("Authenticatie fout:", error);
 
-        token=null;
+        token = null;
 
     }
 
@@ -291,9 +272,7 @@ async function parseToken(){
 async function init(){
 
     if(!token){
-
         return;
-
     }
 
     await loadCalendars();
@@ -309,7 +288,7 @@ async function init(){
 // GOOGLE CALENDAR
 // =========================================================
 
-async function loadCalendars(){
+async function loadCalendars(){   
 
     let r=await fetch(
         "https://www.googleapis.com/calendar/v3/users/me/calendarList",
@@ -323,7 +302,16 @@ async function loadCalendars(){
     let data=await r.json();
 
 
-    console.log(data.items.map(c=>c.summary));
+    if(!data.items){
+
+        console.error("Kalenders konden niet geladen worden:",data);
+
+        return;
+
+    }
+
+
+    console.log(data.items.map(c => c.summary));
 
 
     calendars=data.items
@@ -412,9 +400,7 @@ function getContrastColor(hex){
     let rgb=parseInt(c,16);
 
     let r=(rgb>>16)&0xff;
-
     let g=(rgb>>8)&0xff;
-
     let b=(rgb>>0)&0xff;
 
 
@@ -517,9 +503,7 @@ function activeCalendars(){
     let list=[];
 
 
-    document
-    .querySelectorAll(".filterBtn.active")
-    .forEach(b=>{
+    document.querySelectorAll(".filterBtn.active").forEach(b=>{
 
         list.push(b.dataset.id);
 
@@ -540,13 +524,13 @@ function iconsForEvent(e){
     let text=(e.title).toLowerCase();
 
 
+    // Vervoer heeft prioriteit
+
     if(
         text.includes("rijden van") ||
         text.includes("rijden naar")
     ){
-
         return ["auto"];
-
     }
 
 
@@ -554,9 +538,7 @@ function iconsForEvent(e){
         text.includes("fietsen van") ||
         text.includes("fietsen naar")
     ){
-
         return ["fietsen"];
-
     }
 
 
@@ -566,9 +548,7 @@ function iconsForEvent(e){
         text.includes("lopen van") ||
         text.includes("lopen naar")
     ){
-
         return ["wandelen_rugzak"];
-
     }
 
 
@@ -576,22 +556,18 @@ function iconsForEvent(e){
         text.includes("trein van") ||
         text.includes("trein naar")
     ){
-
         return ["trein"];
-
     }
 
 
     if(
         text.includes("bus van") ||
-        text.includes("bus naar") ||
-        text.includes("openbaar vervoer nemen") ||
+        text.includes("bus naar")||
+        text.includes("openbaar vervoer nemen")||
         text.includes("openbaar vervoer van") ||
         text.includes("openbaar vervoer naar")
     ){
-
         return ["bus"];
-
     }
 
 
@@ -599,9 +575,7 @@ function iconsForEvent(e){
         text.includes("metro van") ||
         text.includes("metro naar")
     ){
-
         return ["metro"];
-
     }
 
 
@@ -609,9 +583,7 @@ function iconsForEvent(e){
         text.includes("tram van") ||
         text.includes("tram naar")
     ){
-
         return ["tram"];
-
     }
 
 
@@ -619,9 +591,7 @@ function iconsForEvent(e){
         text.includes("vliegtuig van") ||
         text.includes("vliegtuig naar")
     ){
-
         return ["vliegtuig"];
-
     }
 
 
@@ -632,12 +602,11 @@ function iconsForEvent(e){
 
         ICON_AI[icon].forEach(word=>{
 
-            let regex=new RegExp(
-                "\\b"+
-                word.toLowerCase()+
-                "\\b",
-                "i"
-            );
+            let regex=
+                new RegExp(
+                    "\\b"+word.toLowerCase()+"\\b",
+                    "i"
+                );
 
 
             let match=text.match(regex);
@@ -713,13 +682,9 @@ function eventsForDay(day,active){
 
 
         list.push({
-
             ...e,
-
             start:start,
-
             end:end
-
         });
 
     });
@@ -757,7 +722,7 @@ function render(){
     for(let i=0;i<days;i++){
 
         let d=new Date(
-            dayMode?currentDate:start
+            dayMode ? currentDate : start
         );
 
 
@@ -775,17 +740,13 @@ function render(){
         col.className="day";
 
 
-        let todayDate=new Date();
+        let today=new Date();
 
 
         if(
-
-            d.getDate()==todayDate.getDate() &&
-
-            d.getMonth()==todayDate.getMonth() &&
-
-            d.getFullYear()==todayDate.getFullYear()
-
+            d.getDate()==today.getDate() &&
+            d.getMonth()==today.getMonth() &&
+            d.getFullYear()==today.getFullYear()
         ){
 
             col.id="today";
@@ -796,7 +757,10 @@ function render(){
         let now=new Date();
 
 
-        if(!dayMode || sameDay(now,d)){
+        if(
+            !dayMode ||
+            sameDay(now,d)
+        ){
 
             let line=document.createElement("div");
 
@@ -848,16 +812,14 @@ function render(){
 
 
         head.innerHTML=
-
             dayIcons[weekday]+" "+
-
             d.toLocaleDateString(
                 "nl-BE",
                 {
                     weekday:"long"
                 }
-            )+" "+
-
+            )+
+            " "+
             d.toLocaleDateString(
                 "nl-BE",
                 {
@@ -905,15 +867,10 @@ function render(){
     agenda.appendChild(container);
 
 
-    if(bigIcons){
-
+    if(bigIcons)
         agenda.classList.add("large");
-
-    }else{
-
+    else
         agenda.classList.remove("large");
-
-    }
 
 
     let todayCol=
@@ -967,8 +924,9 @@ function layoutEvents(
         ){
 
             if(
-                columns[i][columns[i].length-1].end
-                <=e.start
+                columns[i][
+                    columns[i].length-1
+                ].end<=e.start
             ){
 
                 columns[i].push(e);
@@ -994,187 +952,169 @@ function layoutEvents(
     columns.forEach(
         (colEvents,i)=>{
 
-        colEvents.forEach(e=>{
+            colEvents.forEach(e=>{
 
-            let start=
-                (e.start.getHours()-7)*60+
-                e.start.getMinutes();
+                let start=
+                    (e.start.getHours()-7)*60+
+                    e.start.getMinutes();
 
 
-            let dur=
-                (e.end-e.start)/60000;
+                let dur=
+                    (e.end-e.start)/60000;
 
 
-            let div=
-                document.createElement("div");
+                let div=
+                    document.createElement("div");
 
 
-            div.className=
-                printMode
-                ?
-                "event printEvent"
-                :
-                "event";
+                div.className=
+                    printMode
+                    ? "event printEvent"
+                    : "event";
 
 
-            div.style.top=
-                start+"px";
+                div.style.top=
+                    start+"px";
 
 
-            div.style.height=
-                dur+"px";
+                div.style.height=
+                    dur+"px";
 
 
-            let width=
-                90/columns.length;
+                let width=
+                    90/columns.length;
 
 
-            let left=
-                5+i*width;
+                let left=
+                    5+i*width;
 
 
-            div.style.left=
-                left+"%";
+                div.style.left=
+                    left+"%";
 
 
-            div.style.width=
-                (width-2)+"%";
+                div.style.width=
+                    (width-2)+"%";
 
 
-            div.style.background=
-                e.color;
+                div.style.background=
+                    e.color;
 
 
-            let icons=
-                iconsForEvent(e);
+                let icons=
+                    iconsForEvent(e);
 
 
-            let iconHTML=
-                `<div class="icons">`;
+                let iconHTML=
+                    `<div class="icons">`;
 
 
-            icons.forEach(ic=>{
+                icons.forEach(ic=>{
 
-                let extraClass="";
+                    let extraClass="";
 
 
-                if(
+                    if(
 
-                    ic==="steffifamilie" ||
+                        ic==="steffifamilie" ||
+                        ic==="IrenaGezin" ||
+                        ic==="kindjeshalen" ||
+                        ic==="kindjesnaar" ||
+                        ic==="Jana_en_Vinny" ||
+                        ic==="SylvieEnKids" ||
+                        ic==="Vansenne" ||
+                        ic==="AnthonyEnkids" ||
+                        ic==="IrenaEnJulian" ||
+                        ic==="vannoppen"
 
-                    ic==="IrenaGezin" ||
+                    ){
 
-                    ic==="kindjeshalen" ||
+                        extraClass="bigicon";
 
-                    ic==="kindjesnaar" ||
+                    }else{
 
-                    ic==="Jana_en_Vinny" ||
+                        extraClass="smallicon";
 
-                    ic==="SylvieEnKids" ||
+                    }
 
-                    ic==="Vansenne" ||
 
-                    ic==="AnthonyEnkids" ||
+                    iconHTML+=
+                        `<img src="icons/${ic}.png"
+                         class="picto ${extraClass}">`;
 
-                    ic==="IrenaEnJulian" ||
+                });
 
-                    ic==="vannoppen"
 
-                ){
+                iconHTML+=
+                    `</div>`;
 
-                    extraClass="bigicon";
 
-                }else{
+                let displayText=
+                    time(e.start)+
+                    " "+
+                    (e.title||"");
 
-                    extraClass="smallicon";
 
-                }
+                let speechText=(
+                    "agenda "+
+                    e.calendarName+
+                    ": "+
+                    e.title+
+                    ". van "+
+                    time(e.start)+
+                    " tot "+
+                    time(e.end)
+                ).toLowerCase();
 
 
-                iconHTML+=`
+                let words=
+                    displayText.split(" ");
 
-                    <img
-                        src="icons/${ic}.png"
-                        class="picto ${extraClass}"
-                    >
 
-                `;
+                let textHTML=
+                    `<div class="eventText">`;
 
-            });
 
+                words.forEach(
+                    (w,i)=>{
 
-            iconHTML+=`</div>`;
+                        textHTML+=
+                            `<span
+                                class="speechWord"
+                                data-index="${i}"
+                            >${w}</span> `;
 
-
-            let displayText=
-                time(e.start)+
-                " "+
-                (e.title||"");
-
-
-            let speechText=(
-
-                "agenda "+
-                e.calendarName+
-                ": "+
-                e.title+
-                ". van "+
-                time(e.start)+
-                " tot "+
-                time(e.end)
-
-            ).toLowerCase();
-
-
-            let words=
-                displayText.split(" ");
-
-
-            let textHTML=
-                `<div class="eventText">`;
-
-
-            words.forEach((w,i)=>{
-
-                textHTML+=`
-
-                    <span
-                        class="speechWord"
-                        data-index="${i}"
-                    >
-                        ${w}
-                    </span>
-
-                `;
-
-            });
-
-
-            textHTML+=`</div>`;
-
-
-            div.innerHTML=
-                iconHTML+
-                textHTML;
-
-
-            div.onclick=(ev)=>{
-
-                ev.stopPropagation();
-
-                speak(
-                    speechText,
-                    div
+                    }
                 );
 
-            };
+
+                textHTML+=
+                    `</div>`;
 
 
-            col.appendChild(div);
+                div.innerHTML=
+                    iconHTML+
+                    textHTML;
 
-        });
 
-    });
+                div.onclick=(ev)=>{
+
+                    ev.stopPropagation();
+
+                    speak(
+                        speechText,
+                        div
+                    );
+
+                };
+
+
+                col.appendChild(div);
+
+            });
+
+        }
+    );
 
 }
 
@@ -1185,38 +1125,22 @@ function layoutEvents(
 
 function sameDay(a,b){
 
-    return (
-
-        a.getFullYear()==b.getFullYear() &&
-
-        a.getMonth()==b.getMonth() &&
-
-        a.getDate()==b.getDate()
-
-    );
+    return a.getFullYear()==b.getFullYear() &&
+           a.getMonth()==b.getMonth() &&
+           a.getDate()==b.getDate();
 
 }
 
 
 function time(d){
 
-    return (
-
-        d.getHours()
+    return d.getHours()
         .toString()
-        .padStart(2,"0")
-
-        +
-
-        ":"
-
-        +
-
+        .padStart(2,"0")+
+        ":"+
         d.getMinutes()
         .toString()
-        .padStart(2,"0")
-
-    );
+        .padStart(2,"0");
 
 }
 
@@ -1232,7 +1156,6 @@ function getMonday(d){
         day+
         (day==0?-6:1);
 
-
     return new Date(
         d.setDate(diff)
     );
@@ -1241,20 +1164,18 @@ function getMonday(d){
 
 
 // =========================================================
-// NAVIGATIE
+// NAVIGATION
 // =========================================================
 
 function prev(){
 
     dayMode
-    ?
-    currentDate.setDate(
+    ? currentDate.setDate(
         currentDate.getDate()-1
-    )
-    :
-    currentDate.setDate(
+      )
+    : currentDate.setDate(
         currentDate.getDate()-7
-    );
+      );
 
 
     init();
@@ -1265,14 +1186,12 @@ function prev(){
 function next(){
 
     dayMode
-    ?
-    currentDate.setDate(
+    ? currentDate.setDate(
         currentDate.getDate()+1
-    )
-    :
-    currentDate.setDate(
+      )
+    : currentDate.setDate(
         currentDate.getDate()+7
-    );
+      );
 
 
     init();
@@ -1347,25 +1266,22 @@ function showNextEvents(){
 
 
     let upcoming=events
-
     .filter(e=>{
 
         let dur=
-            (e.end-e.start)/
-            3600000;
+            (e.end-e.start)/3600000;
 
 
-        if(dur>=15) return false;
+        if(dur>=15)
+            return false;
 
 
         return e.start>now;
 
     })
-
     .sort(
         (a,b)=>a.start-b.start
     )
-
     .slice(0,4);
 
 
@@ -1409,26 +1325,28 @@ function showNextEvents(){
             "popupLine";
 
 
-        words.forEach((w,i)=>{
+        words.forEach(
+            (w,i)=>{
 
-            let span=
-                document.createElement("span");
-
-
-            span.className=
-                "speechWord";
+                let span=
+                    document.createElement("span");
 
 
-            span.dataset.index=i;
+                span.className=
+                    "speechWord";
 
 
-            span.innerText=
-                w+" ";
+                span.dataset.index=i;
 
 
-            lineDiv.appendChild(span);
+                span.innerText=
+                    w+" ";
 
-        });
+
+                lineDiv.appendChild(span);
+
+            }
+        );
 
 
         popupText.appendChild(
@@ -1467,7 +1385,10 @@ function showNextEvents(){
 // STEM
 // =========================================================
 
-function speak(text,lineDiv){
+function speak(
+    text,
+    lineDiv
+){
 
     speechSynthesis.cancel();
 
@@ -1495,7 +1416,8 @@ function speak(text,lineDiv){
 
     msg.onboundary=function(event){
 
-        if(event.name!=="word") return;
+        if(event.name!=="word")
+            return;
 
 
         let charIndex=
@@ -1516,8 +1438,7 @@ function speak(text,lineDiv){
         ){
 
             total+=
-                speechWords[i].length+
-                1;
+                speechWords[i].length+1;
 
 
             if(total>charIndex){
@@ -1532,8 +1453,7 @@ function speak(text,lineDiv){
 
 
         spans.forEach(
-            s=>
-            s.classList.remove("active")
+            s=>s.classList.remove("active")
         );
 
 
@@ -1541,11 +1461,8 @@ function speak(text,lineDiv){
             spans[currentWordIndex];
 
 
-        if(span){
-
+        if(span)
             span.classList.add("active");
-
-        }
 
     };
 
@@ -1553,8 +1470,7 @@ function speak(text,lineDiv){
     msg.onend=()=>{
 
         spans.forEach(
-            s=>
-            s.classList.remove("active")
+            s=>s.classList.remove("active")
         );
 
     };
@@ -1571,9 +1487,9 @@ function speak(text,lineDiv){
 
 function closePopup(){
 
-    document.getElementById(
-        "popup"
-    ).style.display="none";
+    document
+    .getElementById("popup")
+    .style.display="none";
 
 }
 
@@ -1608,9 +1524,12 @@ document.addEventListener(
             touchStartX-touchEndX;
 
 
-        if(diff>60) next();
+        if(diff>60)
+            next();
 
-        if(diff<-60) prev();
+
+        if(diff<-60)
+            prev();
 
     }
 );
@@ -1700,10 +1619,7 @@ function printWeek(){
 
 
         h2.innerText=
-
-            dayIcons[weekday]+
-            " "+
-
+            dayIcons[weekday]+" "+
             d.toLocaleDateString(
                 "nl-BE",
                 {
@@ -1730,7 +1646,11 @@ function printWeek(){
         );
 
 
-        for(let h=7;h<=23;h++){
+        for(
+            let h=7;
+            h<=23;
+            h++
+        ){
 
             let hourLine=
                 document.createElement("div");
@@ -2010,38 +1930,31 @@ clockDate.onclick=()=>{
 
 
 // =========================================================
-// UPDATE TIJDLIJN
-// =========================================================
-
-setInterval(
-    updateCurrentTimeLine,
-    60000
-);
-
-
-// Alleen uitvoeren als functie bestaat
-if(typeof updateCurrentTimeLine==="function"){
-
-    updateCurrentTimeLine();
-
-}
-
-
-// =========================================================
 // NIEUW
+// AFBEELDING VAN MORGEN
 // =========================================================
-// AFBEELDING MAKEN VAN MORGEN
+//
+// Dit gedeelte gebruikt GEEN OpenAI API.
+// De afbeelding wordt volledig in de browser
+// gemaakt met HTML Canvas.
+//
 // =========================================================
 
-let tomorrowImageDataURL=null;
+
+let tomorrowCanvas=null;
+
+let tomorrowImageDataUrl=null;
 
 
-/**
- * Geeft de datum van morgen terug.
- */
+// ---------------------------------------------------------
+// Morgen bepalen
+// ---------------------------------------------------------
+
 function getTomorrowDate(){
 
     let tomorrow=new Date();
+
+    tomorrow.setHours(0,0,0,0);
 
     tomorrow.setDate(
         tomorrow.getDate()+1
@@ -2052,35 +1965,35 @@ function getTomorrowDate(){
 }
 
 
-/**
- * Haalt alle afspraken van morgen
- * uit de reeds geladen Google Agenda.
- */
+// ---------------------------------------------------------
+// Afspraken van morgen ophalen
+// ---------------------------------------------------------
+
 function getTomorrowEvents(){
 
     let tomorrow=
         getTomorrowDate();
 
 
-    let startOfTomorrow=
+    let startDay=
         new Date(tomorrow);
 
 
-    startOfTomorrow.setHours(
+    startDay.setHours(
         0,0,0,0
     );
 
 
-    let endOfTomorrow=
+    let endDay=
         new Date(tomorrow);
 
 
-    endOfTomorrow.setDate(
-        endOfTomorrow.getDate()+1
+    endDay.setDate(
+        endDay.getDate()+1
     );
 
 
-    endOfTomorrow.setHours(
+    endDay.setHours(
         0,0,0,0
     );
 
@@ -2090,44 +2003,59 @@ function getTomorrowEvents(){
 
 
     return events
-
         .filter(e=>{
 
-            /*
-             * Alleen actieve kalenders
-             */
             if(
-                active.length &&
-                !active.includes(e.calendar)
+                !active.includes(
+                    e.calendar
+                )
             ){
-
                 return false;
-
             }
 
 
-            /*
-             * Event overlapt met morgen
-             */
-            if(e.end<=startOfTomorrow){
-
+            if(e.end<=startDay)
                 return false;
 
-            }
 
-
-            if(e.start>=endOfTomorrow){
-
+            if(e.start>=endDay)
                 return false;
-
-            }
 
 
             return true;
 
         })
+        .map(e=>{
+
+            let start=
+                new Date(
+                    Math.max(
+                        e.start,
+                        startDay
+                    )
+                );
 
 
+            let end=
+                new Date(
+                    Math.min(
+                        e.end,
+                        endDay
+                    )
+                );
+
+
+            return {
+
+                ...e,
+
+                start:start,
+
+                end:end
+
+            };
+
+        })
         .sort(
             (a,b)=>
                 a.start-b.start
@@ -2136,194 +2064,135 @@ function getTomorrowEvents(){
 }
 
 
-/**
- * Mooie datum voor bovenaan de afbeelding.
- */
-function formatTomorrowDate(){
+// ---------------------------------------------------------
+// Afbeelding maken
+// ---------------------------------------------------------
 
-    let d=
-        getTomorrowDate();
+async function makeTomorrowImage(){
 
+    if(!token){
 
-    return d.toLocaleDateString(
-        "nl-BE",
-        {
-            weekday:"long",
-            day:"numeric",
-            month:"long",
-            year:"numeric"
-        }
-    );
+        alert(
+            "Je bent nog niet ingelogd."
+        );
 
-}
-
-
-/**
- * Tekst geschikt maken voor Canvas.
- */
-function wrapCanvasText(
-    ctx,
-    text,
-    x,
-    y,
-    maxWidth,
-    lineHeight
-){
-
-    let words=
-        text.split(" ");
-
-
-    let line="";
-
-
-    for(let n=0;n<words.length;n++){
-
-        let testLine=
-            line+
-            words[n]+
-            " ";
-
-
-        let metrics=
-            ctx.measureText(
-                testLine
-            );
-
-
-        let testWidth=
-            metrics.width;
-
-
-        if(
-            testWidth>maxWidth &&
-            n>0
-        ){
-
-            ctx.fillText(
-                line,
-                x,
-                y
-            );
-
-
-            line=
-                words[n]+" ";
-
-
-            y+=lineHeight;
-
-        }else{
-
-            line=testLine;
-
-        }
+        return;
 
     }
 
 
-    ctx.fillText(
-        line,
-        x,
-        y
-    );
+    let popup=
+        document.getElementById(
+            "imagePopup"
+        );
 
 
-    return y+lineHeight;
+    let status=
+        document.getElementById(
+            "imageStatus"
+        );
+
+
+    tomorrowCanvas=
+        document.getElementById(
+            "tomorrowCanvas"
+        );
+
+
+    popup.style.display="flex";
+
+
+    status.innerText=
+        "📅 afspraken van morgen ophalen...";
+
+
+    try{
+
+        // Eerst opnieuw laden zodat eventuele
+        // nieuwe afspraken zeker aanwezig zijn.
+
+        await loadEvents();
+
+
+        let tomorrowEvents=
+            getTomorrowEvents();
+
+
+        status.innerText=
+            "🖼️ afbeelding maken...";
+
+
+        await drawTomorrowImage(
+            tomorrowEvents
+        );
+
+
+        status.innerText=
+            tomorrowEvents.length+
+            " afspraak"+
+            (
+                tomorrowEvents.length===1
+                ? ""
+                : "pen"
+            )+
+            " gevonden.";
+
+
+    }catch(error){
+
+        console.error(
+            "Afbeelding maken fout:",
+            error
+        );
+
+
+        status.innerText=
+            "❌ Er ging iets mis bij het maken van de afbeelding.";
+
+    }
 
 }
 
 
-/**
- * Laad een pictogram uit /icons/.
- */
-function loadTomorrowIcon(iconName){
+// ---------------------------------------------------------
+// Canvas tekenen
+// ---------------------------------------------------------
 
-    return new Promise(
-        resolve=>{
-
-            let img=
-                new Image();
-
-
-            img.onload=()=>{
-
-                resolve(img);
-
-            };
-
-
-            img.onerror=()=>{
-
-                resolve(null);
-
-            };
-
-
-            img.src=
-                `icons/${iconName}.png`;
-
-        }
-    );
-
-}
-
-
-/**
- * Maak de daadwerkelijke PNG-afbeelding.
- */
-async function createTomorrowCanvasImage(
-    tomorrowEvents
+async function drawTomorrowImage(
+    dayEvents
 ){
 
-    /*
-     * Canvas-formaat.
-     *
-     * 1200 breed is mooi voor smartphone,
-     * computer en eventueel afdruk.
-     */
+    let canvas=
+        tomorrowCanvas;
+
+
+    let ctx=
+        canvas.getContext("2d");
+
+
+    // Afbeeldingformaat
 
     const width=1200;
 
+    const headerHeight=170;
 
-    /*
-     * Hoogte wordt berekend op basis
-     * van het aantal afspraken.
-     */
+    const eventHeight=
+        dayEvents.length>0
+        ? 180
+        : 220;
 
-    const headerHeight=190;
-
-    const eventHeight=150;
 
     const footerHeight=80;
 
 
-    let height=
+    const height=
         headerHeight+
         Math.max(
-            tomorrowEvents.length,
-            1
+            1,
+            dayEvents.length
         )*
         eventHeight+
         footerHeight;
-
-
-    /*
-     * Maximumhoogte.
-     *
-     * Bij heel veel afspraken wordt
-     * de afbeelding dus niet eindeloos.
-     */
-
-    height=
-        Math.min(
-            Math.max(height,650),
-            5000
-        );
-
-
-    let canvas=
-        document.createElement("canvas");
 
 
     canvas.width=width;
@@ -2331,13 +2200,7 @@ async function createTomorrowCanvasImage(
     canvas.height=height;
 
 
-    let ctx=
-        canvas.getContext("2d");
-
-
-    /*
-     * Achtergrond
-     */
+    // Achtergrond
 
     ctx.fillStyle="#ffffff";
 
@@ -2349,9 +2212,7 @@ async function createTomorrowCanvasImage(
     );
 
 
-    /*
-     * Header
-     */
+    // Header
 
     ctx.fillStyle="#4285F4";
 
@@ -2363,200 +2224,71 @@ async function createTomorrowCanvasImage(
     );
 
 
-    /*
-     * Titel
-     */
+    let tomorrow=
+        getTomorrowDate();
+
+
+    let dayIcons=[
+        "☀️",
+        "🌙",
+        "🔥",
+        "🌳",
+        "⭐",
+        "🎉",
+        "🌈"
+    ];
+
+
+    let weekday=
+        tomorrow.getDay();
+
+
+    let dateText=
+        tomorrow.toLocaleDateString(
+            "nl-BE",
+            {
+                weekday:"long",
+                day:"numeric",
+                month:"long",
+                year:"numeric"
+            }
+        );
+
+
+    // Titel
 
     ctx.fillStyle="#ffffff";
 
     ctx.textAlign="center";
 
     ctx.font=
-        "bold 52px Arial";
+        "bold 48px Arial";
 
 
     ctx.fillText(
-        "🌙 MORGEN",
+        dayIcons[weekday]+" "+
+        capitalizeFirstLetter(
+            dateText
+        ),
         width/2,
-        65
+        75
     );
 
 
     ctx.font=
-        "bold 34px Arial";
+        "28px Arial";
 
 
     ctx.fillText(
-        formatTomorrowDate(),
+        "Dagplanning",
         width/2,
-        120
+        125
     );
 
 
-    ctx.font=
-        "24px Arial";
+    // Geen afspraken
 
-
-    ctx.fillText(
-        "Onze dagplanning",
-        width/2,
-        160
-    );
-
-
-    /*
-     * Geen afspraken
-     */
-
-    if(tomorrowEvents.length===0){
-
-        ctx.fillStyle="#333333";
-
-        ctx.textAlign="center";
-
-        ctx.font=
-            "bold 36px Arial";
-
-
-        ctx.fillText(
-            "🌳 Geen afspraken gepland",
-            width/2,
-            headerHeight+150
-        );
-
-
-        ctx.font=
-            "26px Arial";
-
-
-        ctx.fillText(
-            "Een rustige dag! 😊",
-            width/2,
-            headerHeight+200
-        );
-
-
-        return canvas.toDataURL(
-            "image/png"
-        );
-
-    }
-
-
-    /*
-     * Pictogrammen vooraf laden
-     */
-
-    let iconImages=[];
-
-
-    for(
-        let i=0;
-        i<tomorrowEvents.length;
-        i++
-    ){
-
-        let event=
-            tomorrowEvents[i];
-
-
-        let icons=
-            iconsForEvent(event);
-
-
-        /*
-         * We gebruiken maximaal 3 pictogrammen
-         * zodat de afbeelding overzichtelijk blijft.
-         */
-
-        icons=
-            icons.slice(0,3);
-
-
-        let loaded=[];
-
-
-        for(let ic of icons){
-
-            let img=
-                await loadTomorrowIcon(ic);
-
-
-            if(img){
-
-                loaded.push(img);
-
-            }
-
-        }
-
-
-        iconImages.push(loaded);
-
-    }
-
-
-    /*
-     * Afspraken tekenen
-     */
-
-    for(
-        let i=0;
-        i<tomorrowEvents.length;
-        i++
-    ){
-
-        let e=
-            tomorrowEvents[i];
-
-
-        let y=
-            headerHeight+
-            i*eventHeight;
-
-
-        /*
-         * Achtergrond om en om
-         */
-
-        ctx.fillStyle=
-            i%2===0
-            ?
-            "#f7f9fc"
-            :
-            "#ffffff";
-
-
-        ctx.fillRect(
-            0,
-            y,
-            width,
-            eventHeight
-        );
-
-
-        /*
-         * Kalenderkleur als balkje
-         */
-
-        ctx.fillStyle=
-            e.color ||
-            "#4285F4";
-
-
-        ctx.fillRect(
-            0,
-            y,
-            16,
-            eventHeight
-        );
-
-
-        /*
-         * Tijd
-         */
-
-        ctx.textAlign="left";
+    if(dayEvents.length===0){
 
         ctx.fillStyle="#333333";
 
@@ -2564,49 +2296,232 @@ async function createTomorrowCanvasImage(
             "bold 38px Arial";
 
 
-        let eventStart=
-            time(e.start);
-
-
-        let eventEnd=
-            time(e.end);
-
-
         ctx.fillText(
-            eventStart,
-            45,
-            y+55
+            "Geen afspraken",
+            width/2,
+            headerHeight+130
         );
 
 
         ctx.font=
-            "24px Arial";
-
-
-        ctx.fillStyle="#777777";
+            "28px Arial";
 
 
         ctx.fillText(
-            eventEnd,
-            47,
-            y+90
+            "Een rustige dag! 😊",
+            width/2,
+            headerHeight+180
         );
 
 
-        /*
-         * Pictogrammen
-         */
-
-        let images=
-            iconImages[i];
+        finishTomorrowCanvas(
+            canvas
+        );
 
 
-        let iconX=200;
+        return;
+
+    }
 
 
-        images.forEach(img=>{
+    // Afspraken
 
-            let maxSize=80;
+    for(
+        let i=0;
+        i<dayEvents.length;
+        i++
+    ){
+
+        let e=
+            dayEvents[i];
+
+
+        let y=
+            headerHeight+
+            i*eventHeight;
+
+
+        drawTomorrowEvent(
+            ctx,
+            e,
+            y,
+            width,
+            eventHeight
+        );
+
+    }
+
+
+    // Footer
+
+    ctx.fillStyle="#f2f2f2";
+
+    ctx.fillRect(
+        0,
+        height-footerHeight,
+        width,
+        footerHeight
+    );
+
+
+    ctx.fillStyle="#555";
+
+    ctx.textAlign="center";
+
+    ctx.font=
+        "22px Arial";
+
+
+    ctx.fillText(
+        "Agenda Vannoppekes",
+        width/2,
+        height-30
+    );
+
+
+    finishTomorrowCanvas(
+        canvas
+    );
+
+}
+
+
+// ---------------------------------------------------------
+// Eén afspraak tekenen
+// ---------------------------------------------------------
+
+async function drawTomorrowEvent(
+    ctx,
+    event,
+    y,
+    width,
+    height
+){
+
+    // Kaart
+
+    ctx.fillStyle=
+        event.color || "#4285F4";
+
+
+    roundRect(
+        ctx,
+        30,
+        y+15,
+        width-60,
+        height-30,
+        18
+    );
+
+
+    ctx.fill();
+
+
+    // Tijd
+
+    ctx.fillStyle="#ffffff";
+
+    ctx.textAlign="left";
+
+    ctx.font=
+        "bold 34px Arial";
+
+
+    let timeText=
+        time(event.start);
+
+
+    if(
+        event.end &&
+        event.end>event.start
+    ){
+
+        timeText+=
+            " - "+
+            time(event.end);
+
+    }
+
+
+    ctx.fillText(
+        timeText,
+        60,
+        y+65
+    );
+
+
+    // Titel
+
+    ctx.font=
+        "bold 38px Arial";
+
+
+    let title=
+        event.title || "Afspraak";
+
+
+    let titleLines=
+        wrapCanvasText(
+            ctx,
+            title,
+            width-360,
+            38
+        );
+
+
+    let titleY=
+        y+112;
+
+
+    titleLines
+        .slice(0,2)
+        .forEach(line=>{
+
+            ctx.fillText(
+                line,
+                60,
+                titleY
+            );
+
+            titleY+=45;
+
+        });
+
+
+    // Pictogrammen
+
+    let icons=
+        iconsForEvent(event);
+
+
+    let iconX=
+        width-250;
+
+
+    let iconY=
+        y+35;
+
+
+    for(
+        let i=0;
+        i<Math.min(icons.length,3);
+        i++
+    ){
+
+        let icon=
+            icons[i];
+
+
+        try{
+
+            let img=
+                await loadImage(
+                    "icons/"+icon+".png"
+                );
+
+
+            let maxSize=90;
+
 
             let ratio=
                 Math.min(
@@ -2626,7 +2541,7 @@ async function createTomorrowCanvasImage(
             ctx.drawImage(
                 img,
                 iconX,
-                y+30,
+                iconY,
                 w,
                 h
             );
@@ -2634,295 +2549,49 @@ async function createTomorrowCanvasImage(
 
             iconX+=
                 Math.max(
-                    w+15,
-                    75
+                    100,
+                    w+15
                 );
 
-        });
 
+        }catch(error){
 
-        /*
-         * Titel
-         */
-
-        let title=
-            e.title ||
-            "Afspraak";
-
-
-        let titleX=
-            Math.max(
-                iconX+15,
-                360
-            );
-
-
-        ctx.fillStyle="#111111";
-
-        ctx.font=
-            "bold 30px Arial";
-
-
-        let titleY=
-            y+58;
-
-
-        titleY=
-            wrapCanvasText(
-                ctx,
-                title,
-                titleX,
-                titleY,
-                width-titleX-40,
-                38
-            );
-
-
-        /*
-         * Locatie indien aanwezig
-         */
-
-        if(e.location){
-
-            ctx.fillStyle="#777777";
-
-            ctx.font=
-                "22px Arial";
-
-
-            ctx.fillText(
-                "📍 "+e.location,
-                titleX,
-                y+112
-            );
-
-        }
-
-
-        /*
-         * Kalendernaam subtiel
-         */
-
-        if(e.calendarName){
-
-            ctx.fillStyle="#999999";
-
-            ctx.font=
-                "18px Arial";
-
-
-            ctx.textAlign="right";
-
-
-            ctx.fillText(
-                e.calendarName,
-                width-35,
-                y+135
+            console.warn(
+                "Pictogram kon niet geladen worden:",
+                icon,
+                error
             );
 
         }
 
     }
 
-
-    /*
-     * Footer
-     */
-
-    ctx.fillStyle="#4285F4";
-
-    ctx.fillRect(
-        0,
-        height-footerHeight,
-        width,
-        footerHeight
-    );
+}
 
 
-    ctx.fillStyle="#ffffff";
+// ---------------------------------------------------------
+// Canvas afronden / downloadklaar maken
+// ---------------------------------------------------------
 
-    ctx.textAlign="center";
+function finishTomorrowCanvas(
+    canvas
+){
 
-    ctx.font=
-        "24px Arial";
-
-
-    ctx.fillText(
-        "🌙 Een fijne dag gewenst! ❤️",
-        width/2,
-        height-30
-    );
-
-
-    /*
-     * PNG teruggeven
-     */
-
-    return canvas.toDataURL(
-        "image/png"
-    );
+    tomorrowImageDataUrl=
+        canvas.toDataURL(
+            "image/png"
+        );
 
 }
 
 
-/**
- * Hoofdfunctie van de knop.
- */
-async function makeTomorrowImage(){
+// ---------------------------------------------------------
+// Afbeelding downloaden
+// ---------------------------------------------------------
 
-    /*
-     * Controleer login.
-     */
-
-    if(!token){
-
-        alert(
-            "Je moet eerst ingelogd zijn."
-        );
-
-        return;
-
-    }
-
-
-    /*
-     * Open popup.
-     */
-
-    let popup=
-        document.getElementById(
-            "tomorrowImagePopup"
-        );
-
-
-    let info=
-        document.getElementById(
-            "tomorrowImageInfo"
-        );
-
-
-    let container=
-        document.getElementById(
-            "tomorrowImageContainer"
-        );
-
-
-    popup.style.display="flex";
-
-
-    container.innerHTML="";
-
-
-    info.innerText=
-        "📅 De afspraken van morgen worden opgezocht...";
-
-
-    /*
-     * Ophalen.
-     */
-
-    let tomorrowEvents=
-        getTomorrowEvents();
-
-
-    /*
-     * Status tonen.
-     */
-
-    if(
-        tomorrowEvents.length===0
-    ){
-
-        info.innerText=
-            "Morgen staan er geen afspraken in de geselecteerde agenda's.";
-
-    }else{
-
-        info.innerText=
-            `${tomorrowEvents.length} afspraak`+
-            (
-                tomorrowEvents.length===1
-                ?
-                ""
-                :
-                "ken"
-            )+
-            ` gevonden voor ${formatTomorrowDate()}.`;
-
-    }
-
-
-    /*
-     * Afbeelding maken.
-     */
-
-    try{
-
-        tomorrowImageDataURL=
-            await createTomorrowCanvasImage(
-                tomorrowEvents
-            );
-
-
-        /*
-         * Afbeelding tonen.
-         */
-
-        let img=
-            document.createElement("img");
-
-
-        img.src=
-            tomorrowImageDataURL;
-
-
-        img.alt=
-            "Agenda voor morgen";
-
-
-        container.appendChild(
-            img
-        );
-
-
-    }catch(error){
-
-        console.error(
-            "Afbeelding maken mislukt:",
-            error
-        );
-
-
-        info.innerText=
-            "❌ Er ging iets mis bij het maken van de afbeelding.";
-
-    }
-
-}
-
-
-/**
- * Popup sluiten.
- */
-function closeTomorrowImage(){
-
-    let popup=
-        document.getElementById(
-            "tomorrowImagePopup"
-        );
-
-
-    popup.style.display="none";
-
-}
-
-
-/**
- * PNG downloaden.
- */
 function downloadTomorrowImage(){
 
-    if(!tomorrowImageDataURL){
+    if(!tomorrowImageDataUrl){
 
         alert(
             "De afbeelding is nog niet klaar."
@@ -2933,16 +2602,32 @@ function downloadTomorrowImage(){
     }
 
 
+    let tomorrow=
+        getTomorrowDate();
+
+
+    let date=
+        tomorrow.getFullYear()+
+        "-" +
+        String(
+            tomorrow.getMonth()+1
+        ).padStart(2,"0")+
+        "-" +
+        String(
+            tomorrow.getDate()
+        ).padStart(2,"0");
+
+
     let link=
         document.createElement("a");
 
 
     link.download=
-        "agenda-morgen.png";
+        "agenda-morgen-"+date+".png";
 
 
     link.href=
-        tomorrowImageDataURL;
+        tomorrowImageDataUrl;
 
 
     document.body.appendChild(
@@ -2953,109 +2638,234 @@ function downloadTomorrowImage(){
     link.click();
 
 
-    document.body.removeChild(
-        link
+    link.remove();
+
+}
+
+
+// ---------------------------------------------------------
+// Popup sluiten
+// ---------------------------------------------------------
+
+function closeImagePopup(){
+
+    let popup=
+        document.getElementById(
+            "imagePopup"
+        );
+
+
+    popup.style.display="none";
+
+}
+
+
+// ---------------------------------------------------------
+// Canvas hulpmiddelen
+// ---------------------------------------------------------
+
+function loadImage(src){
+
+    return new Promise(
+        (resolve,reject)=>{
+
+            let img=
+                new Image();
+
+
+            img.onload=()=>{
+                resolve(img);
+            };
+
+
+            img.onerror=()=>{
+                reject(
+                    new Error(
+                        "Afbeelding niet gevonden: "+src
+                    )
+                );
+            };
+
+
+            img.src=src;
+
+        }
     );
 
 }
 
 
-/**
- * Afbeelding afdrukken.
- */
-function printTomorrowImage(){
+function roundRect(
+    ctx,
+    x,
+    y,
+    width,
+    height,
+    radius
+){
 
-    if(!tomorrowImageDataURL){
+    if(width<2*radius)
+        radius=width/2;
 
-        alert(
-            "De afbeelding is nog niet klaar."
-        );
 
-        return;
+    if(height<2*radius)
+        radius=height/2;
+
+
+    ctx.beginPath();
+
+
+    ctx.moveTo(
+        x+radius,
+        y
+    );
+
+
+    ctx.arcTo(
+        x+width,
+        y,
+        x+width,
+        y+height,
+        radius
+    );
+
+
+    ctx.arcTo(
+        x+width,
+        y+height,
+        x,
+        y+height,
+        radius
+    );
+
+
+    ctx.arcTo(
+        x,
+        y+height,
+        x,
+        y,
+        radius
+    );
+
+
+    ctx.arcTo(
+        x,
+        y,
+        x+width,
+        y,
+        radius
+    );
+
+
+    ctx.closePath();
+
+}
+
+
+function wrapCanvasText(
+    ctx,
+    text,
+    maxWidth,
+    fontSize
+){
+
+    let words=
+        text.split(/\s+/);
+
+
+    let lines=[];
+
+    let current="";
+
+
+    for(
+        let i=0;
+        i<words.length;
+        i++
+    ){
+
+        let test=
+            current
+            ? current+" "+words[i]
+            : words[i];
+
+
+        let metrics=
+            ctx.measureText(test);
+
+
+        if(
+            metrics.width>maxWidth &&
+            current
+        ){
+
+            lines.push(
+                current
+            );
+
+
+            current=
+                words[i];
+
+        }else{
+
+            current=test;
+
+        }
 
     }
 
 
-    /*
-     * Tijdelijke printcontainer
-     */
-
-    let oldPrint=
-        document.getElementById(
-            "tomorrowPrintImage"
-        );
+    if(current)
+        lines.push(current);
 
 
-    if(oldPrint){
+    return lines;
 
-        oldPrint.remove();
-
-    }
+}
 
 
-    let printDiv=
-        document.createElement("div");
+function capitalizeFirstLetter(text){
+
+    if(!text)
+        return text;
 
 
-    printDiv.id=
-        "tomorrowPrintImage";
+    return text.charAt(0).toUpperCase()+
+           text.slice(1);
+
+}
 
 
-    printDiv.style.display=
-        "none";
+// =========================================================
+// Update lijn elke minuut
+// =========================================================
+//
+// In jouw huidige script staat deze functie niet.
+// Daarom controleren we eerst of ze bestaat.
+// Zo kan ze nooit meer de hele script.js laten crashen.
+//
+
+setInterval(
+    ()=>{
+        if(
+            typeof updateCurrentTimeLine ===
+            "function"
+        ){
+
+            updateCurrentTimeLine();
+
+        }
+    },
+    60000
+);
 
 
-    let img=
-        document.createElement("img");
+if(
+    typeof updateCurrentTimeLine ===
+    "function"
+){
 
-
-    img.src=
-        tomorrowImageDataURL;
-
-
-    img.style.maxWidth=
-        "100%";
-
-
-    img.style.width=
-        "100%";
-
-
-    printDiv.appendChild(
-        img
-    );
-
-
-    document.body.appendChild(
-        printDiv
-    );
-
-
-    document.body.classList.add(
-        "tomorrowPrinting"
-    );
-
-
-    /*
-     * Afdrukdialoog
-     */
-
-    window.print();
-
-
-    /*
-     * Na afdrukken terug normaal
-     */
-
-    setTimeout(()=>{
-
-        document.body.classList.remove(
-            "tomorrowPrinting"
-        );
-
-
-        printDiv.remove();
-
-    },1000);
+    updateCurrentTimeLine();
 
 }
