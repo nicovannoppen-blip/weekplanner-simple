@@ -53,7 +53,7 @@
 <button onclick="showNextEvents()">🔊 afspraken</button>
 
 <!-- NIEUW -->
-<button onclick="makeTomorrowImage()">🖼️ afbeelding morgen</button>
+<button onclick="makeTomorrowImage()">💬 verhaaltje</button>
 
 <div id="liveClock" style="font-weight:bold; cursor:pointer;"></div>
 
@@ -91,33 +91,29 @@
 
     <div class="imagePopupContent">
 
-        <!-- KNOPPEN BOVENAAN -->
-        <div class="imagePopupButtons">
-        
-            <button onclick="shareTomorrowImage()">
-                🤖  Maak verhaaltje
-            </button>
-        
-            <button onclick="downloadTomorrowImage()">
-                ⬇️ afbeelding opslaan
-            </button>
-        
-            <button onclick="closeImagePopup()">
-                ❌ sluiten
-            </button>
-        
-        </div>
-
-
         <h2>🖼️ Dagplanning morgen</h2>
-
 
         <div id="imageStatus">
             Afbeelding wordt gemaakt...
         </div>
 
-
         <canvas id="tomorrowCanvas"></canvas>
+
+        <div class="imagePopupButtons">
+
+            <button onclick="shareTomorrowImage()">
+                💬 naar ChatGPT
+            </button>
+
+            <button onclick="downloadTomorrowImage()">
+                ⬇️ afbeelding opslaan
+            </button>
+
+            <button onclick="closeImagePopup()">
+                ❌ sluiten
+            </button>
+
+        </div>
 
     </div>
 
