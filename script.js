@@ -2592,8 +2592,9 @@ function finishTomorrowCanvas(
 
 }
 // ---------------------------------------------------------
-// naar chatgpt
+// Afbeelding naar ChatGPT sturen
 // ---------------------------------------------------------
+
 async function shareTomorrowImage(){
 
     if(!tomorrowImageDataUrl){
@@ -2621,13 +2622,15 @@ async function shareTomorrowImage(){
             await response.blob();
 
 
-        // Bestandsnaam
+        // ================================================
+        // SMARTPHONE / TABLET
+        // ================================================
 
-        let tomorrow=
+        const tomorrow=
             getTomorrowDate();
 
 
-        let date=
+        const date=
             tomorrow.getFullYear()+
             "-" +
             String(
@@ -2649,8 +2652,8 @@ async function shareTomorrowImage(){
             );
 
 
-        // Controleren of delen met bestanden
-        // door het toestel wordt ondersteund
+        // Als Web Share beschikbaar is:
+        // gebruik het normale deelvenster.
 
         if(
             navigator.share &&
@@ -2679,18 +2682,70 @@ async function shareTomorrowImage(){
         }
 
 
-        // Fallback wanneer delen niet ondersteund wordt
+        // ================================================
+        // PC / DESKTOP
+        // ================================================
+        //
+        // Geen Web Share?
+        // Dan proberen we de afbeelding naar het
+        // klembord te kopiëren.
+        //
+
+        if(
+            navigator.clipboard &&
+            window.ClipboardItem
+        ){
+
+            const clipboardItem=
+                new ClipboardItem({
+                    "image/png":blob
+                });
+
+
+            await navigator.clipboard.write([
+                clipboardItem
+            ]);
+
+
+            // ChatGPT openen
+
+            window.open(
+                "https://chatgpt.com/",
+                "_blank"
+            );
+
+
+            alert(
+                "✅ De dagplanning staat op het klembord.\n\n" +
+                "ChatGPT is geopend.\n\n" +
+                "Druk daar op Ctrl + V om de afbeelding te plakken."
+            );
+
+
+            return;
+
+        }
+
+
+        // ================================================
+        // LAATSTE FALLBACK
+        // ================================================
 
         alert(
-            "Je toestel of browser ondersteunt het rechtstreeks delen van afbeeldingen niet. " +
-            "Gebruik daarom de knop 'afbeelding opslaan' en voeg de afbeelding daarna toe aan ChatGPT."
+            "Deze browser kan de afbeelding niet rechtstreeks delen of naar het klembord kopiëren.\n\n" +
+            "Gebruik daarom 'afbeelding opslaan' en voeg de afbeelding daarna toe aan ChatGPT."
         );
 
 
     }catch(error){
 
-        // Annuleren van het deelvenster
-        // is geen echte fout
+        console.error(
+            "Afbeelding delen fout:",
+            error
+        );
+
+
+        // Gebruiker heeft deelvenster gesloten
 
         if(
             error.name === "AbortError"
@@ -2701,14 +2756,9 @@ async function shareTomorrowImage(){
         }
 
 
-        console.error(
-            "Afbeelding delen fout:",
-            error
-        );
-
-
         alert(
-            "De afbeelding kon niet worden gedeeld."
+            "De afbeelding kon niet rechtstreeks naar ChatGPT worden gestuurd.\n\n" +
+            "Gebruik eventueel de knop 'afbeelding opslaan'."
         );
 
     }
