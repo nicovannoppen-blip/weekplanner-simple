@@ -4,11 +4,6 @@ margin:0;
 background:#f2f2f2;
 }
 
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
 header{
     background:#4285F4;
     color:white;
@@ -30,17 +25,30 @@ header button{
     cursor:pointer;
 }
 
+header button:hover{
+    transform:scale(1.02);
+}
 
-/* =========================================================
-   KLOK
-   ========================================================= */
+/* =========================
+   SLAAPVERHAAL KNOP
+========================= */
+
+header .storyButton{
+    background:#18234a;
+    color:white;
+    font-weight:bold;
+    border:2px solid white;
+}
+
+header .storyButton:hover{
+    background:#283875;
+}
 
 #liveClock{
     margin-left:auto;
 }
 
-
-@media (max-width: 900px){
+@media (max-width:900px){
 
     header{
         justify-content:center;
@@ -59,11 +67,9 @@ header button{
     #liveClockDate{
         font-size:0.9em;
     }
-
 }
 
-
-@media (max-width: 600px){
+@media (max-width:600px){
 
     header button{
         flex:1 1 45%;
@@ -84,9 +90,7 @@ header button{
         font-size:0.8em;
         text-align:center;
     }
-
 }
-
 
 button{
 display:flex;
@@ -102,11 +106,6 @@ cursor:pointer;
 font-size:14px;
 }
 
-
-/* =========================================================
-   FILTERS
-   ========================================================= */
-
 #filters{
 background:white;
 padding:10px;
@@ -118,86 +117,71 @@ gap:10px;
 border-bottom:1px solid #ddd;
 }
 
-
 .filterIcon {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
+    width:100px;
+    height:100px;
+    object-fit:contain;
 }
-
 
 #filters {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
-    gap: 10px;
-    padding: 10px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+    gap:10px;
+    padding:10px;
 }
-
 
 .filterBtn {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justify-content:flex-start;
 
-    border-radius: 12px;
-    padding: 10px;
+    border-radius:12px;
+    padding:10px;
 
-    cursor: pointer;
+    cursor:pointer;
 
-    transition: 0.2s;
-    user-select: none;
-    gap: 10px;
+    transition:0.2s;
+    user-select:none;
+    gap:10px;
 }
-
 
 .filterIcon {
-    width: 48px;
-    height: 48px;
-    object-fit: contain;
+    width:48px;
+    height:48px;
+    object-fit:contain;
 }
-
 
 .filterBtn.active {
-    outline: 3px solid #4285F4;
+    outline:3px solid #4285F4;
 }
-
 
 .filterText {
-    font-size: 14px;
-    text-transform: lowercase;
+    font-size:14px;
+    text-transform:lowercase;
 }
-
 
 .filterBtn:hover {
-    transform: scale(1.05);
+    transform:scale(1.05);
 }
-
 
 .filterBtn:not(.active) {
-    opacity: 0.3;
-    filter: grayscale(100%);
+    opacity:0.3;
+    filter:grayscale(100%);
 }
-
 
 #filters label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px;
 }
-
-
-/* =========================================================
-   WEEK
-   ========================================================= */
 
 .week{
 display:flex;
 height:960px;
 overflow-x:auto;
 }
-
 
 .day{
 flex:1;
@@ -206,7 +190,6 @@ margin:4px;
 border-radius:8px;
 position:relative;
 }
-
 
 .dayHeader{
 text-align:center;
@@ -217,7 +200,6 @@ color:white;
 border-bottom:1px solid #ddd;
 }
 
-
 .hour{
 position:absolute;
 left:0;
@@ -226,7 +208,6 @@ border-top:1px solid #eee;
 font-size:10px;
 color:#888;
 }
-
 
 .event{
 position:absolute;
@@ -243,30 +224,25 @@ align-items:center;
 overflow:visible;
 }
 
-
 .picto{
 width:28px;
 height:28px;
 }
-
 
 .icon img{
 max-width:100%;
 height:auto;
 }
 
-
 .large .picto{
 width:64px;
 height:64px;
 }
 
-
 .large .event{
 flex-direction:column;
 text-align:center;
 }
-
 
 .currentTimeLine {
     position:absolute;
@@ -276,11 +252,6 @@ text-align:center;
     background:red;
     z-index:1000;
 }
-
-
-/* =========================================================
-   POPUP
-   ========================================================= */
 
 .popup{
 position:fixed;
@@ -298,7 +269,6 @@ justify-content:center;
 z-index:1000;
 }
 
-
 .popupContent{
 background:white;
 padding:20px;
@@ -308,18 +278,11 @@ text-align:center;
 font-size:18px;
 }
 
-
 .popupLine {
     margin-bottom:5px;
 }
 
-
-/* =========================================================
-   EVENTS
-   ========================================================= */
-
-.event,
-.event.printEvent {
+.event, .event.printEvent {
     display:flex;
     align-items:center;
     gap:4px;
@@ -330,7 +293,6 @@ font-size:18px;
     box-sizing:border-box;
 }
 
-
 .event .picto,
 .event.printEvent .picto {
     display:inline-block;
@@ -339,18 +301,15 @@ font-size:18px;
     object-fit:contain;
 }
 
-
 .picto.smallicon {
     max-width:40px;
     max-height:40px;
 }
 
-
 .picto.bigicon {
     max-width:100px;
     max-height:40px;
 }
-
 
 .icons {
     display:flex;
@@ -359,7 +318,6 @@ font-size:18px;
     gap:4px;
 }
 
-
 .eventText {
     color:#000;
     text-align:center;
@@ -367,12 +325,10 @@ font-size:18px;
     text-transform:lowercase;
 }
 
-
 .speechWord {
     opacity:1;
     transition:all 0.2s ease;
 }
-
 
 .speechWord.active {
     opacity:1;
@@ -382,255 +338,150 @@ font-size:18px;
     font-weight:bold;
 }
 
-
 .currentEvent .eventText {
     font-weight:bold;
 }
-
 
 .currentEvent {
     outline:3px solid red;
 }
 
 
-/* =========================================================
-   SLAAPVERHAAL KNOP
-   ========================================================= */
+/* =========================
+   SLAAPVERHAAL
+========================= */
 
-.storyButton{
-    background:#fff3c4 !important;
-    color:#4b3b00 !important;
-    border:2px solid #f1c40f !important;
-    font-weight:bold;
-}
-
-
-.storyButton:hover{
-    background:#ffe98a !important;
-    transform:scale(1.03);
-}
-
-
-/* =========================================================
-   SLAAPVERHAAL PANEL
-   ========================================================= */
-
-.storyPanel{
+#storyOverlay{
     display:none;
 
     position:fixed;
+    inset:0;
 
-    top:50%;
-    left:50%;
+    background:rgba(0,0,0,0.65);
 
-    transform:translate(-50%,-50%);
+    z-index:5000;
 
-    width:min(900px,92vw);
-    max-height:90vh;
+    padding:20px;
+
+    box-sizing:border-box;
 
     overflow-y:auto;
+}
 
-    background:#fffdf7;
+#storyBox{
+
+    max-width:850px;
+
+    margin:20px auto;
+
+    background:#fffdf5;
 
     border-radius:20px;
 
-    box-shadow:
-        0 20px 60px rgba(0,0,0,0.30);
+    padding:30px 35px;
 
-    z-index:2000;
+    box-shadow:0 10px 40px rgba(0,0,0,0.35);
 
-    padding:0;
+    font-family:Georgia,serif;
+
+}
+
+#storyTitle{
+
+    text-align:center;
+
+    color:#315a9b;
+
+    font-size:32px;
+
+    margin-top:0;
+
+    margin-bottom:10px;
+
+}
+
+#storyDate{
+
+    text-align:center;
+
+    color:#777;
+
+    font-family:Arial,sans-serif;
+
+    margin-bottom:25px;
+
+}
+
+#storyText{
+
+    font-size:19px;
+
+    line-height:1.75;
 
     color:#292929;
-}
-
-
-.storyPanel.visible{
-    display:block;
-}
-
-
-.storyHeader{
-    position:sticky;
-    top:0;
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    padding:20px 24px;
-
-    background:#fff4c7;
-
-    border-bottom:1px solid #eadb9b;
-
-    z-index:5;
-}
-
-
-.storyTitle{
-    font-size:28px;
-    font-weight:bold;
-}
-
-
-.storyDate{
-    margin-top:5px;
-    color:#776c45;
-    font-size:14px;
-}
-
-
-.storyCloseButton{
-    min-width:45px;
-    width:45px;
-    height:45px;
-
-    border-radius:50%;
-
-    background:white;
-
-    font-size:20px;
-
-    flex:none;
-}
-
-
-.storyLoading{
-    padding:60px 30px;
-
-    text-align:center;
-
-    font-size:20px;
-}
-
-
-.storyLoadingIcon{
-    font-size:60px;
-    margin-bottom:20px;
-
-    animation:moonPulse 2s infinite;
-}
-
-
-.storyLoadingSmall{
-    margin-top:15px;
-    font-size:14px;
-    color:#888;
-}
-
-
-@keyframes moonPulse{
-
-    0%,100%{
-        transform:scale(1);
-        opacity:0.7;
-    }
-
-    50%{
-        transform:scale(1.15);
-        opacity:1;
-    }
 
 }
 
+#storyText p{
 
-.storyContent{
+    margin-bottom:18px;
 
-    padding:30px 45px 20px;
-
-    font-family:Georgia, "Times New Roman", serif;
-
-    font-size:20px;
-
-    line-height:1.85;
-
-    color:#302b22;
 }
 
-
-.storyContent .storyParagraph{
-    margin:0 0 1.2em;
-}
-
-
-.storyContent .storyHeading{
-    text-align:center;
-
-    font-size:30px;
-
-    margin-bottom:30px;
-
-    color:#5a4a25;
-}
-
-
-.storyActions{
+.storyButtons{
 
     display:flex;
 
     flex-wrap:wrap;
 
+    justify-content:center;
+
     gap:10px;
 
-    padding:15px 25px 25px;
+    margin-top:25px;
 
-    border-top:1px solid #eadb9b;
-
-    background:#fffaf0;
 }
 
+.storyButtons button{
 
-.storyActions button{
-    flex:1 1 150px;
+    background:#4285F4;
 
-    background:white;
+    color:white;
 
-    border:1px solid #ddd;
-
-    font-size:16px;
+    font-weight:bold;
 }
 
+.storyButtons button.closeStory{
 
-.storyActions button:hover{
-    background:#f2f2f2;
+    background:#777;
 }
 
+#storyLoading{
 
-@media(max-width:600px){
+    text-align:center;
 
-    .storyPanel{
-        width:96vw;
-        max-height:94vh;
-        border-radius:14px;
-    }
+    font-family:Arial,sans-serif;
 
-    .storyHeader{
-        padding:15px;
-    }
+    font-size:18px;
 
-    .storyTitle{
-        font-size:21px;
-    }
+    padding:40px;
 
-    .storyContent{
-        padding:22px 20px;
+}
 
-        font-size:18px;
+.storyMoon{
 
-        line-height:1.75;
-    }
+    font-size:42px;
 
-    .storyActions{
-        padding:12px;
-    }
+    text-align:center;
+
+    margin-bottom:5px;
 
 }
 
 
-/* =========================================================
+/* =========================
    PRINT
-   ========================================================= */
+========================= */
 
 @media print {
 
@@ -649,11 +500,6 @@ font-size:18px;
         top:0;
         width:100%;
     }
-
-
-    /* -----------------------------------------------------
-       EVENTS
-       ----------------------------------------------------- */
 
     .event.printEvent {
         position:absolute;
@@ -675,7 +521,6 @@ font-size:18px;
         print-color-adjust:exact;
     }
 
-
     .event.printEvent .icons {
         display:flex !important;
         flex-direction:row !important;
@@ -686,7 +531,6 @@ font-size:18px;
         width:100%;
     }
 
-
     .event.printEvent .picto {
         display:inline-block !important;
         width:auto !important;
@@ -694,38 +538,29 @@ font-size:18px;
         object-fit:contain;
     }
 
-
     .event.printEvent .picto.smallicon {
         width:40px !important;
         height:40px !important;
     }
-
 
     .event.printEvent .picto.bigicon {
         width:120px !important;
         height:40px !important;
     }
 
-
     .event.printEvent .eventText {
         text-align:center;
         width:100%;
         font-size:20px;
-        color:#000000;
+        color:#000;
         margin-top:0;
         overflow:visible;
     }
-
 
     img.picto {
         -webkit-print-color-adjust:exact;
         print-color-adjust:exact;
     }
-
-
-    /* -----------------------------------------------------
-       DAGEN
-       ----------------------------------------------------- */
 
     .printDay {
         page-break-after:always;
@@ -738,21 +573,16 @@ font-size:18px;
         font-family:Arial,sans-serif;
     }
 
-
     .printDay h2 {
         font-size:40px;
         text-align:center;
         margin-bottom:10px;
-
         display:flex;
         justify-content:center;
         align-items:center;
-
         gap:10px;
-
-        background:#4285F4 !important;
-        color:white !important;
-
+        background:#4285F4!important;
+        color:white!important;
         padding:8px;
         border-radius:6px;
 
@@ -760,44 +590,30 @@ font-size:18px;
         print-color-adjust:exact;
     }
 
-
     .dayIcon {
         font-size:35px;
     }
-
 
     .printDayContainer {
         position:relative;
         height:960px;
     }
 
-
     .printHour {
         position:absolute;
         left:0;
         right:0;
-
         border-top:1px solid #4285F4;
-
         font-size:10px;
-
         color:#4285F4;
-
         padding-left:4px;
     }
-
 
     @page {
         size:A4;
         margin:15mm;
     }
-
 }
-
-
-/* =========================================================
-   PRINT WEEK EXTRA
-   ========================================================= */
 
 @media print {
 
@@ -807,7 +623,6 @@ font-size:18px;
         break-after:page;
     }
 
-
     .printDay {
         page-break-after:always;
         break-inside:avoid;
@@ -816,89 +631,84 @@ font-size:18px;
 
 }
 
-
 .printDay:nth-child(odd) {
     page-break-after:always;
 }
-
 
 .printDay:nth-child(even) {
     page-break-after:always;
 }
 
 
-/* =========================================================
-   SLAAPVERHAAL AFDRUKKEN
-   ========================================================= */
+/* =========================
+   SLAAPVERHAAL PRINT
+========================= */
 
-@media print {
+@media print{
 
-    body.storyPrinting > * {
-        display:none !important;
-    }
+    body.printStoryMode #storyOverlay{
 
-
-    body.storyPrinting #storyPanel {
         display:block !important;
 
-        position:static !important;
+        position:static;
 
-        transform:none !important;
+        background:white;
 
-        width:100% !important;
+        padding:0;
 
-        max-height:none !important;
+        overflow:visible;
 
-        overflow:visible !important;
-
-        box-shadow:none !important;
-
-        border-radius:0 !important;
-
-        background:white !important;
     }
 
+    body.printStoryMode #storyBox{
 
-    body.storyPrinting #storyPanel * {
-        visibility:visible !important;
+        box-shadow:none;
+
+        max-width:none;
+
+        margin:0;
+
+        padding:0;
+
     }
 
+    body.printStoryMode #storyText{
 
-    body.storyPrinting .storyHeader {
-        position:static !important;
+        font-size:16pt;
 
-        background:white !important;
+        line-height:1.6;
 
-        border-bottom:2px solid #333 !important;
     }
 
+    body.printStoryMode .storyButtons{
 
-    body.storyPrinting .storyActions,
-    body.storyPrinting .storyCloseButton {
+        display:none;
+    }
+
+    body.printStoryMode header,
+    body.printStoryMode #filters,
+    body.printStoryMode #agenda,
+    body.printStoryMode #popup{
+
         display:none !important;
-    }
 
-
-    body.storyPrinting .storyContent {
-        font-size:18px;
-        line-height:1.7;
-        padding:20px;
-    }
-
-
-    @page {
-        size:A4;
-        margin:20mm;
     }
 
 }
 
 
-/* =========================================================
-   SWIPE / TOUCH
-   ========================================================= */
+/* =========================
+   KLOK
+========================= */
 
-html,
-body{
-    overscroll-behavior-x:none;
+#liveClockTime{
+    cursor:pointer;
+    font-weight:bold;
+    font-size:3em;
+}
+
+#liveClockDate{
+    cursor:pointer;
+    font-weight:bold;
+    font-size:1em;
 }
