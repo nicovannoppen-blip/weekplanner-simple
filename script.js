@@ -1,14 +1,18 @@
-let token=null
-let calendars=[]
-let events=[]
-let currentDate=new Date()
-let dayMode=false
-let bigIcons=false
+/* ============================================================
+   GEZINSAGENDA VANNOPPEKES
+   ============================================================ */
+
+let token = null;
+let calendars = [];
+let events = [];
+let currentDate = new Date();
+let dayMode = false;
+let bigIcons = false;
 
 
-// =========================================================
-// HERNOEM LANGE KALENDER NAMEN
-// =========================================================
+/* ============================================================
+   KALENDER NAMEN
+============================================================ */
 
 function rename(name){
 
@@ -25,11 +29,12 @@ function rename(name){
 }
 
 
-// =========================================================
-// VOLGORDE FILTER
-// =========================================================
+/* ============================================================
+   KALENDER VOLGORDE
+============================================================ */
 
-const CALENDAR_ORDER=[
+const CALENDAR_ORDER = [
+
     "Gezin",
     "Nico",
     "Elke",
@@ -38,191 +43,361 @@ const CALENDAR_ORDER=[
     "Rifter",
     "Rita",
     "Feestdagen"
-]
+
+];
 
 
-// =========================================================
-// SMART PICTO AI
-// =========================================================
+/* ============================================================
+   VERBORGEN KALENDERS
+============================================================ */
 
-const ICON_AI={
+const HIDDEN_CALENDARS = [];
+
+
+/* ============================================================
+   SMART PICTO AI
+============================================================ */
+
+const ICON_AI = {
 
 school:["school","klas","les"],
+
 thuis:["thuis","huis"],
+
 kunstschool:["beeldatelier"],
+
 bus:["bus"],
+
 zwemmen:["zwem","zwembad","zwemmen","plopsaqua"],
+
 dokter:["dokter","arts","ziekenhuis"],
+
 tandarts:["tandarts"],
+
 beugel:["beugel"],
+
 auto:["auto","rijden"],
+
 eten:["eten","lunch","avondeten"],
+
 slapen:["slapen","bedtijd"],
+
 sport:["sport","training"],
+
 winkel:["winkel","boodschappen","colruyt","hubo","aldi","lidl","decathlon","aveve","spar"],
+
 Verjaardag:["verjaardag","jarig"],
+
 oppas:["oppas","nanny"],
+
 muziek:["muziek","piano","gitaar"],
+
 computer:["computer","tablet"],
+
 lezen:["lezen","boek"],
+
 douchen:["douchen","bad"],
+
 wandelen_bergen:["bergen"],
+
 wandelen_oude_stad:["oudestad"],
+
 wandelen_rugzak:["wandelen rugzak","wandelen"],
+
 wandeling_park_bos:["wandeling parkbos"],
+
 wandelzoektocht_bos:["wandelzoektocht bos"],
+
 ziekenhuis:["ziekenhuis"],
+
 bureau:["nacht","nachtvergadering","team","teambuilding"],
+
 bakfiets:["bakfiets"],
+
 bezoek_van:["bezoek van","komt","komen"],
+
 boot:["boot"],
+
 bos:["bos"],
+
 camper:["camper"],
+
 camping_caravan:["camping caravan"],
+
 camping:["camping"],
+
 carnaval:["carnaval"],
+
 elke:["elke","mama"],
+
 fietsen:["fietsen"],
+
 Jana:["jana"],
+
 kasteel:["kasteel"],
-kermis:["kermis"],
-kermis:["kermis", "attractie", "attractiepark"],
+
+kermis:["kermis","attractie","attractiepark"],
+
 kippen_eten_geven:["kippen eten geven"],
+
 koffer:["koffer"],
+
 logeren:["logeren","bij"],
+
 museum:["museum"],
+
 nico:["nico","papa"],
+
 niel:["niel"],
+
 Niels:["niels"],
+
 odin:["odin"],
+
 op_bezoek:["op bezoek","bezoeken"],
+
 orthodontist:["orthodontist","orthodont"],
+
 pedicure:["pedicure","myrthe"],
+
 pretpark:["pretpark"],
+
 psycholoog:["psycholoog","nele","karen","thuisbegeleiding"],
+
 rita:["rita","moeke"],
+
 rolstoel:["rolstoel symbool"],
+
 spelen_binnen:["spelen binnen"],
+
 spelen_buiten:["spelen buiten"],
+
 stad:["stad"],
+
 Steven:["steven"],
+
 Thomas:["thomas"],
+
 trein:["trein"],
+
 tuin:["tuin","snoeien","planten","oogsten"],
+
 verpleegster:["v18","n14","l80","l89","l90","v18","v23"],
+
 Vinny:["vinny"],
+
 vliegtuig:["vliegtuig","airport","luchthaven"],
+
 vorming:["vorming","Bedrijfseerstehulp"],
+
 naschoolse_opvang:["strooppotje"],
+
 Ophelie:["ophelie","ophélie"],
+
 Vansenne:["vansenne"],
+
 SylvieEnKids:["sylvie en kids","sylvie en kindjes","sylvie met kindjes","sylvie met de kindjes"],
-IrenaGezin:["irena","irena","irena"],
+
+IrenaGezin:["irena","irena"],
+
 Irena:["irena alleen"],
+
 AnthonyEnkids:["anthony en kids","anthony en kindjes","anthony met kindjes","anthony met de kindjes"],
+
 IrenaEnJulian:["julian"],
+
 Sylvie:["sylvie"],
+
 Anthony:["anthony"],
+
 Thibeau:["thibeau"],
+
 vannoppen:["vannoppen","vannoppens"],
+
 broers:["broers"],
+
 zoo:["zoo","dierentuin"],
+
 garage:["garage","pascal"],
+
 lopen:["lopen","tungrirun"],
+
 Alexander:["alexander"],
+
 Christine:["christine"],
+
 dino:["dino"],
+
 Facts:["facts"],
+
 feest:["feest","viering","verjaardagsfeest"],
+
 feestdagen:["feestdag","feestdagen"],
+
 grootouderfeest:["grootouderfeest"],
+
 Herfstvakantie:["herfstvakantie"],
+
 karton:["karton"],
+
 kerstmis:["kerstmis","kerst"],
+
 kerstvakantie:["kerstvakantie"],
+
 kindjeshalen:["kindjes halen","Kindjes en Rita halen"],
+
 kindjesnaar:["kindjes naar"],
+
 Krokusvakantie:["krokusvakantie"],
+
 Loriana:["loriana"],
+
 mamaenpapa:["mama en papa"],
+
 musical:["musical"],
+
 paasvakantie:["paasvakantie"],
+
 pasen:["pasen"],
+
 ramadan:["ramadan"],
+
 trouwen:["trouwen"],
+
 voorraad:["voorraad"],
+
 Zomervakantie:["zomervakantie"],
+
 steffifamilie:["steffie","steffi"],
+
 Koen:["koen","koentje"],
+
 Bhodi:["bhodi","bodi","bohdi"],
+
 concert:["concert","festival","optreden"],
+
 inpakken:["inpakken"],
+
 opzetten_tent:["opzetten"],
+
 safari:["safari","safaripark"],
+
 zeehond:["zeehond"],
+
 reptiel:["reptiel","reptielen"],
+
 dierenwinkel:["dierenwinkel","schoubben"],
+
 gezin:["gezin"],
+
 Johnny:["johnny","papa"],
+
 verhuizen:["verhuizen","tent opruimen"],
+
 tattoo:["tattoo","tatoo","tatoe"],
+
 luchtballon:["luchtballon","ballonvaart"],
+
 schoolreis:["schoolreis"],
+
 sauna:["sauna","welness"],
+
 geit:["geit"],
+
 geit_eten_geven:["geit eten geven","geit_voederen"],
+
 kameel:["kameel","kamelen"],
+
 OmieEnOpie:["omie en opie","opie en omie"],
+
 paard_rijden:["paard rijden","ponyrijden"],
+
 pony:["pony"],
+
 binnenspeeltuin:["binnenspeeltuin"],
+
 speeltuin:["speeltuin"],
+
 verkennen:["verkennen"],
+
 welkomstspel:["welkomstspel"],
+
 dierenspeurtocht:["dierenspeurtocht"],
+
 knutselen:["knutselen","workshop"],
+
 volksspelen:["volksspelen"],
+
 dansen:["dansen"],
+
 huifkar:["huifkar"],
+
 pannenkoek:["pannenkoek","pannenkoeken"],
+
 efteling:["efteling"],
+
 boerenontbijt:["boerenontbijt"],
+
 bowlen:["bowlen"],
+
 golf:["golf"],
+
 etensamen:["samen eten","eten samen"],
+
 dolfinarium:["dolfinarium"],
+
 winkelcentrum:["winkelcentrum"],
+
 markt:["markt"],
+
 toonmoment:["toonmoment"],
+
 parking:["parking"],
+
 wekker:["wekker"],
+
 vissen:["vissen","aquarium"],
+
 vuurtoren:["vuurtoren"],
+
 Hunebed:["hunebed"],
+
 bunker:["bunker","bunkers"],
+
 ster:["ster","sterren"],
+
 orca:["orca","orka"],
+
 cinema:["cinema","kinepolis","euroscoop"],
+
 medicatie_druppels:["druppeltjes"],
+
 gezelschapsspel:["gezelschapsspel"],
+
 kamp:["kamp","bivak"],
+
 camper:["camper","mobilhome"],
+
 fotograaf:["fotograaf","fotoshoot","photoshoot"],
+
 sanne:["sanne"],
+
 koken:["koken"],
+
 kampvuur:["kampvuur"],
+
 oogarts:["oogarts"]
 
-}
+};
 
 
-// =========================================================
-// LOGIN / LOGOUT
-// =========================================================
+/* ============================================================
+   LOGIN
+============================================================ */
 
 function login(){
 
-    window.location.href="/api/auth";
+    window.location.href = "/api/auth";
 
 }
 
@@ -239,7 +414,7 @@ async function logout(){
 
     }
 
-    token=null;
+    token = null;
 
     localStorage.removeItem("token");
 
@@ -248,15 +423,19 @@ async function logout(){
 }
 
 
+/* ============================================================
+   TOKEN
+============================================================ */
+
 async function parseToken(){
 
     try{
 
-        const response=await fetch("/api/token");
+        const response = await fetch("/api/token");
 
         if(!response.ok){
 
-            token=null;
+            token = null;
 
             console.log("Niet ingelogd");
 
@@ -264,9 +443,9 @@ async function parseToken(){
 
         }
 
-        const data=await response.json();
+        const data = await response.json();
 
-        token=data.access_token;
+        token = data.access_token;
 
         console.log("Automatisch ingelogd");
 
@@ -276,17 +455,23 @@ async function parseToken(){
 
         console.error("Authenticatie fout:",error);
 
-        token=null;
+        token = null;
 
     }
 
 }
 
 
+/* ============================================================
+   INIT
+============================================================ */
+
 async function init(){
 
     if(!token){
+
         return;
+
     }
 
     await loadCalendars();
@@ -298,13 +483,13 @@ async function init(){
 }
 
 
-// =========================================================
-// GOOGLE CALENDAR
-// =========================================================
+/* ============================================================
+   CALENDARS
+============================================================ */
 
 async function loadCalendars(){
 
-    let r=await fetch(
+    let r = await fetch(
         "https://www.googleapis.com/calendar/v3/users/me/calendarList",
         {
             headers:{
@@ -313,81 +498,59 @@ async function loadCalendars(){
         }
     );
 
-    let data=await r.json();
+    let data = await r.json();
 
-    if(!r.ok){
+    calendars = data.items
+        .filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
+        .sort((a,b)=>{
 
-        console.error("Kalenders ophalen mislukt:",data);
+            let ia = CALENDAR_ORDER.indexOf(rename(a.summary));
+            let ib = CALENDAR_ORDER.indexOf(rename(b.summary));
 
-        return;
+            if(ia===-1) ia=999;
+            if(ib===-1) ib=999;
 
-    }
+            return ia-ib;
 
-    console.log(
-        data.items.map(c=>c.summary)
-    );
-
-    calendars=data.items
-    .filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
-    .sort((a,b)=>{
-
-        let ia=CALENDAR_ORDER.indexOf(
-            rename(a.summary)
-        );
-
-        let ib=CALENDAR_ORDER.indexOf(
-            rename(b.summary)
-        );
-
-        if(ia===-1)ia=999;
-
-        if(ib===-1)ib=999;
-
-        return ia-ib;
-
-    });
+        });
 
     buildFilters();
 
 }
 
 
+/* ============================================================
+   FILTERS
+============================================================ */
+
 function buildFilters(){
 
-    let f=document.getElementById("filters");
+    let f = document.getElementById("filters");
 
-    f.innerHTML="";
+    f.innerHTML = "";
 
     calendars.forEach(c=>{
 
-        let btn=document.createElement("div");
+        let btn = document.createElement("div");
 
-        btn.className="filterBtn active";
+        btn.className = "filterBtn active";
 
-        btn.dataset.id=c.id;
+        btn.dataset.id = c.id;
 
-        let name=rename(c.summary);
+        let name = rename(c.summary);
 
-        let iconName=name.toLowerCase();
+        let iconName = name.toLowerCase();
 
-        btn.innerHTML=`
-            <img
-                src="icons/${iconName}.png"
-                class="filterIcon"
-                onerror="this.style.display='none'"
-            >
-
-            <div class="filterText">
-                ${escapeHtml(name)}
-            </div>
+        btn.innerHTML = `
+            <img src="icons/${iconName}.png" class="filterIcon">
+            <div class="filterText">${name}</div>
         `;
 
-        btn.style.background=c.backgroundColor;
+        btn.style.background = c.backgroundColor;
 
-        btn.style.color=
-            getContrastColor(c.backgroundColor);
+        btn.style.color = getContrastColor(c.backgroundColor);
 
-        btn.onclick=()=>{
+        btn.onclick = ()=>{
 
             btn.classList.toggle("active");
 
@@ -404,57 +567,49 @@ function buildFilters(){
 
 function getContrastColor(hex){
 
-    if(!hex)return"#000";
+    if(!hex) return "#000";
 
-    let c=hex.substring(1);
+    let c = hex.substring(1);
 
-    let rgb=parseInt(c,16);
+    let rgb = parseInt(c,16);
 
-    let r=(rgb>>16)&0xff;
+    let r = (rgb>>16)&0xff;
+    let g = (rgb>>8)&0xff;
+    let b = rgb&0xff;
 
-    let g=(rgb>>8)&0xff;
+    let luminance =
+        (0.299*r + 0.587*g + 0.114*b)/255;
 
-    let b=rgb&0xff;
-
-    let luminance=
-        (0.299*r+
-         0.587*g+
-         0.114*b)/255;
-
-    return luminance>0.6?"#000":"#fff";
+    return luminance > 0.6 ? "#000" : "#fff";
 
 }
 
 
-// =========================================================
-// EVENTS LADEN
-// =========================================================
+/* ============================================================
+   EVENTS LADEN
+============================================================ */
 
 async function loadEvents(){
 
-    events=[];
+    events = [];
 
-    let start=new Date(currentDate);
+    let start = new Date(currentDate);
 
-    start.setDate(
-        start.getDate()-7
-    );
+    start.setDate(start.getDate()-7);
 
-    let end=new Date(currentDate);
+    let end = new Date(currentDate);
 
-    end.setDate(
-        end.getDate()+7
-    );
+    end.setDate(end.getDate()+7);
 
     for(let cal of calendars){
 
-        let url=
-        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
-        `timeMin=${start.toISOString()}&`+
-        `timeMax=${end.toISOString()}&`+
-        `singleEvents=true&orderBy=startTime`;
+        let url =
+            `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
+            `timeMin=${start.toISOString()}&`+
+            `timeMax=${end.toISOString()}&`+
+            `singleEvents=true&orderBy=startTime`;
 
-        let r=await fetch(
+        let r = await fetch(
             url,
             {
                 headers:{
@@ -463,30 +618,21 @@ async function loadEvents(){
             }
         );
 
-        let data=await r.json();
+        let data = await r.json();
 
-        if(!r.ok){
+        if(!data.items) continue;
 
-            console.error(
-                "Agenda ophalen mislukt:",
-                data
-            );
+        data.items.forEach(e=>{
 
-            continue;
+            let s = e.start.dateTime || e.start.date;
 
-        }
+            let en = e.end.dateTime || e.end.date;
 
-        (data.items||[]).forEach(e=>{
-
-            let s=e.start.dateTime||e.start.date;
-
-            let en=e.end.dateTime||e.end.date;
-
-            if(!s)return;
+            if(!s) return;
 
             events.push({
 
-                title:e.summary||"",
+                title:e.summary || "",
 
                 start:new Date(s),
 
@@ -498,9 +644,7 @@ async function loadEvents(){
 
                 color:cal.backgroundColor,
 
-                location:e.location||"",
-
-                allDay:!e.start.dateTime
+                location:e.location || ""
 
             });
 
@@ -511,16 +655,15 @@ async function loadEvents(){
 }
 
 
-// =========================================================
-// FILTER
-// =========================================================
+/* ============================================================
+   ACTIVE CALENDARS
+============================================================ */
 
 function activeCalendars(){
 
-    let list=[];
+    let list = [];
 
-    document
-        .querySelectorAll(".filterBtn.active")
+    document.querySelectorAll(".filterBtn.active")
         .forEach(b=>{
 
             list.push(b.dataset.id);
@@ -532,26 +675,30 @@ function activeCalendars(){
 }
 
 
-// =========================================================
-// PICTOGRAMMEN
-// =========================================================
+/* ============================================================
+   PICTOGRAMMEN
+============================================================ */
 
 function iconsForEvent(e){
 
-    let text=(e.title||"").toLowerCase();
+    let text = (e.title || "").toLowerCase();
 
     if(
         text.includes("rijden van") ||
         text.includes("rijden naar")
     ){
-        return["auto"];
+
+        return ["auto"];
+
     }
 
     if(
         text.includes("fietsen van") ||
         text.includes("fietsen naar")
     ){
-        return["fietsen"];
+
+        return ["fietsen"];
+
     }
 
     if(
@@ -560,14 +707,18 @@ function iconsForEvent(e){
         text.includes("lopen van") ||
         text.includes("lopen naar")
     ){
-        return["wandelen_rugzak"];
+
+        return ["wandelen_rugzak"];
+
     }
 
     if(
         text.includes("trein van") ||
         text.includes("trein naar")
     ){
-        return["trein"];
+
+        return ["trein"];
+
     }
 
     if(
@@ -577,45 +728,32 @@ function iconsForEvent(e){
         text.includes("openbaar vervoer van") ||
         text.includes("openbaar vervoer naar")
     ){
-        return["bus"];
-    }
 
-    if(
-        text.includes("metro van") ||
-        text.includes("metro naar")
-    ){
-        return["metro"];
-    }
+        return ["bus"];
 
-    if(
-        text.includes("tram van") ||
-        text.includes("tram naar")
-    ){
-        return["tram"];
     }
 
     if(
         text.includes("vliegtuig van") ||
         text.includes("vliegtuig naar")
     ){
-        return["vliegtuig"];
+
+        return ["vliegtuig"];
+
     }
 
-    let found=[];
+    let found = [];
 
     for(let icon in ICON_AI){
 
         ICON_AI[icon].forEach(word=>{
 
-            let regex=
-                new RegExp(
-                    "\\b"+
-                    escapeRegex(word.toLowerCase())+
-                    "\\b",
-                    "i"
-                );
+            let regex = new RegExp(
+                "\\b"+word.toLowerCase()+"\\b",
+                "i"
+            );
 
-            let match=text.match(regex);
+            let match = text.match(regex);
 
             if(match){
 
@@ -633,60 +771,47 @@ function iconsForEvent(e){
 
     }
 
-    found.sort(
-        (a,b)=>a.pos-b.pos
-    );
+    found.sort((a,b)=>a.pos-b.pos);
 
-    let icons=found.map(
-        f=>f.icon
-    );
+    let icons = found.map(f=>f.icon);
 
-    icons=[...new Set(icons)];
+    icons = [...new Set(icons)];
 
     return icons;
 
 }
 
 
-// =========================================================
-// MEERDAAGSE EVENTS
-// =========================================================
+/* ============================================================
+   EVENTS VOOR DAG
+============================================================ */
 
 function eventsForDay(day,active){
 
-    let startDay=new Date(day);
+    let startDay = new Date(day);
 
-    startDay.setHours(8,0,0,0);
+    startDay.setHours(0,0,0,0);
 
-    let endDay=new Date(day);
+    let endDay = new Date(day);
 
-    endDay.setHours(23,0,0,0);
+    endDay.setHours(23,59,59,999);
 
-    let list=[];
+    let list = [];
 
     events.forEach(e=>{
 
-        if(!active.includes(e.calendar))
-            return;
+        if(!active.includes(e.calendar)) return;
 
-        if(e.end<=startDay)
-            return;
+        if(e.end <= startDay) return;
 
-        if(e.start>=endDay)
-            return;
+        if(e.start >= endDay) return;
 
-        let start=new Date(
-            Math.max(
-                e.start,
-                startDay
-            )
+        let start = new Date(
+            Math.max(e.start,startDay)
         );
 
-        let end=new Date(
-            Math.min(
-                e.end,
-                endDay
-            )
+        let end = new Date(
+            Math.min(e.end,endDay)
         );
 
         list.push({
@@ -706,47 +831,43 @@ function eventsForDay(day,active){
 }
 
 
-// =========================================================
-// RENDER
-// =========================================================
+/* ============================================================
+   RENDER
+============================================================ */
 
 function render(){
 
-    let agenda=
-        document.getElementById("agenda");
+    let agenda = document.getElementById("agenda");
 
-    agenda.innerHTML="";
+    agenda.innerHTML = "";
 
-    let start=getMonday(currentDate);
+    let start = getMonday(currentDate);
 
-    let days=dayMode?1:7;
+    let days = dayMode ? 1 : 7;
 
-    let container=
-        document.createElement("div");
+    let container = document.createElement("div");
 
-    container.className="week";
+    container.className = "week";
 
-    let active=activeCalendars();
+    let active = activeCalendars();
 
     for(let i=0;i<days;i++){
 
-        let d=new Date(
-            dayMode?
-            currentDate:
-            start
+        let d = new Date(
+            dayMode ? currentDate : start
         );
 
-        if(!dayMode)
-            d.setDate(
-                start.getDate()+i
-            );
+        if(!dayMode){
 
-        let col=
-            document.createElement("div");
+            d.setDate(start.getDate()+i);
 
-        col.className="day";
+        }
 
-        let todayDate=new Date();
+        let col = document.createElement("div");
+
+        col.className = "day";
+
+        let todayDate = new Date();
 
         if(
             d.getDate()==todayDate.getDate() &&
@@ -754,28 +875,24 @@ function render(){
             d.getFullYear()==todayDate.getFullYear()
         ){
 
-            col.id="today";
+            col.id = "today";
 
         }
 
-        let now=new Date();
 
-        if(
-            !dayMode ||
-            sameDay(now,d)
-        ){
+        let now = new Date();
 
-            let line=
-                document.createElement("div");
+        if(!dayMode || sameDay(now,d)){
 
-            line.className=
-                "currentTimeLine";
+            let line = document.createElement("div");
 
-            let minutesSince7=
+            line.className = "currentTimeLine";
+
+            let minutesSince7 =
                 (now.getHours()-7)*60+
                 now.getMinutes();
 
-            line.style.top=
+            line.style.top =
                 minutesSince7+"px";
 
             col.appendChild(line);
@@ -783,37 +900,28 @@ function render(){
         }
 
 
-        col.onclick=()=>{
+        col.onclick = ()=>{
 
-            currentDate=new Date(d);
+            currentDate = new Date(d);
 
-            dayMode=true;
+            dayMode = true;
 
             render();
 
         };
 
 
-        let head=
-            document.createElement("div");
+        let head = document.createElement("div");
 
-        head.className="dayHeader";
+        head.className = "dayHeader";
 
-        let dayIcons=[
-            "☀️",
-            "🌙",
-            "🔥",
-            "🌳",
-            "⭐",
-            "🎉",
-            "🌈"
-        ];
+        let dayIcons =
+            ["☀️","🌙","🔥","🌳","⭐","🎉","🌈"];
 
-        let weekday=d.getDay();
+        let weekday = d.getDay();
 
-        head.innerHTML=
-            dayIcons[weekday]+
-            " "+
+        head.innerHTML =
+            dayIcons[weekday]+" "+
             d.toLocaleDateString(
                 "nl-BE",
                 {
@@ -834,12 +942,12 @@ function render(){
 
         for(let h=7;h<=23;h++){
 
-            let line=
+            let line =
                 document.createElement("div");
 
-            line.className="hour";
+            line.className = "hour";
 
-            line.style.top=
+            line.style.top =
                 ((h-7)*60)+"px";
 
             col.appendChild(line);
@@ -847,7 +955,7 @@ function render(){
         }
 
 
-        let dayEvents=
+        let dayEvents =
             eventsForDay(
                 d,
                 active
@@ -870,7 +978,7 @@ function render(){
         agenda.classList.remove("large");
 
 
-    let todayCol=
+    let todayCol =
         document.getElementById("today");
 
     if(todayCol){
@@ -890,41 +998,33 @@ function render(){
 }
 
 
-// =========================================================
-// LAYOUT EVENTS
-// =========================================================
+/* ============================================================
+   LAYOUT EVENTS
+============================================================ */
 
-function layoutEvents(
-    list,
-    col,
-    printMode=false
-){
+function layoutEvents(list,col,printMode=false){
 
     list.sort(
         (a,b)=>a.start-b.start
     );
 
-    let columns=[];
+    let columns = [];
 
     list.forEach(e=>{
 
-        let placed=false;
+        let placed = false;
 
-        for(
-            let i=0;
-            i<columns.length;
-            i++
-        ){
+        for(let i=0;i<columns.length;i++){
 
             if(
                 columns[i][
                     columns[i].length-1
-                ].end<=e.start
+                ].end <= e.start
             ){
 
                 columns[i].push(e);
 
-                placed=true;
+                placed = true;
 
                 break;
 
@@ -941,107 +1041,94 @@ function layoutEvents(
     });
 
 
-    columns.forEach(
-        (colEvents,i)=>{
+    columns.forEach((colEvents,i)=>{
 
         colEvents.forEach(e=>{
 
-            let start=
+            let start =
                 (e.start.getHours()-7)*60+
                 e.start.getMinutes();
 
-            let dur=
+            let dur =
                 (e.end-e.start)/60000;
 
-            let div=
+            let div =
                 document.createElement("div");
 
-            div.className=
-                printMode?
-                "event printEvent":
-                "event";
+            div.className =
+                printMode
+                ? "event printEvent"
+                : "event";
 
-            div.style.top=
+            div.style.top =
                 start+"px";
 
-            div.style.height=
+            div.style.height =
                 dur+"px";
 
 
-            let width=
+            let width =
                 90/columns.length;
 
-            let left=
+            let left =
                 5+i*width;
 
-            div.style.left=
+            div.style.left =
                 left+"%";
 
-            div.style.width=
+            div.style.width =
                 (width-2)+"%";
 
 
-            div.style.background=
+            div.style.background =
                 e.color;
 
 
-            let icons=
+            let icons =
                 iconsForEvent(e);
 
-            let iconHTML=
+            let iconHTML =
                 `<div class="icons">`;
-
 
             icons.forEach(ic=>{
 
-                let extraClass="";
+                let extraClass = "";
 
                 if(
-
                     ic==="steffifamilie" ||
                     ic==="IrenaGezin" ||
                     ic==="kindjeshalen" ||
                     ic==="kindjesnaar" ||
-                    ic==="Jana_en_Vinny" ||
                     ic==="SylvieEnKids" ||
                     ic==="Vansenne" ||
                     ic==="AnthonyEnkids" ||
                     ic==="IrenaEnJulian" ||
                     ic==="vannoppen"
-
                 ){
 
-                    extraClass="bigicon";
+                    extraClass = "bigicon";
 
                 }else{
 
-                    extraClass="smallicon";
+                    extraClass = "smallicon";
 
                 }
 
-                iconHTML+=`
-
-                    <img
-                        src="icons/${ic}.png"
-                        class="picto ${extraClass}"
-                        onerror="this.style.display='none'"
-                    >
-
-                `;
+                iconHTML +=
+                    `<img src="icons/${ic}.png" class="picto ${extraClass}">`;
 
             });
 
-
-            iconHTML+=`</div>`;
-
-
-            let displayText=
-                time(e.start)+
-                " "+
-                (e.title||"");
+            iconHTML += `</div>`;
 
 
-            let speechText=(
+            let displayText =
+                time(e.start)+" "+
+                (e.title || "");
+
+
+            let speechText =
+
                 "agenda "+
                 e.calendarName+
                 ": "+
@@ -1049,43 +1136,35 @@ function layoutEvents(
                 ". van "+
                 time(e.start)+
                 " tot "+
-                time(e.end)
-            ).toLowerCase();
+                time(e.end);
 
 
-            let words=
+            let words =
                 displayText.split(" ");
 
 
-            let textHTML=
+            let textHTML =
                 `<div class="eventText">`;
 
 
             words.forEach((w,i)=>{
 
-                textHTML+=`
-
-                    <span
-                        class="speechWord"
-                        data-index="${i}"
-                    >
-                        ${escapeHtml(w)}
-                    </span>
-
-                `;
+                textHTML +=
+                    `<span class="speechWord" data-index="${i}">${w}</span> `;
 
             });
 
 
-            textHTML+=`</div>`;
+            textHTML +=
+                `</div>`;
 
 
-            div.innerHTML=
+            div.innerHTML =
                 iconHTML+
                 textHTML;
 
 
-            div.onclick=(ev)=>{
+            div.onclick = ev=>{
 
                 ev.stopPropagation();
 
@@ -1106,13 +1185,13 @@ function layoutEvents(
 }
 
 
-// =========================================================
-// HELPERS
-// =========================================================
+/* ============================================================
+   HELPERS
+============================================================ */
 
 function sameDay(a,b){
 
-    return(
+    return (
         a.getFullYear()==b.getFullYear() &&
         a.getMonth()==b.getMonth() &&
         a.getDate()==b.getDate()
@@ -1123,30 +1202,27 @@ function sameDay(a,b){
 
 function time(d){
 
-    return(
-        d.getHours()
-            .toString()
-            .padStart(2,"0")
-        +
-        ":"+
+    return d.getHours()
+        .toString()
+        .padStart(2,"0")
+        +":"+
         d.getMinutes()
-            .toString()
-            .padStart(2,"0")
-    );
+        .toString()
+        .padStart(2,"0");
 
 }
 
 
 function getMonday(d){
 
-    d=new Date(d);
+    d = new Date(d);
 
-    let day=d.getDay();
+    let day = d.getDay();
 
-    let diff=
+    let diff =
         d.getDate()-
         day+
-        (day==0?-6:1);
+        (day==0 ? -6 : 1);
 
     return new Date(
         d.setDate(diff)
@@ -1155,41 +1231,19 @@ function getMonday(d){
 }
 
 
-function escapeHtml(text){
-
-    return String(text||"")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-
-}
-
-
-function escapeRegex(text){
-
-    return String(text).replace(
-        /[.*+?^${}()|[\]\\]/g,
-        "\\$&"
-    );
-
-}
-
-
-// =========================================================
-// NAVIGATIE
-// =========================================================
+/* ============================================================
+   NAVIGATIE
+============================================================ */
 
 function prev(){
 
-    dayMode?
-        currentDate.setDate(
+    dayMode
+        ? currentDate.setDate(
             currentDate.getDate()-1
-        ):
-        currentDate.setDate(
+          )
+        : currentDate.setDate(
             currentDate.getDate()-7
-        );
+          );
 
     init();
 
@@ -1198,13 +1252,13 @@ function prev(){
 
 function next(){
 
-    dayMode?
-        currentDate.setDate(
+    dayMode
+        ? currentDate.setDate(
             currentDate.getDate()+1
-        ):
-        currentDate.setDate(
+          )
+        : currentDate.setDate(
             currentDate.getDate()+7
-        );
+          );
 
     init();
 
@@ -1213,7 +1267,7 @@ function next(){
 
 function today(){
 
-    currentDate=new Date();
+    currentDate = new Date();
 
     init();
 
@@ -1222,7 +1276,7 @@ function today(){
 
 function toggleView(){
 
-    dayMode=!dayMode;
+    dayMode = !dayMode;
 
     render();
 
@@ -1255,25 +1309,19 @@ function selectNone(){
 }
 
 
-// =========================================================
-// INIT
-// =========================================================
-
-parseToken();
-
-
-// =========================================================
-// KOMENDE AFSPRAKEN
-// =========================================================
+/* ============================================================
+   KOMENDE AFSPRAKEN
+============================================================ */
 
 function showNextEvents(){
 
-    let now=new Date();
+    let now = new Date();
 
-    let upcoming=events
+    let upcoming = events
+
         .filter(e=>{
 
-            let dur=
+            let dur =
                 (e.end-e.start)/3600000;
 
             if(dur>=15)
@@ -1282,69 +1330,78 @@ function showNextEvents(){
             return e.start>now;
 
         })
+
         .sort(
             (a,b)=>a.start-b.start
         )
+
         .slice(0,4);
 
 
-    let popup=
+    let popup =
         document.getElementById("popup");
 
-    let popupText=
+    let popupText =
         document.getElementById("popupText");
 
-    popupText.innerHTML="";
+
+    popupText.innerHTML = "";
 
 
     upcoming.forEach(e=>{
 
-        let lineText=(
+        let lineText = (
+
             "agenda "+
-            (e.calendarName||"")+
+            (e.calendarName || "")+
             ": van "+
             time(e.start)+
             " tot "+
             time(e.end)+
             " "+
-            (e.title||" ")+
+            (e.title || "")+
             "."
+
         ).toLowerCase();
 
 
-        let words=
+        let words =
             lineText.split(/\s+/);
 
 
-        let lineDiv=
+        let lineDiv =
             document.createElement("div");
 
-        lineDiv.className="popupLine";
+        lineDiv.className =
+            "popupLine";
 
 
         words.forEach((w,i)=>{
 
-            let span=
+            let span =
                 document.createElement("span");
 
-            span.className=
+            span.className =
                 "speechWord";
 
-            span.dataset.index=i;
+            span.dataset.index = i;
 
-            span.innerText=w+" ";
+            span.innerText =
+                w+" ";
 
             lineDiv.appendChild(span);
 
         });
 
 
-        popupText.appendChild(lineDiv);
+        popupText.appendChild(
+            lineDiv
+        );
 
     });
 
 
-    popup.style.display="flex";
+    popup.style.display = "flex";
 
 
     speak(
@@ -1352,13 +1409,13 @@ function showNextEvents(){
         upcoming.map(e=>
 
             "agenda "+
-            (e.calendarName||"")+
+            (e.calendarName || "")+
             ": van "+
             time(e.start)+
             " tot "+
             time(e.end)+
             " "+
-            (e.title||"")
+            (e.title || "")
 
         ).join(". "),
 
@@ -1369,78 +1426,87 @@ function showNextEvents(){
 }
 
 
-// =========================================================
-// STEM
-// =========================================================
+/* ============================================================
+   STEM
+============================================================ */
 
 function speak(text,lineDiv){
 
     speechSynthesis.cancel();
 
-    let speechWords=
+    let speechWords =
         text.split(/\s+/);
 
-    let spans=
+    let spans =
         Array.from(
             lineDiv.querySelectorAll(
                 ".speechWord"
             )
         );
 
-    let msg=
-        new SpeechSynthesisUtterance(text);
 
-    msg.lang="nl-BE";
+    let msg =
+        new SpeechSynthesisUtterance(
+            text
+        );
 
-    msg.onboundary=function(event){
-
-        if(event.name!=="word")
-            return;
-
-        let charIndex=
-            event.charIndex;
-
-        let total=0;
-
-        let currentWordIndex=
-            speechWords.length-1;
+    msg.lang = "nl-BE";
 
 
-        for(
-            let i=0;
-            i<speechWords.length;
-            i++
-        ){
+    msg.onboundary =
+        function(event){
 
-            total+=
-                speechWords[i].length+1;
+            if(event.name!=="word")
+                return;
 
-            if(total>charIndex){
 
-                currentWordIndex=i;
+            let charIndex =
+                event.charIndex;
 
-                break;
+
+            let total = 0;
+
+            let currentWordIndex =
+                speechWords.length-1;
+
+
+            for(
+                let i=0;
+                i<speechWords.length;
+                i++
+            ){
+
+                total +=
+                    speechWords[i].length+1;
+
+
+                if(total>charIndex){
+
+                    currentWordIndex=i;
+
+                    break;
+
+                }
 
             }
 
-        }
+
+            spans.forEach(
+                s=>s.classList.remove("active")
+            );
 
 
-        spans.forEach(
-            s=>s.classList.remove("active")
-        );
+            let span =
+                spans[currentWordIndex];
 
 
-        let span=
-            spans[currentWordIndex];
+            if(span)
+                span.classList.add("active");
 
-        if(span)
-            span.classList.add("active");
-
-    };
+        };
 
 
-    msg.onend=()=>{
+    msg.onend = ()=>{
 
         spans.forEach(
             s=>s.classList.remove("active")
@@ -1454,9 +1520,9 @@ function speak(text,lineDiv){
 }
 
 
-// =========================================================
-// POPUP
-// =========================================================
+/* ============================================================
+   POPUP
+============================================================ */
 
 function closePopup(){
 
@@ -1467,17 +1533,16 @@ function closePopup(){
 }
 
 
-// =========================================================
-// SWIPE
-// =========================================================
+/* ============================================================
+   SWIPE
+============================================================ */
 
-let touchStartX=0;
-
+let touchStartX = 0;
 
 document.addEventListener(
     "touchstart",
     e=>{
-        touchStartX=
+        touchStartX =
             e.changedTouches[0].screenX;
     }
 );
@@ -1487,10 +1552,10 @@ document.addEventListener(
     "touchend",
     e=>{
 
-        let touchEndX=
+        let touchEndX =
             e.changedTouches[0].screenX;
 
-        let diff=
+        let diff =
             touchStartX-touchEndX;
 
         if(diff>60)
@@ -1503,16 +1568,16 @@ document.addEventListener(
 );
 
 
-// =========================================================
-// PRINT WEEK
-// =========================================================
+/* ============================================================
+   PRINT WEEK
+============================================================ */
 
 function printWeek(){
 
-    let start=
+    let start =
         getMonday(currentDate);
 
-    let printContainer=
+    let printContainer =
         document.getElementById(
             "printContainer"
         );
@@ -1520,10 +1585,10 @@ function printWeek(){
 
     if(!printContainer){
 
-        printContainer=
+        printContainer =
             document.createElement("div");
 
-        printContainer.id=
+        printContainer.id =
             "printContainer";
 
         document.body.appendChild(
@@ -1533,16 +1598,16 @@ function printWeek(){
     }
 
 
-    printContainer.innerHTML="";
+    printContainer.innerHTML = "";
 
 
-    let active=
+    let active =
         activeCalendars();
 
 
     for(let i=0;i<7;i++){
 
-        let d=
+        let d =
             new Date(start);
 
         d.setDate(
@@ -1550,41 +1615,35 @@ function printWeek(){
         );
 
 
-        let dayEvents=
+        let dayEvents =
             eventsForDay(
                 d,
                 active
             );
 
 
-        let dayDiv=
+        let dayDiv =
             document.createElement("div");
 
-        dayDiv.className=
+        dayDiv.className =
             "printDay";
 
 
-        let dayIcons=[
-            "☀️",
-            "🌙",
-            "🔥",
-            "🌳",
-            "⭐",
-            "🎉",
-            "🌈"
-        ];
+        let dayIcons =
+            ["☀️","🌙","🔥","🌳","⭐","🎉","🌈"];
 
 
-        let weekday=d.getDay();
+        let weekday =
+            d.getDay();
 
 
-        let h2=
+        let h2 =
             document.createElement("h2");
 
 
-        h2.innerText=
-            dayIcons[weekday]+
-            " "+
+        h2.innerText =
+
+            dayIcons[weekday]+" "+
             d.toLocaleDateString(
                 "nl-BE",
                 {
@@ -1598,11 +1657,13 @@ function printWeek(){
         dayDiv.appendChild(h2);
 
 
-        let dayContainer=
+        let dayContainer =
             document.createElement("div");
 
-        dayContainer.className=
+
+        dayContainer.className =
             "printDayContainer";
+
 
         dayDiv.appendChild(
             dayContainer
@@ -1611,16 +1672,16 @@ function printWeek(){
 
         for(let h=7;h<=23;h++){
 
-            let hourLine=
+            let hourLine =
                 document.createElement("div");
 
-            hourLine.className=
+            hourLine.className =
                 "printHour";
 
-            hourLine.style.top=
+            hourLine.style.top =
                 ((h-7)*60)+"px";
 
-            hourLine.innerText=
+            hourLine.innerText =
                 h+":00";
 
             dayContainer.appendChild(
@@ -1645,8 +1706,9 @@ function printWeek(){
 
 
     alert(
-        "Tip: zet je printer op enkelzijdig voor beste resultaat"
+        "Tip: zet je printer op enkelzijdig voor het beste resultaat."
     );
+
 
     window.print();
 
@@ -1655,66 +1717,72 @@ function printWeek(){
 }
 
 
-// =========================================================
-// LIVE KLOK
-// =========================================================
+/* ============================================================
+   KLOK
+============================================================ */
 
-let clockContainer=
+let clockContainer =
     document.createElement("div");
 
-clockContainer.id="liveClock";
+clockContainer.id =
+    "liveClock";
 
-clockContainer.style.display=
+clockContainer.style.display =
     "inline-flex";
 
-clockContainer.style.alignItems=
+clockContainer.style.alignItems =
     "center";
 
-clockContainer.style.marginLeft=
+clockContainer.style.marginLeft =
     "5px";
 
-clockContainer.style.gap=
+clockContainer.style.gap =
     "30px";
+
 
 document
     .querySelector("header")
-    .appendChild(clockContainer);
+    .appendChild(
+        clockContainer
+    );
 
 
-let clockTime=
+let clockTime =
     document.createElement("div");
 
-clockTime.id=
+clockTime.id =
     "liveClockTime";
 
-clockTime.style.cursor=
+clockTime.style.cursor =
     "pointer";
 
-clockTime.style.fontWeight=
+clockTime.style.fontWeight =
     "bold";
 
-clockTime.style.fontSize=
+clockTime.style.fontSize =
     "3em";
+
 
 clockContainer.appendChild(
     clockTime
 );
 
 
-let clockDate=
+let clockDate =
     document.createElement("div");
 
-clockDate.id=
+clockDate.id =
     "liveClockDate";
 
-clockDate.style.cursor=
+clockDate.style.cursor =
     "pointer";
 
-clockDate.style.fontWeight=
+clockDate.style.fontWeight =
     "bold";
 
-clockDate.style.fontSize=
+clockDate.style.fontSize =
     "1em";
+
 
 clockContainer.appendChild(
     clockDate
@@ -1723,24 +1791,24 @@ clockContainer.appendChild(
 
 function updateClock(){
 
-    let now=new Date();
+    let now = new Date();
 
-    let hours=
+    let hours =
         now.getHours()
         .toString()
         .padStart(2,"0");
 
-    let minutes=
+    let minutes =
         now.getMinutes()
         .toString()
         .padStart(2,"0");
 
 
-    clockTime.innerText=
+    clockTime.innerText =
         `${hours}:${minutes}`;
 
 
-    let weekday=
+    let weekday =
         now.toLocaleDateString(
             "nl-BE",
             {
@@ -1748,12 +1816,14 @@ function updateClock(){
             }
         );
 
-    let day=
+
+    let day =
         now.getDate()
         .toString()
         .padStart(2,"0");
 
-    let month=
+
+    let month =
         now.toLocaleDateString(
             "nl-BE",
             {
@@ -1761,11 +1831,12 @@ function updateClock(){
             }
         );
 
-    let year=
+
+    let year =
         now.getFullYear();
 
 
-    clockDate.innerText=
+    clockDate.innerText =
         `${weekday} ${day} ${month} ${year}`;
 
 }
@@ -1779,34 +1850,30 @@ setInterval(
 updateClock();
 
 
-clockTime.onclick=()=>{
+clockTime.onclick = ()=>{
 
-    let now=new Date();
+    let now = new Date();
 
-    let hours=now.getHours();
+    let speech =
+        `Het is ${now.getHours()} uur en ${now.getMinutes()} minuten.`;
 
-    let minutes=now.getMinutes();
-
-    let speech=
-        `Het is ${hours} uur en ${minutes} minuten.`;
-
-    let msg=
+    let msg =
         new SpeechSynthesisUtterance(
             speech
         );
 
-    msg.lang="nl-BE";
+    msg.lang = "nl-BE";
 
     speechSynthesis.speak(msg);
 
 };
 
 
-clockDate.onclick=()=>{
+clockDate.onclick = ()=>{
 
-    let now=new Date();
+    let now = new Date();
 
-    let weekday=
+    let weekday =
         now.toLocaleDateString(
             "nl-BE",
             {
@@ -1814,9 +1881,11 @@ clockDate.onclick=()=>{
             }
         );
 
-    let day=now.getDate();
+    let day =
+        now.getDate();
 
-    let month=
+
+    let month =
         now.toLocaleDateString(
             "nl-BE",
             {
@@ -1824,112 +1893,61 @@ clockDate.onclick=()=>{
             }
         );
 
-    let year=now.getFullYear();
+
+    let year =
+        now.getFullYear();
 
 
-    let speech=
+    let speech =
         `Vandaag is ${weekday} ${day} ${month} ${year}.`;
 
-    let msg=
+
+    let msg =
         new SpeechSynthesisUtterance(
             speech
         );
 
-    msg.lang="nl-BE";
+    msg.lang = "nl-BE";
 
     speechSynthesis.speak(msg);
 
 };
 
 
-// =========================================================
-// UPDATE CURRENT TIME LINE
-// =========================================================
+/* ============================================================
+   TIJDLIJN
+============================================================ */
+
+function updateCurrentTimeLine(){
+
+    if(typeof render==="function")
+        render();
+
+}
+
 
 setInterval(
     updateCurrentTimeLine,
     60000
 );
 
-updateCurrentTimeLine();
+
+/* ============================================================
+   ============================================================
+   SLAAPVERHAAL
+   ============================================================
+============================================================ */
 
 
-function updateCurrentTimeLine(){
+/*
+    Deze functie haalt de afspraken van morgen
+    rechtstreeks uit Google Agenda.
 
-    let now=new Date();
+    Hierdoor zijn we niet afhankelijk van de
+    huidige weekweergave.
+*/
 
-    let line=
-        document.querySelector(
-            ".currentTimeLine"
-        );
-
-    if(!line)
-        return;
-
-    let minutesSince7=
-        (now.getHours()-7)*60+
-        now.getMinutes();
-
-    line.style.top=
-        minutesSince7+"px";
-
-}
-
-
-// =========================================================
-// =========================================================
-// SLAAPVERHAAL
-// =========================================================
-// =========================================================
-
-
-// ---------------------------------------------------------
-// Datum van morgen
-// ---------------------------------------------------------
-
-function getTomorrow(){
-
-    let tomorrow=new Date();
-
-    tomorrow.setDate(
-        tomorrow.getDate()+1
-    );
-
-    tomorrow.setHours(
-        0,0,0,0
-    );
-
-    return tomorrow;
-
-}
-
-
-// ---------------------------------------------------------
-// Nederlandse datum
-// ---------------------------------------------------------
-
-function formatStoryDate(date){
-
-    return date.toLocaleDateString(
-        "nl-BE",
-        {
-            weekday:"long",
-            day:"numeric",
-            month:"long",
-            year:"numeric"
-        }
-    );
-
-}
-
-
-// ---------------------------------------------------------
-// Haal ALLE afspraken van morgen rechtstreeks
-// uit Google Calendar.
-// Dit staat los van de huidige weekweergave.
-// ---------------------------------------------------------
-
-async function getTomorrowCalendarEvents(){
+async function getTomorrowEvents(){
 
     if(!token){
 
@@ -1940,18 +1958,19 @@ async function getTomorrowCalendarEvents(){
     }
 
 
-    if(!calendars || calendars.length===0){
+    let tomorrow =
+        new Date();
 
-        await loadCalendars();
+    tomorrow.setDate(
+        tomorrow.getDate()+1
+    );
 
-    }
+    tomorrow.setHours(
+        0,0,0,0
+    );
 
 
-    let tomorrow=
-        getTomorrow();
-
-
-    let dayAfter=
+    let dayAfter =
         new Date(tomorrow);
 
     dayAfter.setDate(
@@ -1959,101 +1978,91 @@ async function getTomorrowCalendarEvents(){
     );
 
 
-    let result=[];
+    let result = [];
 
 
-    for(const cal of calendars){
+    for(let cal of calendars){
 
-        let url=
+        let url =
+
             `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
             `timeMin=${encodeURIComponent(tomorrow.toISOString())}&`+
             `timeMax=${encodeURIComponent(dayAfter.toISOString())}&`+
-            `singleEvents=true&`+
-            `orderBy=startTime&`+
-            `maxResults=100`;
+            `singleEvents=true&orderBy=startTime`;
 
 
-        let response=
-            await fetch(
-                url,
-                {
-                    headers:{
-                        Authorization:
-                            "Bearer "+token
+        try{
+
+            let response =
+                await fetch(
+                    url,
+                    {
+                        headers:{
+                            Authorization:
+                                "Bearer "+token
+                        }
                     }
-                }
-            );
+                );
 
 
-        if(!response.ok){
-
-            let errorText=
-                await response.text();
-
-            console.error(
-                "Fout bij kalender:",
-                cal.summary,
-                errorText
-            );
-
-            continue;
-
-        }
+            if(!response.ok)
+                continue;
 
 
-        let data=
-            await response.json();
+            let data =
+                await response.json();
 
 
-        (data.items||[]).forEach(event=>{
-
-            let isAllDay=
-                Boolean(event.start.date);
+            if(!data.items)
+                continue;
 
 
-            let start=
-                event.start.dateTime ||
-                event.start.date;
+            data.items.forEach(e=>{
+
+                let start =
+                    e.start.dateTime ||
+                    e.start.date;
 
 
-            let end=
-                event.end.dateTime ||
-                event.end.date;
+                let end =
+                    e.end.dateTime ||
+                    e.end.date;
 
 
-            if(!start)
-                return;
+                if(!start)
+                    return;
 
 
-            result.push({
+                result.push({
 
-                title:
-                    event.summary ||
-                    "Afspraak",
+                    title:
+                        e.summary || "",
 
-                start:
-                    new Date(start),
+                    start:
+                        new Date(start),
 
-                end:
-                    new Date(end),
+                    end:
+                        new Date(end),
 
-                calendar:
-                    rename(cal.summary),
+                    calendarName:
+                        rename(cal.summary),
 
-                location:
-                    event.location ||
-                    "",
+                    location:
+                        e.location || ""
 
-                description:
-                    event.description ||
-                    "",
-
-                allDay:
-                    isAllDay
+                });
 
             });
 
-        });
+
+        }catch(error){
+
+            console.error(
+                "Agenda fout:",
+                error
+            );
+
+        }
 
     }
 
@@ -2068,443 +2077,889 @@ async function getTomorrowCalendarEvents(){
 }
 
 
-// ---------------------------------------------------------
-// Maak een rustige samenvatting van de agenda.
-// Deze tekst wordt naar de API gestuurd.
-// ---------------------------------------------------------
+/* ============================================================
+   ACTIVITEIT HERKENNEN
+============================================================ */
 
-function createStoryAgendaSummary(events){
+function storyActivity(event){
 
-    if(!events.length){
+    let text =
+        (
+            (event.title || "")+
+            " "+
+            (event.location || "")
+        ).toLowerCase();
 
-        return `
-Er staan morgen geen afspraken in de agenda.
-Maak daarom een rustig fantasie-avontuur waarin Odin en Niel
-een gewone maar bijzondere dag beleven.
-`;
+
+    if(
+        text.includes("binnenspeeltuin")
+    ){
+
+        return {
+            type:"play",
+            name:"de binnenspeeltuin",
+            detail:"een grote overdekte speelplek vol klimtoestellen en kleine geheime hoekjes"
+        };
 
     }
 
 
-    let lines=[];
+    if(
+        text.includes("speeltuin")
+    ){
+
+        return {
+            type:"play",
+            name:"de speeltuin",
+            detail:"een vrolijke plek met hoge glijbanen en spannende klimtoestellen"
+        };
+
+    }
 
 
-    events.forEach((event,index)=>{
+    if(
+        text.includes("strand") ||
+        text.includes("zee")
+    ){
 
-        let timeText;
+        return {
+            type:"beach",
+            name:"het strand",
+            detail:"het rustige strand waar de zee zachtjes tegen het zand fluistert"
+        };
+
+    }
 
 
-        if(event.allDay){
+    if(
+        text.includes("stad") ||
+        text.includes("stadje") ||
+        text.includes("centrum")
+    ){
 
-            timeText=
-                "de hele dag";
+        return {
+            type:"city",
+            name:"het stadje",
+            detail:"de kleine straatjes waar overal iets bijzonders te ontdekken valt"
+        };
 
-        }else{
+    }
 
-            timeText=
-                `${time(event.start)} tot ${time(event.end)}`;
+
+    if(
+        text.includes("museum")
+    ){
+
+        return {
+            type:"museum",
+            name:"het museum",
+            detail:"een stil gebouw vol oude geheimen en wonderlijke voorwerpen"
+        };
+
+    }
+
+
+    if(
+        text.includes("wandelen") ||
+        text.includes("wandeling") ||
+        text.includes("bos")
+    ){
+
+        return {
+            type:"forest",
+            name:"het bos",
+            detail:"het zachte bos waar de bladeren ritselen in de wind"
+        };
+
+    }
+
+
+    if(
+        text.includes("zwem") ||
+        text.includes("zwembad")
+    ){
+
+        return {
+            type:"water",
+            name:"het water",
+            detail:"een warme plek met rustig kabbelend water"
+        };
+
+    }
+
+
+    if(
+        text.includes("camping") ||
+        text.includes("tent")
+    ){
+
+        return {
+            type:"camp",
+            name:"de camping",
+            detail:"de gezellige plek waar tenten zachtjes bewegen in de avondwind"
+        };
+
+    }
+
+
+    if(
+        text.includes("winkel") ||
+        text.includes("boodschap")
+    ){
+
+        return {
+            type:"shop",
+            name:"de winkels",
+            detail:"een gezellig straatje met kleine winkeltjes"
+        };
+
+    }
+
+
+    if(
+        text.includes("trein")
+    ){
+
+        return {
+            type:"train",
+            name:"de trein",
+            detail:"een lange trein die rustig door het landschap reed"
+        };
+
+    }
+
+
+    if(
+        text.includes("bus")
+    ){
+
+        return {
+            type:"bus",
+            name:"de bus",
+            detail:"een vriendelijke bus die hen naar hun volgende avontuur bracht"
+        };
+
+    }
+
+
+    if(
+        text.includes("auto") ||
+        text.includes("rijden")
+    ){
+
+        return {
+            type:"car",
+            name:"de auto",
+            detail:"de auto waarmee ze rustig naar hun volgende bestemming reden"
+        };
+
+    }
+
+
+    if(
+        text.includes("pannenkoek")
+    ){
+
+        return {
+            type:"food",
+            name:"pannenkoeken",
+            detail:"warme, heerlijke pannenkoeken met een geur die zelfs de uil wakker maakte"
+        };
+
+    }
+
+
+    if(
+        text.includes("dieren") ||
+        text.includes("dierentuin") ||
+        text.includes("zoo")
+    ){
+
+        return {
+            type:"animals",
+            name:"de dieren",
+            detail:"allerlei nieuwsgierige dieren die hen vriendelijk begroetten"
+        };
+
+    }
+
+
+    if(
+        text.includes("kasteel")
+    ){
+
+        return {
+            type:"castle",
+            name:"het kasteel",
+            detail:"een oud kasteel met torens die tot hoog boven de bomen uitstaken"
+        };
+
+    }
+
+
+    if(
+        text.includes("dino")
+    ){
+
+        return {
+            type:"dino",
+            name:"de dinosaurussen",
+            detail:"grote vriendelijke dinosaurussen uit een heel ver verleden"
+        };
+
+    }
+
+
+    if(
+        text.includes("koken") ||
+        text.includes("eten")
+    ){
+
+        return {
+            type:"food",
+            name:"het eten",
+            detail:"een heerlijke maaltijd waar iedereen rustig van genoot"
+        };
+
+    }
+
+
+    if(
+        text.includes("feest") ||
+        text.includes("verjaardag")
+    ){
+
+        return {
+            type:"party",
+            name:"het feest",
+            detail:"een klein en gezellig feest vol warme lichtjes"
+        };
+
+    }
+
+
+    if(
+        text.includes("tuin")
+    ){
+
+        return {
+            type:"garden",
+            name:"de tuin",
+            detail:"de groene tuin vol planten, bloemen en kleine kriebelbeestjes"
+        };
+
+    }
+
+
+    return {
+
+        type:"general",
+
+        name:
+            event.title ||
+            "een bijzondere plek",
+
+        detail:
+            "een plek waar iets bijzonders bleek te gebeuren"
+
+    };
+
+}
+
+
+/* ============================================================
+   MOOIE TEKST VAN AFSPRAAK
+============================================================ */
+
+function storyDescription(event){
+
+    let activity =
+        storyActivity(event);
+
+    return activity;
+
+}
+
+
+/* ============================================================
+   HULPTEKST
+============================================================ */
+
+function firstNameFromTitle(title){
+
+    let text =
+        (title || "").toLowerCase();
+
+
+    if(text.includes("odin"))
+        return "Odin";
+
+    if(text.includes("niel"))
+        return "Niel";
+
+    return null;
+
+}
+
+
+/* ============================================================
+   SLAAPVERHAAL GENERATOR
+============================================================ */
+
+function generateSleepStory(eventsTomorrow){
+
+    let date =
+        new Date();
+
+    date.setDate(
+        date.getDate()+1
+    );
+
+
+    let dateText =
+        date.toLocaleDateString(
+            "nl-BE",
+            {
+                weekday:"long",
+                day:"numeric",
+                month:"long"
+            }
+        );
+
+
+    let activities =
+        eventsTomorrow.map(
+            storyDescription
+        );
+
+
+    let paragraphs = [];
+
+
+    /*
+       BEGIN
+    */
+
+    paragraphs.push(
+
+        `Het was een rustige avond in het kabouterbos. `+
+        `De maan hing als een klein zilveren lampje tussen de donkere boomtakken. `+
+        `In een huisje onder een grote oude eik lagen Odin en Niel al bijna in bed. `+
+        `Maar net toen Niel zijn dekentje goed trok, hoorde hij buiten een heel zacht geluid. `+
+        `Tik... tik... tik... `+
+        `Odin keek nieuwsgierig door het ronde raampje. `+
+        `"Wat zou dat zijn?" fluisterde hij.`
+        
+    );
+
+
+    paragraphs.push(
+
+        `Op het pad voor hun huisje zat de oude uil. `+
+        `Naast hem stond de schildpad, en tussen twee varens piepte het egeltje voorzichtig tevoorschijn. `+
+        `De drie vrienden keken alsof ze op iets bijzonders wachtten. `+
+        `Odin en Niel deden hun kabouterjasjes aan en stapten naar buiten. `+
+        `"Er is vannacht iets vreemds gebeurd," zei de uil zacht. `+
+        `"De Maanster heeft een klein stukje van zijn licht verloren."`
+        
+    );
+
+
+    paragraphs.push(
+
+        `Niel keek naar de hemel. `+
+        `Inderdaad. Tussen de sterren zat een klein donker plekje. `+
+        `De schildpad knikte langzaam. `+
+        `"Het licht komt morgen terug," zei hij, `+
+        `"maar alleen als jullie goed opletten tijdens jullie avonturen." `+
+        `Het egeltje glimlachte. `+
+        `"Misschien vinden we onderweg wel een glinsterend stukje van het maanlicht."`
+        
+    );
+
+
+    /*
+       ACTIVITEITEN
+    */
+
+    if(activities.length===0){
+
+        paragraphs.push(
+
+            `De volgende ochtend begonnen Odin en Niel rustig aan hun dag. `+
+            `Er stond niets vast, en daarom besloten ze het kabouterbos te verkennen. `+
+            `Elke plek die ze bezochten leek hen een klein geheim te vertellen.`
+            
+        );
+
+    }
+
+
+    activities.forEach((activity,index)=>{
+
+        let extra = "";
+
+
+        if(activity.type==="play"){
+
+            extra =
+
+                `Toen ze daar aankwamen, zagen Odin en Niel iets wonderlijks. `+
+                `De speelplek was niet zomaar een gewone speelplek. `+
+                `Helemaal bovenaan stond een klein houten deurtje dat alleen kabouters konden zien. `+
+                `Het egeltje klom voorzichtig achter hen aan. `+
+                `Toen Odin het deurtje opende, dwarrelden er drie zachte lichtjes naar buiten. `+
+                `De uil fluisterde dat het misschien stukjes van de Maanster waren.`;
+
+        }
+
+        else if(activity.type==="beach"){
+
+            extra =
+
+                `Aan het strand bleven de kabouters even helemaal stil. `+
+                `De golven kwamen zachtjes aanrollen en trokken zich daarna weer terug. `+
+                `Niel zag iets schitteren tussen het zand. `+
+                `Hij bukte zich en vond een piepklein zilveren schelpje. `+
+                `Toen hij het schelpje tegen zijn oor hield, hoorde hij niet alleen de zee, maar ook een heel zacht slaapliedje.`;
+
+        }
+
+        else if(activity.type==="city"){
+
+            extra =
+
+                `In de kleine straatjes ontdekten Odin en Niel allerlei geluidjes. `+
+                `Een deurbel klingelde, ergens lachte iemand en verderop reed een fiets voorbij. `+
+                `Maar tussen al die geluiden hoorden de kabouters plotseling een zacht gerinkel. `+
+                `Op de grond lag een klein zilveren belletje. `+
+                `Het egeltje tikte er voorzichtig tegenaan en meteen wees een sterretje de weg naar de volgende plek.`;
+
+        }
+
+        else if(activity.type==="museum"){
+
+            extra =
+
+                `In het museum vonden ze een oude kast die niemand anders kon openen. `+
+                `Odin legde zijn hand op het deurtje en het ging vanzelf een klein stukje open. `+
+                `Binnen lag een kaart van het kabouterbos. `+
+                `Op de kaart stonden drie kleine sterren getekend. `+
+                `De schildpad glimlachte. `+
+                `"We zijn op de goede weg."`;
+
+        }
+
+        else if(activity.type==="forest"){
+
+            extra =
+
+                `In het bos liepen ze heel rustig verder. `+
+                `De bomen bewogen zachtjes heen en weer. `+
+                `Het egeltje wees naar een klein paadje tussen de varens. `+
+                `Daar vonden ze een rond steentje dat warm aanvoelde. `+
+                `Toen Odin het oppakte, begon het steentje heel zacht te glanzen.`;
+
+        }
+
+        else if(activity.type==="water"){
+
+            extra =
+
+                `Bij het water gingen Odin en Niel even zitten. `+
+                `De schildpad keek tevreden naar de kleine golfjes. `+
+                `Opeens kwam er een kringetje over het water. `+
+                `Daarna nog één. `+
+                `En nog één. `+
+                `In het midden verscheen een klein zilveren lichtje dat langzaam naar de kant dreef.`;
+
+        }
+
+        else if(activity.type==="camp"){
+
+            extra =
+
+                `Toen ze bij de camping kwamen, zagen ze hoe de tenten zachtjes bewogen in de wind. `+
+                `De uil vloog boven hen en wees naar een klein lichtje tussen twee tenten. `+
+                `Odin en Niel gingen voorzichtig kijken. `+
+                `Daar lag een klein stukje maanlicht te rusten alsof het moe was.`;
+
+        }
+
+        else if(activity.type==="shop"){
+
+            extra =
+
+                `Tussen de winkeltjes zagen de kabouters iets glinsteren. `+
+                `Het lag helemaal onderaan bij een deur. `+
+                `Het was een klein zilveren knopje. `+
+                `Toen Niel het aanraakte, klonk ergens heel ver weg een vrolijk kabouterbelletje.`;
+
+        }
+
+        else if(activity.type==="train" || activity.type==="bus" || activity.type==="car"){
+
+            extra =
+
+                `Onderweg hielden Odin en Niel goed hun ogen open. `+
+                `De wereld gleed rustig voorbij en achter iedere bocht kon iets nieuws verschijnen. `+
+                `De uil vloog een stukje mee en de schildpad had een klein kaartje bij zich. `+
+                `Zo wisten ze precies wanneer ze moesten opletten.`;
+
+        }
+
+        else if(activity.type==="food"){
+
+            extra =
+
+                `Toen het tijd was om iets lekkers te eten, werd iedereen vanzelf een beetje vrolijk. `+
+                `Zelfs de uil kwam dichterbij. `+
+                `Het egeltje kreeg een klein hapje en de schildpad nam rustig de tijd. `+
+                `Na het eten voelde iedereen zich warm en tevreden. `+
+                `Precies toen begon het gevonden maanlicht opnieuw zacht te schitteren.`;
+
+        }
+
+        else if(activity.type==="animals"){
+
+            extra =
+
+                `De dieren waren nieuwsgierig naar de twee kabouters. `+
+                `Een klein dier wees met zijn neus naar een verborgen paadje. `+
+                `Odin en Niel volgden het spoor en ontdekten daar een rustige plek waar honderden kleine lichtpuntjes tussen het gras zweefden.`;
+
+        }
+
+        else if(activity.type==="castle"){
+
+            extra =
+
+                `Bij het kasteel zagen ze hoog boven de toren een klein zilveren lichtje. `+
+                `De uil vloog omhoog en kwam even later terug met goed nieuws. `+
+                `Het lichtje was een stukje van de Maanster.`;
+
+        }
+
+        else if(activity.type==="dino"){
+
+            extra =
+
+                `De dinosaurussen waren gelukkig heel vriendelijk. `+
+                `Een grote dino boog zijn hoofd zodat Odin en Niel op zijn rug konden kijken. `+
+                `Van daarboven zagen ze iets schitteren in de verte. `+
+                `Het was opnieuw een stukje maanlicht.`;
+
+        }
+
+        else if(activity.type==="garden"){
+
+            extra =
+
+                `In de tuin zochten ze tussen de bladeren. `+
+                `Een klein egeltje kroop onder een plant vandaan. `+
+                `Hij had iets gevonden: een piepklein zilveren blaadje. `+
+                `Het voelde zacht en warm en begon meteen te glanzen toen Odin het aanraakte.`;
+
+        }
+
+        else if(activity.type==="party"){
+
+            extra =
+
+                `Er waren warme lichtjes en iedereen was rustig en blij. `+
+                `Odin ontdekte dat zelfs de maanster een beetje begon te schitteren. `+
+                `Misschien hield de Maanster wel van vrolijke momenten.`;
+
+        }
+
+        else{
+
+            extra =
+
+                `Odin en Niel bleven goed kijken. `+
+                `Ook al leek het op het eerste gezicht een gewone plek, de kabouters wisten inmiddels dat gewone dagen soms de mooiste geheimen verborgen. `+
+                `En inderdaad: vlakbij vonden ze een klein zilveren lichtje.`;
 
         }
 
 
-        let line=
-            `${index+1}. ${timeText} — ${event.title}`;
+        paragraphs.push(
 
-
-        if(event.calendar){
-
-            line+=
-                ` [agenda: ${event.calendar}]`;
-
-        }
-
-
-        if(event.location){
-
-            line+=
-                ` [plaats: ${event.location}]`;
-
-        }
-
-
-        lines.push(line);
+            `${extra} `+
+            `Daarna gingen Odin en Niel rustig verder. `+
+            `Ze hoefden nergens haast voor te maken. `+
+            `De uil vloog boven hen, de schildpad kwam op zijn eigen rustige tempo achter hen aan en het egeltje huppelde vrolijk tussen de bladeren.`
+            
+        );
 
     });
 
 
-    return lines.join("\n");
-
-}
-
-
-// ---------------------------------------------------------
-// Vorig verhaal ophalen.
-// Dit zorgt voor continuïteit tussen verhalen.
-// ---------------------------------------------------------
-
-function getPreviousStory(){
-
-    try{
-
-        return localStorage.getItem(
-            "odinNielLastStory"
-        ) || "";
-
-    }catch(error){
-
-        console.warn(
-            "Vorig verhaal kon niet worden gelezen:",
-            error
-        );
-
-        return "";
-
-    }
-
-}
-
-
-// ---------------------------------------------------------
-// Nieuw verhaal bewaren.
-// ---------------------------------------------------------
-
-function saveStory(story){
-
-    try{
-
-        localStorage.setItem(
-            "odinNielLastStory",
-            story
-        );
-
-        localStorage.setItem(
-            "odinNielLastStoryDate",
-            new Date().toISOString()
-        );
-
-    }catch(error){
-
-        console.warn(
-            "Verhaal kon niet worden opgeslagen:",
-            error
-        );
-
-    }
-
-}
-
-
-// ---------------------------------------------------------
-// Genereer verhaal via onze server.
-// ---------------------------------------------------------
-
-async function generateTomorrowStory(
-    calendarEvents
-){
-
-    let tomorrow=
-        getTomorrow();
-
-
-    let previousStory=
-        getPreviousStory();
-
-
-    // Het vorige verhaal kan erg lang zijn.
-    // We gebruiken alleen het einde als continuïteitsanker.
-    let previousExcerpt="";
-
-    if(previousStory){
-
-        previousExcerpt=
-            previousStory.slice(-5000);
-
-    }
-
-
-    let agendaSummary=
-        createStoryAgendaSummary(
-            calendarEvents
-        );
-
-
-    let response=
-        await fetch(
-            "/api/story",
-            {
-                method:"POST",
-
-                headers:{
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:JSON.stringify({
-
-                    date:
-                        tomorrow.toISOString(),
-
-                    agenda:
-                        agendaSummary,
-
-                    previousStory:
-                        previousExcerpt
-
-                })
-
-            }
-        );
-
-
-    let data=
-        await response.json();
-
-
-    if(!response.ok){
-
-        throw new Error(
-            data.error ||
-            "Het slaapverhaal kon niet worden gemaakt."
-        );
-
-    }
-
-
-    if(!data.story){
-
-        throw new Error(
-            "De AI heeft geen verhaal teruggestuurd."
-        );
-
-    }
-
-
-    return data.story;
-
-}
-
-
-// ---------------------------------------------------------
-// Verhaal tonen
-// ---------------------------------------------------------
-
-function displayStory(story,date){
-
-    let panel=
-        document.getElementById(
-            "storyPanel"
-        );
-
-    let content=
-        document.getElementById(
-            "storyContent"
-        );
-
-    let loading=
-        document.getElementById(
-            "storyLoading"
-        );
-
-    let actions=
-        document.getElementById(
-            "storyActions"
-        );
-
-    let storyDate=
-        document.getElementById(
-            "storyDate"
-        );
-
-
-    storyDate.innerText=
-        formatStoryDate(date);
-
-
-    content.innerHTML=
-        formatStoryHtml(story);
-
-
-    loading.style.display=
-        "none";
-
-
-    content.style.display=
-        "block";
-
-
-    actions.style.display=
-        "flex";
-
-
-    panel.classList.add(
-        "visible"
+    /*
+       MIDDEN VAN HET VERHAAL
+    */
+
+    paragraphs.push(
+
+        `Toen de avond langzaam dichterbij kwam, hadden Odin en Niel alle kleine lichtjes verzameld. `+
+        `Ze gingen samen met hun vrienden naar de hoogste heuvel van het kabouterbos. `+
+        `Daar konden ze de hele hemel zien. `+
+        `De maan stond precies boven de oude eik. `+
+        `Odin legde de lichtjes voorzichtig naast elkaar.`
+        
     );
 
 
-    panel.scrollTop=0;
+    paragraphs.push(
+
+        `Maar er gebeurde niets. `+
+        `De Maanster bleef donker. `+
+        `Niel keek een beetje bezorgd. `+
+        `"Misschien hebben we iets vergeten," zei hij. `+
+        `De uil knikte. `+
+        `"Jullie hebben de lichtjes gevonden. Maar het belangrijkste stukje ontbreekt nog."`
+        
+    );
+
+
+    paragraphs.push(
+
+        `Iedereen werd stil. `+
+        `De schildpad dacht lang na. `+
+        `Het egeltje keek naar de grond. `+
+        `Toen hoorde Niel iets heel zachts. `+
+        `Niet boven hen, maar vlak naast hem. `+
+        `Het was het geluid van de wind door de bladeren. `+
+        `En plots begreep hij het.`
+        
+    );
+
+
+    paragraphs.push(
+
+        `"Het laatste stukje is misschien helemaal geen lichtje," zei Niel. `+
+        `"Misschien is het de herinnering aan alles wat we vandaag samen hebben meegemaakt." `+
+        `Odin glimlachte. `+
+        `De uil sloot zijn ogen. `+
+        `De schildpad glimlachte. `+
+        `En het egeltje kroop dicht tegen Odin aan.`
+        
+    );
+
+
+    /*
+       EINDE
+    */
+
+    paragraphs.push(
+
+        `Odin en Niel dachten aan alle plekken die ze die dag hadden gezien. `+
+        `Aan de kleine ontdekkingen. `+
+        `Aan het lachen. `+
+        `Aan de rustige momenten. `+
+        `Aan hun vrienden. `+
+        `Aan de schildpad die altijd rustig bleef, de uil die alles vanuit de lucht zag en het egeltje dat altijd wel ergens een geheim vond.`
+        
+    );
+
+
+    paragraphs.push(
+
+        `Toen gebeurde er iets wonderlijks. `+
+        `Eerst begon één klein lichtje te glanzen. `+
+        `Daarna een tweede. `+
+        `En toen alle andere. `+
+        `De lichtjes zweefden langzaam omhoog. `+
+        `Ze gingen steeds hoger en hoger, totdat ze precies op hun plaats in de Maanster terechtkwamen.`
+        
+    );
+
+
+    paragraphs.push(
+
+        `De hemel werd weer helder. `+
+        `De maan straalde zacht over het kabouterbos. `+
+        `De bomen kregen zilveren randjes en zelfs het kleine huisje van Odin en Niel leek een beetje te glinsteren.`
+        
+    );
+
+
+    paragraphs.push(
+
+        `De uil keek naar de kabouters. `+
+        `"Het is gelukt." `+
+        `De schildpad knikte langzaam. `+
+        `"Omdat jullie goed hebben gekeken." `+
+        `Het egeltje geeuwde. `+
+        `"En omdat jullie samen waren."`
+        
+    );
+
+
+    paragraphs.push(
+
+        `Odin en Niel wandelden terug naar hun huisje. `+
+        `De nacht was inmiddels helemaal stil geworden. `+
+        `Odin trok zijn pyjama aan en kroop onder zijn dekentje. `+
+        `Niel legde zijn hoofd op zijn kussen. `+
+        `Buiten hoorden ze de uil nog één keer zacht roepen.`
+        
+    );
+
+
+    paragraphs.push(
+
+        `De schildpad lag al te slapen onder een groot blad. `+
+        `Het egeltje had zich opgerold tot een klein bolletje. `+
+        `En hoog boven het kabouterbos stond de Maanster te schitteren.`
+        
+    );
+
+
+    paragraphs.push(
+
+        `Odin deed zijn ogen dicht. `+
+        `Niel deed zijn ogen dicht. `+
+        `De maan scheen zacht door het raam. `+
+        `En ergens heel ver weg fluisterde de nacht: `+
+        `"Slaap maar rustig. Morgen wacht er weer een nieuw avontuur."`
+        
+    );
+
+
+    paragraphs.push(
+
+        `En zo vielen Odin en Niel langzaam in slaap. `+
+        `Dromend van bossen, sterren, kleine geheimen en alle avonturen die nog zouden komen.`
+        
+    );
+
+
+    return {
+
+        dateText:dateText,
+
+        paragraphs:paragraphs
+
+    };
 
 }
 
 
-// ---------------------------------------------------------
-// Maak tekst netjes op.
-// ---------------------------------------------------------
+/* ============================================================
+   HTML VOOR VERHAAL
+============================================================ */
 
-function formatStoryHtml(story){
-
-    let safe=
-        escapeHtml(story);
-
-
-    let paragraphs=
-        safe
-        .split(/\n\s*\n/)
-        .map(p=>p.trim())
-        .filter(Boolean);
-
-
-    if(paragraphs.length===0){
-
-        paragraphs=
-            safe
-            .split("\n")
-            .map(p=>p.trim())
-            .filter(Boolean);
-
-    }
-
+function storyToHTML(paragraphs){
 
     return paragraphs
-        .map(p=>{
-
-            if(
-                p.length<100 &&
-                !p.includes(".")
-            ){
-
-                return `
-                    <div class="storyHeading">
-                        ${p}
-                    </div>
-                `;
-
-            }
-
-
-            return `
-                <p class="storyParagraph">
-                    ${p.replace(/\n/g,"<br>")}
-                </p>
-            `;
-
-        })
+        .map(p=>`<p>${escapeHTML(p)}</p>`)
         .join("");
 
 }
 
 
-// ---------------------------------------------------------
-// KNOP: Maak slaapverhaal voor morgen
-// ---------------------------------------------------------
+function escapeHTML(text){
 
-async function makeTomorrowStory(){
+    return text
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
 
-    let panel=
+}
+
+
+/* ============================================================
+   SLAAPVERHAAL MAKEN
+============================================================ */
+
+async function makeSleepStory(){
+
+    let overlay =
         document.getElementById(
-            "storyPanel"
+            "storyOverlay"
         );
 
-    let loading=
+    let loading =
         document.getElementById(
             "storyLoading"
         );
 
-    let content=
+    let storyText =
         document.getElementById(
-            "storyContent"
+            "storyText"
         );
 
-    let actions=
-        document.getElementById(
-            "storyActions"
-        );
-
-    let storyDate=
+    let storyDate =
         document.getElementById(
             "storyDate"
         );
 
-    let button=
-        document.getElementById(
-            "storyButton"
-        );
 
+    overlay.style.display = "block";
 
-    if(!token){
+    loading.style.display = "block";
 
-        alert(
-            "Je moet eerst ingelogd zijn om de agenda te kunnen gebruiken."
-        );
-
-        return;
-
-    }
-
-
-    // Stop eventueel lopende voorleesfunctie.
-    speechSynthesis.cancel();
-
-
-    panel.classList.add(
-        "visible"
-    );
-
-
-    loading.style.display=
-        "block";
-
-
-    content.style.display=
-        "none";
-
-
-    actions.style.display=
-        "none";
-
-
-    let tomorrow=
-        getTomorrow();
-
-
-    storyDate.innerText=
-        formatStoryDate(tomorrow);
-
-
-    button.disabled=true;
-
-    button.innerText=
-        "🌙 Verhaal wordt gemaakt...";
+    storyText.innerHTML = "";
 
 
     try{
 
-        let calendarEvents=
-            await getTomorrowCalendarEvents();
+        if(!token){
+
+            throw new Error(
+                "Je bent niet ingelogd bij Google Agenda."
+            );
+
+        }
 
 
-        let story=
-            await generateTomorrowStory(
-                calendarEvents
+        loading.innerHTML =
+            "📅 De afspraken van morgen worden opgehaald...";
+
+
+        let tomorrowEvents =
+            await getTomorrowEvents();
+
+
+        loading.innerHTML =
+            "🧙 Odin en Niel zijn hun avontuur aan het voorbereiden...";
+
+
+        /*
+           kleine vertraging zodat de gebruiker
+           de animatietekst ook echt ziet
+        */
+
+        await new Promise(
+            resolve=>setTimeout(
+                resolve,
+                400
+            )
+        );
+
+
+        let story =
+            generateSleepStory(
+                tomorrowEvents
             );
 
 
-        saveStory(story);
+        storyDate.innerText =
+            "Avontuur voor "+
+            story.dateText;
 
 
-        displayStory(
-            story,
-            tomorrow
-        );
+        storyText.innerHTML =
+            storyToHTML(
+                story.paragraphs
+            );
+
+
+        loading.style.display =
+            "none";
 
 
     }catch(error){
@@ -2515,85 +2970,49 @@ async function makeTomorrowStory(){
         );
 
 
-        loading.innerHTML=`
+        loading.innerHTML =
 
-            <div style="font-size:50px;">
-                😕
-            </div>
-
-            <div style="margin-top:15px;">
-                Het slaapverhaal kon niet worden gemaakt.
-            </div>
-
-            <div
-                style="
-                    margin-top:10px;
-                    font-size:14px;
-                    color:#777;
-                "
-            >
-                ${escapeHtml(error.message)}
-            </div>
-
-        `;
-
-        loading.style.display=
-            "block";
-
-
-        content.style.display=
-            "none";
-
-
-        actions.style.display=
-            "none";
-
-
-    }finally{
-
-        button.disabled=false;
-
-        button.innerText=
-            "📖 Maak slaapverhaal voor morgen";
+            "😕 Het slaapverhaal kon niet worden gemaakt.<br><br>"+
+            escapeHTML(error.message);
 
     }
 
 }
 
 
-// ---------------------------------------------------------
-// Sluit verhaal
-// ---------------------------------------------------------
+/* ============================================================
+   VERHAAL SLUITEN
+============================================================ */
 
-function closeStory(){
+function closeSleepStory(){
 
-    stopStoryReading();
+    speechSynthesis.cancel();
 
-    document
-        .getElementById("storyPanel")
-        .classList.remove("visible");
+    document.getElementById(
+        "storyOverlay"
+    ).style.display = "none";
 
 }
 
 
-// ---------------------------------------------------------
-// Verhaal voorlezen
-// ---------------------------------------------------------
+/* ============================================================
+   VERHAAL VOORLEZEN
+============================================================ */
 
-function readStory(){
+function readSleepStory(){
 
-    let content=
+    let storyText =
         document.getElementById(
-            "storyContent"
+            "storyText"
         );
 
 
-    if(!content)
+    if(!storyText)
         return;
 
 
-    let text=
-        content.innerText.trim();
+    let text =
+        storyText.innerText;
 
 
     if(!text)
@@ -2603,18 +3022,47 @@ function readStory(){
     speechSynthesis.cancel();
 
 
-    let msg=
+    let msg =
         new SpeechSynthesisUtterance(
             text
         );
 
 
-    msg.lang="nl-BE";
+    msg.lang = "nl-BE";
 
-    // Rustig tempo voor bedtijd.
-    msg.rate=0.82;
+    msg.rate = 0.85;
 
-    msg.pitch=1;
+    msg.pitch = 1.0;
+
+    msg.volume = 1;
+
+
+    /*
+       Probeer een Nederlandse stem
+       te vinden.
+    */
+
+    let voices =
+        speechSynthesis.getVoices();
+
+
+    let dutchVoice =
+        voices.find(
+            voice =>
+                voice.lang === "nl-BE"
+        ) ||
+        voices.find(
+            voice =>
+                voice.lang.startsWith("nl")
+        );
+
+
+    if(dutchVoice){
+
+        msg.voice =
+            dutchVoice;
+
+    }
 
 
     speechSynthesis.speak(msg);
@@ -2622,44 +3070,25 @@ function readStory(){
 }
 
 
-// ---------------------------------------------------------
-// Voorlezen stoppen
-// ---------------------------------------------------------
+/* ============================================================
+   VERHAAL STOPPEN
+============================================================ */
 
-function stopStoryReading(){
+function stopSleepStory(){
 
     speechSynthesis.cancel();
 
 }
 
 
-// ---------------------------------------------------------
-// Verhaal afdrukken
-// ---------------------------------------------------------
+/* ============================================================
+   VERHAAL PRINTEN
+============================================================ */
 
-function printStory(){
-
-    stopStoryReading();
-
-
-    let content=
-        document.getElementById(
-            "storyContent"
-        );
-
-
-    if(
-        !content ||
-        !content.innerText.trim()
-    ){
-
-        return;
-
-    }
-
+function printSleepStory(){
 
     document.body.classList.add(
-        "storyPrinting"
+        "printStoryMode"
     );
 
 
@@ -2669,7 +3098,7 @@ function printStory(){
     setTimeout(()=>{
 
         document.body.classList.remove(
-            "storyPrinting"
+            "printStoryMode"
         );
 
     },1000);
@@ -2677,36 +3106,8 @@ function printStory(){
 }
 
 
-// ---------------------------------------------------------
-// Escape handler voor slaapverhaal
-// ---------------------------------------------------------
+/* ============================================================
+   INIT STARTEN
+============================================================ */
 
-document.addEventListener(
-    "keydown",
-    event=>{
-
-        if(
-            event.key==="Escape"
-        ){
-
-            let panel=
-                document.getElementById(
-                    "storyPanel"
-                );
-
-
-            if(
-                panel &&
-                panel.classList.contains(
-                    "visible"
-                )
-            ){
-
-                closeStory();
-
-            }
-
-        }
-
-    }
-);
+parseToken();
