@@ -569,7 +569,6 @@ font-size:18px;
     page-break-after:always;
 }
 
-
 /* =========================================================
    NIEUW: AFBEELDING VAN MORGEN
    ========================================================= */
@@ -628,6 +627,51 @@ font-size:18px;
 }
 
 
+/* =========================================================
+   KNOPPEN BOVENAAN
+   ========================================================= */
+
+.imagePopupButtons{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-top:0;
+
+    margin-bottom:15px;
+
+}
+
+
+.imagePopupButtons button{
+
+    background:#4285F4;
+
+    color:white;
+
+    min-width:180px;
+
+}
+
+
+.imagePopupButtons button:last-child{
+
+    background:#777;
+
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
 #imageStatus{
 
     margin:10px;
@@ -638,6 +682,10 @@ font-size:18px;
 
 }
 
+
+/* =========================================================
+   AFBEELDING
+   ========================================================= */
 
 #tomorrowCanvas{
 
@@ -654,39 +702,9 @@ font-size:18px;
 }
 
 
-.imagePopupButtons{
-
-    display:flex;
-
-    justify-content:center;
-
-    flex-wrap:wrap;
-
-    gap:10px;
-
-    margin-top:0;
-
-    margin-bottom:15px;
-
-}
-
-
-.imagePopupButtons button{
-    background:#4285F4;
-    color:white;
-    min-width:180px;
-}
-
-
-.imagePopupButtons button:first-child{
-    background:#34A853;
-}
-
-
-.imagePopupButtons button:last-child{
-    background:#777;
-}
-
+/* =========================================================
+   SMARTPHONE
+   ========================================================= */
 
 @media(max-width:600px){
 
@@ -698,6 +716,14 @@ font-size:18px;
 
     }
 
+
+    .imagePopupButtons{
+
+        margin-bottom:10px;
+
+    }
+
+
     .imagePopupButtons button{
 
         width:100%;
@@ -705,3 +731,4 @@ font-size:18px;
     }
 
 }
+
