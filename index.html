@@ -7,8 +7,9 @@
 
 <link rel="icon" href="favicon.ico">
 <link rel="shortcut icon" href="/favicon.ico">
-    
+
 <link rel="stylesheet" href="style.css">
+
 <style>
 #speechOverlay{
     position:fixed;
@@ -24,48 +25,142 @@
     font-size:14px;
     line-height:1.4;
 }
-
 </style>
+
 </head>
 
 <body>
 
 <header>
+
 <button onclick="login()">🔐 login</button>
 <button onclick="logout()">🚪 logout</button>
+
 <button onclick="prev()">⬅ vorige</button>
 <button onclick="today()">📅 vandaag</button>
 <button onclick="next()">➡ volgende</button>
+
 <button onclick="toggleView()">🗓 dag/week</button>
+
 <button onclick="selectAll()">✅ alles</button>
 <button onclick="selectNone()">❌ niets</button>
 
 <button onclick="printWeek()">🖨 print week</button>
-    
+
 <!-- Toon en lees komende 4 agendapunten -->
 <button onclick="showNextEvents()">🔊 afspraken</button>
 
+<!-- NIEUW -->
+<button
+    id="storyButton"
+    class="storyButton"
+    onclick="makeTomorrowStory()">
+    📖 Maak slaapverhaal voor morgen
+</button>
+
 <div id="liveClock" style="font-weight:bold; cursor:pointer;"></div>
-    
+
 </header>
 
 
-    
 <div id="filters"></div>
+
 <div id="agenda"></div>
+
 
 <!-- Overlay voor spraaktekst -->
 <div id="speechOverlay" style="display:none;"></div>
 
+
+<!-- ========================================================= -->
+<!-- SLAAPVERHAAL -->
+<!-- ========================================================= -->
+
+<div id="storyPanel" class="storyPanel">
+
+    <div class="storyHeader">
+
+        <div>
+            <div class="storyTitle">
+                🌙 Slaapverhaal voor morgen
+            </div>
+
+            <div id="storyDate" class="storyDate"></div>
+        </div>
+
+        <button
+            class="storyCloseButton"
+            onclick="closeStory()">
+            ✕
+        </button>
+
+    </div>
+
+
+    <div id="storyLoading" class="storyLoading">
+
+        <div class="storyLoadingIcon">
+            🌙
+        </div>
+
+        <div>
+            Odin en Niel zijn hun avontuur aan het voorbereiden...
+        </div>
+
+        <div class="storyLoadingSmall">
+            Even geduld, het verhaal wordt geschreven.
+        </div>
+
+    </div>
+
+
+    <div id="storyContent" class="storyContent"></div>
+
+
+    <div id="storyActions" class="storyActions">
+
+        <button onclick="readStory()">
+            🔊 Voorlezen
+        </button>
+
+        <button onclick="stopStoryReading()">
+            ⏹ Stop
+        </button>
+
+        <button onclick="printStory()">
+            🖨 Afdrukken
+        </button>
+
+        <button onclick="makeTomorrowStory()">
+            🔄 Nieuw verhaal
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- POPUP -->
+<!-- ========================================================= -->
+
+<div id="popup" class="popup">
+
+    <div class="popupContent">
+
+        <div id="popupText"></div>
+
+        <button onclick="closePopup()">
+            OK
+        </button>
+
+    </div>
+
+</div>
+
+
 <script src="config.js"></script>
 <script src="script.js"></script>
-    
-<div id="popup" class="popup">
-<div class="popupContent">
-<div id="popupText"></div>
-<button onclick="closePopup()">OK</button>
-</div>
-</div>
-    
+
 </body>
 </html>
