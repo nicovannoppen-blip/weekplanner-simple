@@ -5,9 +5,7 @@ background:#f2f2f2;
 }
 
 
-/* ========================= */
-/* HEADER */
-/* ========================= */
+/* ================= HEADER ================= */
 
 header{
     background:#4285F4;
@@ -54,6 +52,7 @@ header button{
     #liveClockDate{
         font-size:0.9em;
     }
+
 }
 
 
@@ -78,6 +77,7 @@ header button{
         font-size:0.8em;
         text-align:center;
     }
+
 }
 
 
@@ -96,9 +96,7 @@ font-size:14px;
 }
 
 
-/* ========================= */
-/* FILTERS */
-/* ========================= */
+/* ================= FILTERS ================= */
 
 #filters{
 background:white;
@@ -113,77 +111,75 @@ border-bottom:1px solid #ddd;
 
 
 .filterIcon {
-    width:100px;
-    height:100px;
-    object-fit:contain;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
 }
 
 
 #filters {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
-    gap:10px;
-    padding:10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+    gap: 10px;
+    padding: 10px;
 }
 
 
 .filterBtn {
-    display:flex;
-    flex-direction:row;
-    align-items:center;
-    justify-content:flex-start;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
 
-    border-radius:12px;
-    padding:10px;
+    border-radius: 12px;
+    padding: 10px;
 
-    cursor:pointer;
+    cursor: pointer;
 
-    transition:0.2s;
-    user-select:none;
-    gap:10px;
+    transition: 0.2s;
+    user-select: none;
+    gap: 10px;
 }
 
 
 .filterIcon {
-    width:48px;
-    height:48px;
-    object-fit:contain;
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
 }
 
 
 .filterBtn.active {
-    outline:3px solid #4285F4;
+    outline: 3px solid #4285F4;
 }
 
 
 .filterText {
-    font-size:14px;
-    text-transform:lowercase;
+    font-size: 14px;
+    text-transform: lowercase;
 }
 
 
 .filterBtn:hover {
-    transform:scale(1.05);
+    transform: scale(1.05);
 }
 
 
 .filterBtn:not(.active) {
-    opacity:0.3;
-    filter:grayscale(100%);
+    opacity: 0.3;
+    filter: grayscale(100%);
 }
 
 
 #filters label {
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
 }
 
 
-/* ========================= */
-/* WEEK */
-/* ========================= */
+/* ================= WEEK ================= */
 
 .week{
 display:flex;
@@ -221,9 +217,7 @@ color:#888;
 }
 
 
-/* ========================= */
-/* EVENTS */
-/* ========================= */
+/* ================= EVENTS ================= */
 
 .event{
 position:absolute;
@@ -275,9 +269,7 @@ text-align:center;
 }
 
 
-/* ========================= */
-/* POPUP */
-/* ========================= */
+/* ================= POPUP ================= */
 
 .popup{
 position:fixed;
@@ -306,9 +298,7 @@ font-size:18px;
 }
 
 
-/* ========================= */
-/* EVENTS / ICONEN */
-/* ========================= */
+/* ================= ICONEN ================= */
 
 .event,
 .event.printEvent {
@@ -397,206 +387,9 @@ font-size:18px;
 }
 
 
-/* ================================================= */
-/* NIEUW: POPUP VOOR AFBEELDING VAN MORGEN */
-/* ================================================= */
-
-.tomorrowPopup {
-
-    position:fixed;
-
-    left:0;
-    top:0;
-    right:0;
-    bottom:0;
-
-    background:rgba(0,0,0,0.65);
-
-    display:none;
-
-    align-items:center;
-    justify-content:center;
-
-    z-index:5000;
-
-    padding:20px;
-
-    box-sizing:border-box;
-
-}
-
-
-.tomorrowPopupContent {
-
-    position:relative;
-
-    background:white;
-
-    width:min(100%,1000px);
-
-    max-height:95vh;
-
-    overflow:auto;
-
-    border-radius:18px;
-
-    padding:20px;
-
-    box-sizing:border-box;
-
-    box-shadow:0 5px 30px rgba(0,0,0,0.4);
-
-    text-align:center;
-
-}
-
-
-.tomorrowPopupContent h2 {
-
-    margin-top:5px;
-
-    color:#333;
-
-}
-
-
-.tomorrowCloseButton {
-
-    position:absolute;
-
-    right:12px;
-    top:12px;
-
-    width:42px;
-    height:42px;
-
-    border-radius:50%;
-
-    background:#eee;
-
-    font-size:20px;
-
-    cursor:pointer;
-
-}
-
-
-#tomorrowImageInfo {
-
-    margin:10px 0 15px 0;
-
-    font-size:16px;
-
-    color:#555;
-
-}
-
-
-#tomorrowImageContainer {
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    width:100%;
-
-}
-
-
-#tomorrowImageContainer img {
-
-    display:block;
-
-    max-width:100%;
-
-    max-height:65vh;
-
-    width:auto;
-
-    height:auto;
-
-    border-radius:12px;
-
-    box-shadow:0 2px 10px rgba(0,0,0,0.2);
-
-}
-
-
-.tomorrowImageButtons {
-
-    display:flex;
-
-    flex-wrap:wrap;
-
-    justify-content:center;
-
-    gap:10px;
-
-    margin-top:18px;
-
-}
-
-
-.tomorrowImageButtons button {
-
-    background:#4285F4;
-
-    color:white;
-
-    padding:12px 18px;
-
-    border-radius:10px;
-
-    font-size:15px;
-
-}
-
-
-.tomorrowImageButtons button:hover {
-
-    transform:scale(1.03);
-
-}
-
-
-/* mobiel */
-
-@media(max-width:600px){
-
-    .tomorrowPopup {
-
-        padding:8px;
-
-    }
-
-    .tomorrowPopupContent {
-
-        padding:12px;
-
-        border-radius:12px;
-
-    }
-
-    .tomorrowPopupContent h2 {
-
-        font-size:20px;
-
-    }
-
-    .tomorrowImageButtons button {
-
-        flex:1 1 100%;
-
-    }
-
-}
-
-
-/* ================================================= */
-/* PRINT WEEK */
-/* ================================================= */
+/* =========================================================
+   PRINT
+   ========================================================= */
 
 @media print {
 
@@ -712,7 +505,6 @@ font-size:18px;
         color:white !important;
 
         padding:8px;
-
         border-radius:6px;
 
         -webkit-print-color-adjust:exact;
@@ -735,13 +527,9 @@ font-size:18px;
         position:absolute;
         left:0;
         right:0;
-
         border-top:1px solid #4285F4;
-
         font-size:10px;
-
         color:#4285F4;
-
         padding-left:4px;
     }
 
@@ -782,35 +570,136 @@ font-size:18px;
 }
 
 
-/* ================================================= */
-/* PRINTEN VAN AFBEELDING MORGEN */
-/* ================================================= */
+/* =========================================================
+   NIEUW: AFBEELDING VAN MORGEN
+   ========================================================= */
 
-@media print {
+.imagePopup{
 
-    body.tomorrowPrinting * {
-        visibility:hidden;
+    position:fixed;
+
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+
+    background:rgba(0,0,0,0.65);
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    z-index:3000;
+
+    padding:20px;
+
+    box-sizing:border-box;
+
+}
+
+
+.imagePopupContent{
+
+    background:white;
+
+    border-radius:15px;
+
+    padding:20px;
+
+    max-width:95vw;
+    max-height:95vh;
+
+    overflow:auto;
+
+    text-align:center;
+
+    box-shadow:0 5px 30px rgba(0,0,0,0.4);
+
+}
+
+
+.imagePopupContent h2{
+
+    margin-top:0;
+
+    color:#4285F4;
+
+}
+
+
+#imageStatus{
+
+    margin:10px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+}
+
+
+#tomorrowCanvas{
+
+    max-width:100%;
+
+    height:auto;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    background:white;
+
+}
+
+
+.imagePopupButtons{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-top:15px;
+
+}
+
+
+.imagePopupButtons button{
+
+    background:#4285F4;
+
+    color:white;
+
+    min-width:180px;
+
+}
+
+
+.imagePopupButtons button:last-child{
+
+    background:#777;
+
+}
+
+
+@media(max-width:600px){
+
+    .imagePopupContent{
+
+        padding:10px;
+
+        max-width:98vw;
+
     }
 
-    body.tomorrowPrinting #tomorrowPrintImage,
-    body.tomorrowPrinting #tomorrowPrintImage * {
-
-        visibility:visible;
-
-    }
-
-    body.tomorrowPrinting #tomorrowPrintImage {
-
-        position:absolute;
-
-        left:0;
-        top:0;
+    .imagePopupButtons button{
 
         width:100%;
-
-        display:flex;
-
-        justify-content:center;
 
     }
 
