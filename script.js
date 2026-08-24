@@ -2003,26 +2003,37 @@ function getTomorrowEvents(){
 
 
     return events
-        .filter(e=>{
+    .filter(e=>{
 
-            if(
-                !active.includes(
-                    e.calendar
-                )
-            ){
-                return false;
-            }
-
-
-            if(e.end<=startDay)
-                return false;
+        if(
+            !active.includes(
+                e.calendar
+            )
+        ){
+            return false;
+        }
 
 
-            if(e.start>=endDay)
-                return false;
+        if(e.end<=startDay)
+            return false;
 
 
-            return true;
+        if(e.start>=endDay)
+            return false;
+
+
+        // "Druppeltjes nemen" niet tonen
+        // in de afbeelding van morgen
+        if(
+            (e.title || "")
+                .toLowerCase()
+                .includes("druppeltjes nemen")
+        ){
+            return false;
+        }
+
+
+        return true;
 
         })
         .map(e=>{
@@ -2127,7 +2138,7 @@ async function makeTomorrowImage(){
         );
 
 
-        tatus.innerText =
+        status.innerText =
         tomorrowEvents.length +
         (tomorrowEvents.length === 1
             ? " afspraak gevonden."
