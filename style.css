@@ -4,15 +4,10 @@ margin:0;
 background:#f2f2f2;
 }
 
-/*header{
-background:#4285F4;
-color:white;
-padding:10px;
 
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-gap:8px;
-}*/
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 header{
     background:#4285F4;
@@ -20,22 +15,31 @@ header{
     padding:10px;
 
     display:flex;
-    flex-wrap:wrap;              /* 🔥 belangrijk */
+    flex-wrap:wrap;
     align-items:center;
     gap:8px;
 }
+
 header button{
-    flex:1 1 auto;              /* groeit mee */
-    min-width:90px;             /* voorkomt te klein */
+    flex:1 1 auto;
+    min-width:90px;
     padding:10px;
     border:none;
     border-radius:8px;
     background:white;
     cursor:pointer;
 }
+
+
+/* =========================================================
+   KLOK
+   ========================================================= */
+
 #liveClock{
-    margin-left:auto;           /* rechts uitlijnen op desktop */
+    margin-left:auto;
 }
+
+
 @media (max-width: 900px){
 
     header{
@@ -43,7 +47,7 @@ header button{
     }
 
     #liveClock{
-        order:-1;               /* 🔥 klok bovenaan */
+        order:-1;
         width:100%;
         margin-left:0;
     }
@@ -55,11 +59,14 @@ header button{
     #liveClockDate{
         font-size:0.9em;
     }
+
 }
+
+
 @media (max-width: 600px){
 
     header button{
-        flex:1 1 45%;           /* 2 knoppen per rij */
+        flex:1 1 45%;
         font-size:14px;
         padding:8px;
     }
@@ -77,7 +84,9 @@ header button{
         font-size:0.8em;
         text-align:center;
     }
+
 }
+
 
 button{
 display:flex;
@@ -93,6 +102,11 @@ cursor:pointer;
 font-size:14px;
 }
 
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
 #filters{
 background:white;
 padding:10px;
@@ -104,13 +118,14 @@ gap:10px;
 border-bottom:1px solid #ddd;
 }
 
+
 .filterIcon {
     width: 100px;
     height: 100px;
     object-fit: contain;
 }
 
-/* container */
+
 #filters {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
@@ -118,10 +133,10 @@ border-bottom:1px solid #ddd;
     padding: 10px;
 }
 
-/* knop */
+
 .filterBtn {
     display: flex;
-    flex-direction: row;   /* 🔥 icoon naast tekst */
+    flex-direction: row;
     align-items: center;
     justify-content: flex-start;
 
@@ -135,45 +150,54 @@ border-bottom:1px solid #ddd;
     gap: 10px;
 }
 
-/* pictogram */
+
 .filterIcon {
     width: 48px;
     height: 48px;
     object-fit: contain;
 }
 
+
 .filterBtn.active {
     outline: 3px solid #4285F4;
 }
 
-/* tekst */
+
 .filterText {
     font-size: 14px;
     text-transform: lowercase;
 }
 
-/* hover */
+
 .filterBtn:hover {
     transform: scale(1.05);
 }
 
-/* UITGESCHAKELD */
+
 .filterBtn:not(.active) {
     opacity: 0.3;
     filter: grayscale(100%);
 }
 
+
 #filters label {
     display: flex;
     align-items: center;
-    gap: 10px;          /* iets meer ruimte */
-    padding: 8px;       /* iets groter klikvlak */
+    gap: 10px;
+    padding: 8px;
 }
+
+
+/* =========================================================
+   WEEK
+   ========================================================= */
+
 .week{
 display:flex;
 height:960px;
 overflow-x:auto;
 }
+
 
 .day{
 flex:1;
@@ -183,14 +207,16 @@ border-radius:8px;
 position:relative;
 }
 
+
 .dayHeader{
 text-align:center;
 font-weight:bold;
 padding:6px;
-background: #4285F4;
-color: white;
+background:#4285F4;
+color:white;
 border-bottom:1px solid #ddd;
 }
+
 
 .hour{
 position:absolute;
@@ -201,6 +227,7 @@ font-size:10px;
 color:#888;
 }
 
+
 .event{
 position:absolute;
 border-radius:6px;
@@ -210,40 +237,50 @@ font-size:12px;
 
 display:flex;
 flex-direction:column;
-justify-content: center;   /* 🔥 verticaal centreren */
-align-items: center;       /* horizontaal centreren */
+justify-content:center;
+align-items:center;
 
 overflow:visible;
 }
+
 
 .picto{
 width:28px;
 height:28px;
 }
 
+
 .icon img{
 max-width:100%;
 height:auto;
 }
+
 
 .large .picto{
 width:64px;
 height:64px;
 }
 
+
 .large .event{
 flex-direction:column;
 text-align:center;
 }
 
+
 .currentTimeLine {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: red;
-    z-index: 1000;
+    position:absolute;
+    left:0;
+    width:100%;
+    height:2px;
+    background:red;
+    z-index:1000;
 }
+
+
+/* =========================================================
+   POPUP
+   ========================================================= */
 
 .popup{
 position:fixed;
@@ -261,6 +298,7 @@ justify-content:center;
 z-index:1000;
 }
 
+
 .popupContent{
 background:white;
 padding:20px;
@@ -270,247 +308,597 @@ text-align:center;
 font-size:18px;
 }
 
-/* Pictogrammen naast elkaar voor scherm en print */
-.event, .event.printEvent {
-    display: flex;
-    align-items: center;   /* pictogrammen verticaal gecentreerd met tekst */
-    gap: 4px;              /* ruimte tussen pictogrammen en tekst */
-    padding: 2px 4px;
-    border-radius: 4px;
-    color: inherit;           /* tekstkleur */
-    font-size: 12px;
-    box-sizing: border-box;
-}
-
-/* Pictogrammen zelf */
-.event .picto,
-.event.printEvent .picto {
-    display: inline-block;
-    width: auto;           /* breedte schaalt automatisch */
-    height: auto;          /* hoogte schaalt automatisch */
-    object-fit: contain;
-    
-}
-.picto.smallicon {
-    max-width: 40px;
-    max-height: 40px;
-}
-
-.picto.bigicon {
-    max-width: 100px;
-    max-height: 40px;
-}
-
-/* ICONEN naast elkaar */
-.icons {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 4px;
-}
-.eventText {
-    color: #000;
-    text-align: center;
-    width: 100%;
-    text-transform: lowercase;
-}
 
 .popupLine {
-    margin-bottom: 5px; /* ruimte tussen afspraken */
+    margin-bottom:5px;
 }
 
 
-/* Tekst onder iconen */
-.event {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* =========================================================
+   EVENTS
+   ========================================================= */
+
+.event,
+.event.printEvent {
+    display:flex;
+    align-items:center;
+    gap:4px;
+    padding:2px 4px;
+    border-radius:4px;
+    color:inherit;
+    font-size:12px;
+    box-sizing:border-box;
 }
+
+
+.event .picto,
+.event.printEvent .picto {
+    display:inline-block;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+}
+
+
+.picto.smallicon {
+    max-width:40px;
+    max-height:40px;
+}
+
+
+.picto.bigicon {
+    max-width:100px;
+    max-height:40px;
+}
+
+
+.icons {
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+    gap:4px;
+}
+
+
+.eventText {
+    color:#000;
+    text-align:center;
+    width:100%;
+    text-transform:lowercase;
+}
+
 
 .speechWord {
-    opacity: 1;
-    transition: all 0.2s ease;
+    opacity:1;
+    transition:all 0.2s ease;
 }
 
+
 .speechWord.active {
-    opacity: 1;
-    background: yellow;
-    border-radius: 4px;
-    padding: 1px 3px;
-    font-weight: bold;
+    opacity:1;
+    background:yellow;
+    border-radius:4px;
+    padding:1px 3px;
+    font-weight:bold;
 }
+
+
 .currentEvent .eventText {
-    font-weight: bold;
+    font-weight:bold;
 }
+
+
 .currentEvent {
-    outline: 3px solid red;
+    outline:3px solid red;
 }
+
+
+/* =========================================================
+   SLAAPVERHAAL KNOP
+   ========================================================= */
+
+.storyButton{
+    background:#fff3c4 !important;
+    color:#4b3b00 !important;
+    border:2px solid #f1c40f !important;
+    font-weight:bold;
+}
+
+
+.storyButton:hover{
+    background:#ffe98a !important;
+    transform:scale(1.03);
+}
+
+
+/* =========================================================
+   SLAAPVERHAAL PANEL
+   ========================================================= */
+
+.storyPanel{
+    display:none;
+
+    position:fixed;
+
+    top:50%;
+    left:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:min(900px,92vw);
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    background:#fffdf7;
+
+    border-radius:20px;
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.30);
+
+    z-index:2000;
+
+    padding:0;
+
+    color:#292929;
+}
+
+
+.storyPanel.visible{
+    display:block;
+}
+
+
+.storyHeader{
+    position:sticky;
+    top:0;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:20px 24px;
+
+    background:#fff4c7;
+
+    border-bottom:1px solid #eadb9b;
+
+    z-index:5;
+}
+
+
+.storyTitle{
+    font-size:28px;
+    font-weight:bold;
+}
+
+
+.storyDate{
+    margin-top:5px;
+    color:#776c45;
+    font-size:14px;
+}
+
+
+.storyCloseButton{
+    min-width:45px;
+    width:45px;
+    height:45px;
+
+    border-radius:50%;
+
+    background:white;
+
+    font-size:20px;
+
+    flex:none;
+}
+
+
+.storyLoading{
+    padding:60px 30px;
+
+    text-align:center;
+
+    font-size:20px;
+}
+
+
+.storyLoadingIcon{
+    font-size:60px;
+    margin-bottom:20px;
+
+    animation:moonPulse 2s infinite;
+}
+
+
+.storyLoadingSmall{
+    margin-top:15px;
+    font-size:14px;
+    color:#888;
+}
+
+
+@keyframes moonPulse{
+
+    0%,100%{
+        transform:scale(1);
+        opacity:0.7;
+    }
+
+    50%{
+        transform:scale(1.15);
+        opacity:1;
+    }
+
+}
+
+
+.storyContent{
+
+    padding:30px 45px 20px;
+
+    font-family:Georgia, "Times New Roman", serif;
+
+    font-size:20px;
+
+    line-height:1.85;
+
+    color:#302b22;
+}
+
+
+.storyContent .storyParagraph{
+    margin:0 0 1.2em;
+}
+
+
+.storyContent .storyHeading{
+    text-align:center;
+
+    font-size:30px;
+
+    margin-bottom:30px;
+
+    color:#5a4a25;
+}
+
+
+.storyActions{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    padding:15px 25px 25px;
+
+    border-top:1px solid #eadb9b;
+
+    background:#fffaf0;
+}
+
+
+.storyActions button{
+    flex:1 1 150px;
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    font-size:16px;
+}
+
+
+.storyActions button:hover{
+    background:#f2f2f2;
+}
+
+
+@media(max-width:600px){
+
+    .storyPanel{
+        width:96vw;
+        max-height:94vh;
+        border-radius:14px;
+    }
+
+    .storyHeader{
+        padding:15px;
+    }
+
+    .storyTitle{
+        font-size:21px;
+    }
+
+    .storyContent{
+        padding:22px 20px;
+
+        font-size:18px;
+
+        line-height:1.75;
+    }
+
+    .storyActions{
+        padding:12px;
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+   ========================================================= */
 
 @media print {
 
-    /* ================= BASIS ================= */
-
     body * {
-        visibility: hidden;
+        visibility:hidden;
     }
 
-    #printContainer, 
+    #printContainer,
     #printContainer * {
-        visibility: visible;
+        visibility:visible;
     }
 
     #printContainer {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
     }
 
-    /* ================= EVENTS ================= */
+
+    /* -----------------------------------------------------
+       EVENTS
+       ----------------------------------------------------- */
 
     .event.printEvent {
-    position: absolute;
-    border-radius: 6px;
-    font-size: 12px;
-    padding: 4px;
-    box-sizing: border-box;
-    overflow: visible;   /* 🔥 NIET MEER AFKAPPEN */
+        position:absolute;
+        border-radius:6px;
+        font-size:12px;
+        padding:4px;
+        box-sizing:border-box;
+        overflow:visible;
 
-    color: #000;
+        color:#000;
 
-    display: flex;
-    flex-direction: column;
+        display:flex;
+        flex-direction:column;
 
-    justify-content: center;   /* 🔥 VERTICAAL CENTREREN */
-    align-items: center;
+        justify-content:center;
+        align-items:center;
 
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-}
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+    }
 
-    /* 🔥 ICONEN naast elkaar (BELANGRIJKSTE FIX) */
+
     .event.printEvent .icons {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: center;
-        align-items: center;
-        gap: 1px;
-        margin-bottom: 0px;
-        width: 100%;
+        display:flex !important;
+        flex-direction:row !important;
+        justify-content:center;
+        align-items:center;
+        gap:1px;
+        margin-bottom:0;
+        width:100%;
     }
 
-/* 🔥 basis pictogram */
-.event.printEvent .picto {
-    display: inline-block !important;
-    width: auto !important;
-    height: auto !important;
-    object-fit: contain;
-}
 
-/* 🔥 kleine iconen */
-.event.printEvent .picto.smallicon {
-    width: 40px !important;
-    height: 40px !important;
-}
+    .event.printEvent .picto {
+        display:inline-block !important;
+        width:auto !important;
+        height:auto !important;
+        object-fit:contain;
+    }
 
-/* 🔥 GROTE iconen (FIX) */
-.event.printEvent .picto.bigicon {
-    width: 120px !important;
-    height: 40px !important;
-}
 
-    /* 🔥 tekst onder iconen */
+    .event.printEvent .picto.smallicon {
+        width:40px !important;
+        height:40px !important;
+    }
+
+
+    .event.printEvent .picto.bigicon {
+        width:120px !important;
+        height:40px !important;
+    }
+
+
     .event.printEvent .eventText {
-        text-align: center;
-        width: 100%;
-        font-size: 20px;
-        color: #000000;
-        margin-top: 0px;
-        overflow: visible;   /* 🔥 NIET MEER AFKAPPEN */
+        text-align:center;
+        width:100%;
+        font-size:20px;
+        color:#000000;
+        margin-top:0;
+        overflow:visible;
     }
+
 
     img.picto {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
     }
 
-    /* ================= DAGEN ================= */
+
+    /* -----------------------------------------------------
+       DAGEN
+       ----------------------------------------------------- */
 
     .printDay {
-        page-break-after: always;
-        position: relative;
-        width: 100%;
-        height: 960px;
-        margin: 0;
-        padding: 20px;
-        background: white;
-        font-family: Arial, sans-serif;
+        page-break-after:always;
+        position:relative;
+        width:100%;
+        height:960px;
+        margin:0;
+        padding:20px;
+        background:white;
+        font-family:Arial,sans-serif;
     }
 
-    /* 🔥 HEADER met icoon + tekst naast elkaar */
+
     .printDay h2 {
-        font-size: 40px;
-        text-align: center;
-        margin-bottom: 10px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        background: #4285F4!important;  /* 🔥 blauw forceren */
-        color: white !important;          /* tekst wit */
-        padding: 8px;
-        border-radius: 6px;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+        font-size:40px;
+        text-align:center;
+        margin-bottom:10px;
+
+        display:flex;
+        justify-content:center;
+        align-items:center;
+
+        gap:10px;
+
+        background:#4285F4 !important;
+        color:white !important;
+
+        padding:8px;
+        border-radius:6px;
+
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
     }
+
 
     .dayIcon {
-        font-size: 35px;
+        font-size:35px;
     }
+
 
     .printDayContainer {
-        position: relative;
-        height: 960px;
+        position:relative;
+        height:960px;
     }
+
 
     .printHour {
-        position: absolute;
-        left: 0;
-        right: 0;
-        border-top: 1px solid #4285F4; /* 🔥 duidelijke blauwe lijn */
-        font-size: 10px;
-        color: #4285F4;                  /* optioneel: uur ook blauw */
-        padding-left: 4px;
+        position:absolute;
+        left:0;
+        right:0;
+
+        border-top:1px solid #4285F4;
+
+        font-size:10px;
+
+        color:#4285F4;
+
+        padding-left:4px;
     }
 
+
     @page {
-        size: A4;
-        margin: 15mm;
+        size:A4;
+        margin:15mm;
     }
+
 }
+
+
+/* =========================================================
+   PRINT WEEK EXTRA
+   ========================================================= */
+
 @media print {
 
     @page {
-        size: A4 portrait;
-        margin: 15mm;
-
-        /* 🔥 FORCEERT enkelzijdig gedrag */
-        break-after: page;
+        size:A4 portrait;
+        margin:15mm;
+        break-after:page;
     }
+
 
     .printDay {
-        page-break-after: always;
-
-        /* 🔥 BELANGRIJK: voorkomt dubbelzijdig pairing */
-        break-inside: avoid;
-        page-break-inside: avoid;
+        page-break-after:always;
+        break-inside:avoid;
+        page-break-inside:avoid;
     }
 
 }
+
+
 .printDay:nth-child(odd) {
-    page-break-after: always;
+    page-break-after:always;
 }
 
+
 .printDay:nth-child(even) {
-    page-break-after: always;
+    page-break-after:always;
+}
+
+
+/* =========================================================
+   SLAAPVERHAAL AFDRUKKEN
+   ========================================================= */
+
+@media print {
+
+    body.storyPrinting > * {
+        display:none !important;
+    }
+
+
+    body.storyPrinting #storyPanel {
+        display:block !important;
+
+        position:static !important;
+
+        transform:none !important;
+
+        width:100% !important;
+
+        max-height:none !important;
+
+        overflow:visible !important;
+
+        box-shadow:none !important;
+
+        border-radius:0 !important;
+
+        background:white !important;
+    }
+
+
+    body.storyPrinting #storyPanel * {
+        visibility:visible !important;
+    }
+
+
+    body.storyPrinting .storyHeader {
+        position:static !important;
+
+        background:white !important;
+
+        border-bottom:2px solid #333 !important;
+    }
+
+
+    body.storyPrinting .storyActions,
+    body.storyPrinting .storyCloseButton {
+        display:none !important;
+    }
+
+
+    body.storyPrinting .storyContent {
+        font-size:18px;
+        line-height:1.7;
+        padding:20px;
+    }
+
+
+    @page {
+        size:A4;
+        margin:20mm;
+    }
+
+}
+
+
+/* =========================================================
+   SWIPE / TOUCH
+   ========================================================= */
+
+html,
+body{
+    overscroll-behavior-x:none;
 }
