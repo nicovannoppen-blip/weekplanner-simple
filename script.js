@@ -6,31 +6,50 @@ let dayMode=false
 let bigIcons=false
 
 
+// =========================================================
 // Hernoem lange kalender namen
+// =========================================================
+
 function rename(name){
-    if(name.toLowerCase().includes("belgie feestdagen") || name.toLowerCase().includes("schoolvakanties") || name.toLowerCase().includes("www.feestdagen-belgie.be")
-       || name.toLowerCase().includes("feestdagen in belgië") ){
+
+    if(
+        name.toLowerCase().includes("belgie feestdagen") ||
+        name.toLowerCase().includes("schoolvakanties") ||
+        name.toLowerCase().includes("www.feestdagen-belgie.be") ||
+        name.toLowerCase().includes("feestdagen in belgië")
+    ){
+
         return "Feestdagen";
+
     }
 
     return name;
+
 }
 
 
-// volgorde filter
+// =========================================================
+// VOLGORDE FILTER
+// =========================================================
+
 const CALENDAR_ORDER=[
-"Gezin",
-"Nico",
-"Elke",
-"Niel",
-"Odin",
-"Rifter",
-"Rita",
-"Feestdagen"
+
+    "Gezin",
+    "Nico",
+    "Elke",
+    "Niel",
+    "Odin",
+    "Rifter",
+    "Rita",
+    "Feestdagen"
+
 ]
 
 
+// =========================================================
 // SMART PICTO AI
+// =========================================================
+
 const ICON_AI={
 
 school:["school","klas","les"],
@@ -63,7 +82,7 @@ bakfiets:["bakfiets"],
 bezoek_van:["bezoek van","komt","komen"],
 boot:["boot"],
 bos:["bos"],
-camper:["camper"],
+camper:["camper","mobilhome"],
 camping_caravan:["camping caravan"],
 camping:["camping"],
 carnaval:["carnaval"],
@@ -71,8 +90,7 @@ elke:["elke","mama"],
 fietsen:["fietsen"],
 Jana:["jana"],
 kasteel:["kasteel"],
-kermis:["kermis"],
-kermis:["kermis", "attractie", "attractiepark"],
+kermis:["kermis","attractie","attractiepark"],
 kippen_eten_geven:["kippen eten geven"],
 koffer:["koffer"],
 logeren:["logeren","bij"],
@@ -151,49 +169,48 @@ dierenwinkel:["dierenwinkel","schoubben"],
 gezin:["gezin"],
 Johnny:["johnny","papa"],
 verhuizen:["verhuizen","tent opruimen"],
-tattoo: ["tattoo","tatoo","tatoe"],
-luchtballon: ["luchtballon","ballonvaart"],
-schoolreis: ["schoolreis"],
-sauna: ["sauna", "welness"],
-geit: ["geit"],
-geit_eten_geven: ["geit eten geven","geit_voederen"],
-kameel: ["kameel", "kamelen"],
-OmieEnOpie: ["omie en opie","opie en omie"],
-paard_rijden: ["paard rijden","ponyrijden"],
-pony: ["pony"],
-binnenspeeltuin: ["binnenspeeltuin"],
-speeltuin: ["speeltuin"],
-verkennen: ["verkennen"],
-welkomstspel: ["welkomstspel"],
-dierenspeurtocht: ["dierenspeurtocht"],
-knutselen: ["knutselen", "workshop"],
-volksspelen: ["volksspelen"],
-dansen: ["dansen"],
-huifkar: ["huifkar"],
-pannenkoek: ["pannenkoek","pannenkoeken"],
-efteling: ["efteling"],
-boerenontbijt: ["boerenontbijt"],
-bowlen: ["bowlen"],
-golf: ["golf"],
-etensamen: ["samen eten", "eten samen"],
-dolfinarium: ["dolfinarium"],
-winkelcentrum: ["winkelcentrum"],
-markt: ["markt"],
-toonmoment: ["toonmoment"],
-parking: ["parking"],
-wekker: ["wekker"],
-vissen: ["vissen","aquarium"],
-vuurtoren: ["vuurtoren"],
-Hunebed: ["hunebed"],
-bunker: ["bunker","bunkers"],
-ster: ["ster","sterren"],
-orca: ["orca","orka"],
-cinema: ["cinema","kinepolis","euroscoop"],
-medicatie_druppels: ["druppeltjes"],
-gezelschapsspel: ["gezelschapsspel"],
-kamp: ["kamp","bivak"],
-camper: ["camper","mobilhome"],
-fotograaf: ["fotograaf","fotoshoot","photoshoot"],
+tattoo:["tattoo","tatoo","tatoe"],
+luchtballon:["luchtballon","ballonvaart"],
+schoolreis:["schoolreis"],
+sauna:["sauna","welness"],
+geit:["geit"],
+geit_eten_geven:["geit eten geven","geit_voederen"],
+kameel:["kameel","kamelen"],
+OmieEnOpie:["omie en opie","opie en omie"],
+paard_rijden:["paard rijden","ponyrijden"],
+pony:["pony"],
+binnenspeeltuin:["binnenspeeltuin"],
+speeltuin:["speeltuin"],
+verkennen:["verkennen"],
+welkomstspel:["welkomstspel"],
+dierenspeurtocht:["dierenspeurtocht"],
+knutselen:["knutselen","workshop"],
+volksspelen:["volksspelen"],
+dansen:["dansen"],
+huifkar:["huifkar"],
+pannenkoek:["pannenkoek","pannenkoeken"],
+efteling:["efteling"],
+boerenontbijt:["boerenontbijt"],
+bowlen:["bowlen"],
+golf:["golf"],
+etensamen:["samen eten","eten samen"],
+dolfinarium:["dolfinarium"],
+winkelcentrum:["winkelcentrum"],
+markt:["markt"],
+toonmoment:["toonmoment"],
+parking:["parking"],
+wekker:["wekker"],
+vissen:["vissen","aquarium"],
+vuurtoren:["vuurtoren"],
+Hunebed:["hunebed"],
+bunker:["bunker","bunkers"],
+ster:["ster","sterren"],
+orca:["orca","orka"],
+cinema:["cinema","kinepolis","euroscoop"],
+medicatie_druppels:["druppeltjes"],
+gezelschapsspel:["gezelschapsspel"],
+kamp:["kamp","bivak"],
+fotograaf:["fotograaf","fotoshoot","photoshoot"],
 sanne:["sanne"],
 koken:["koken"],
 kampvuur:["kampvuur"],
@@ -208,24 +225,27 @@ oogarts:["oogarts"]
 
 function login(){
 
-    window.location.href = "/api/auth";
+    window.location.href="/api/auth";
 
 }
 
 
 async function logout(){
 
-    try {
+    try{
 
         await fetch("/api/logout");
 
-    } catch(e) {
+    }catch(e){
 
-        console.error("Logout fout:", e);
+        console.error(
+            "Logout fout:",
+            e
+        );
 
     }
 
-    token = null;
+    token=null;
 
     localStorage.removeItem("token");
 
@@ -236,33 +256,48 @@ async function logout(){
 
 async function parseToken(){
 
-    try {
+    try{
 
-        const response = await fetch("/api/token");
+        const response=
+            await fetch("/api/token");
+
 
         if(!response.ok){
 
-            token = null;
+            token=null;
 
-            console.log("Niet ingelogd");
+            console.log(
+                "Niet ingelogd"
+            );
 
             return;
 
         }
 
-        const data = await response.json();
 
-        token = data.access_token;
+        const data=
+            await response.json();
 
-        console.log("Automatisch ingelogd");
+
+        token=
+            data.access_token;
+
+
+        console.log(
+            "Automatisch ingelogd"
+        );
+
 
         await init();
 
-    } catch(error){
+    }catch(error){
 
-        console.error("Authenticatie fout:", error);
+        console.error(
+            "Authenticatie fout:",
+            error
+        );
 
-        token = null;
+        token=null;
 
     }
 
@@ -272,8 +307,11 @@ async function parseToken(){
 async function init(){
 
     if(!token){
+
         return;
+
     }
+
 
     await loadCalendars();
 
@@ -290,43 +328,74 @@ async function init(){
 
 async function loadCalendars(){   
 
-    let r=await fetch(
-        "https://www.googleapis.com/calendar/v3/users/me/calendarList",
-        {
-            headers:{
-                Authorization:"Bearer "+token
+    let r=
+        await fetch(
+            "https://www.googleapis.com/calendar/v3/users/me/calendarList",
+            {
+                headers:{
+                    Authorization:"Bearer "+token
+                }
             }
-        }
-    );
+        );
 
-    let data=await r.json();
+
+    let data=
+        await r.json();
 
 
     if(!data.items){
 
-        console.error("Kalenders konden niet geladen worden:",data);
+        console.error(
+            "Kalenders konden niet geladen worden:",
+            data
+        );
 
         return;
 
     }
 
 
-    console.log(data.items.map(c => c.summary));
+    console.log(
+        data.items.map(
+            c=>c.summary
+        )
+    );
 
 
-    calendars=data.items
-    .filter(c=>!HIDDEN_CALENDARS.includes(c.summary))
-    .sort((a,b)=>{
+    calendars=
+        data.items
+        .filter(
+            c=>!HIDDEN_CALENDARS.includes(
+                c.summary
+            )
+        )
+        .sort(
+            (a,b)=>{
 
-        let ia=CALENDAR_ORDER.indexOf(rename(a.summary));
-        let ib=CALENDAR_ORDER.indexOf(rename(b.summary));
+                let ia=
+                    CALENDAR_ORDER.indexOf(
+                        rename(a.summary)
+                    );
 
-        if(ia==-1) ia=999;
-        if(ib==-1) ib=999;
 
-        return ia-ib;
+                let ib=
+                    CALENDAR_ORDER.indexOf(
+                        rename(b.summary)
+                    );
 
-    });
+
+                if(ia==-1)
+                    ia=999;
+
+
+                if(ib==-1)
+                    ib=999;
+
+
+                return ia-ib;
+
+            }
+        );
 
 
     buildFilters();
@@ -336,23 +405,37 @@ async function loadCalendars(){
 
 function buildFilters(){
 
-    let f=document.getElementById("filters");
+    let f=
+        document.getElementById(
+            "filters"
+        );
+
 
     f.innerHTML="";
 
 
     calendars.forEach(c=>{
 
-        let btn=document.createElement("div");
+        let btn=
+            document.createElement(
+                "div"
+            );
 
-        btn.className="filterBtn active";
 
-        btn.dataset.id=c.id;
+        btn.className=
+            "filterBtn active";
 
 
-        let name=rename(c.summary);
+        btn.dataset.id=
+            c.id;
 
-        let iconName=name.toLowerCase();
+
+        let name=
+            rename(c.summary);
+
+
+        let iconName=
+            name.toLowerCase();
 
 
         btn.innerHTML=`
@@ -369,14 +452,21 @@ function buildFilters(){
         `;
 
 
-        btn.style.background=c.backgroundColor;
+        btn.style.background=
+            c.backgroundColor;
 
-        btn.style.color=getContrastColor(c.backgroundColor);
+
+        btn.style.color=
+            getContrastColor(
+                c.backgroundColor
+            );
 
 
         btn.onclick=()=>{
 
-            btn.classList.toggle("active");
+            btn.classList.toggle(
+                "active"
+            );
 
             render();
 
@@ -392,25 +482,44 @@ function buildFilters(){
 
 function getContrastColor(hex){
 
-    if(!hex) return "#000";
+    if(!hex)
+        return "#000";
 
 
-    let c=hex.substring(1);
+    let c=
+        hex.substring(1);
 
-    let rgb=parseInt(c,16);
 
-    let r=(rgb>>16)&0xff;
-    let g=(rgb>>8)&0xff;
-    let b=(rgb>>0)&0xff;
+    let rgb=
+        parseInt(
+            c,
+            16
+        );
+
+
+    let r=
+        (rgb>>16)&0xff;
+
+
+    let g=
+        (rgb>>8)&0xff;
+
+
+    let b=
+        (rgb>>0)&0xff;
 
 
     let luminance=
-        (0.299*r+
-         0.587*g+
-         0.114*b)/255;
+        (
+            0.299*r+
+            0.587*g+
+            0.114*b
+        )/255;
 
 
-    return luminance>0.6 ? "#000" : "#fff";
+    return luminance>0.6
+        ? "#000"
+        : "#fff";
 
 }
 
@@ -424,66 +533,93 @@ async function loadEvents(){
     events=[];
 
 
-    let start=new Date(currentDate);
+    let start=
+        new Date(currentDate);
 
-    start.setDate(start.getDate()-7);
+
+    start.setDate(
+        start.getDate()-7
+    );
 
 
-    let end=new Date(currentDate);
+    let end=
+        new Date(currentDate);
 
-    end.setDate(end.getDate()+7);
+
+    end.setDate(
+        end.getDate()+7
+    );
 
 
     for(let cal of calendars){
 
         let url=
-        `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
-        `timeMin=${start.toISOString()}&`+
-        `timeMax=${end.toISOString()}&`+
-        `singleEvents=true&orderBy=startTime`;
+            `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?`+
+            `timeMin=${start.toISOString()}&`+
+            `timeMax=${end.toISOString()}&`+
+            `singleEvents=true&orderBy=startTime`;
 
 
-        let r=await fetch(
-            url,
-            {
-                headers:{
-                    Authorization:"Bearer "+token
+        let r=
+            await fetch(
+                url,
+                {
+                    headers:{
+                        Authorization:
+                            "Bearer "+token
+                    }
                 }
-            }
-        );
+            );
 
 
-        let data=await r.json();
+        let data=
+            await r.json();
 
 
-        if(!data.items) continue;
+        if(!data.items)
+            continue;
 
 
         data.items.forEach(e=>{
 
-            let s=e.start.dateTime||e.start.date;
+            let s=
+                e.start.dateTime ||
+                e.start.date;
 
-            let en=e.end.dateTime||e.end.date;
+
+            let en=
+                e.end.dateTime ||
+                e.end.date;
 
 
-            if(!s) return;
+            if(!s)
+                return;
 
 
             events.push({
 
-                title:e.summary||"",
+                title:
+                    e.summary || "",
 
-                start:new Date(s),
+                start:
+                    new Date(s),
 
-                end:new Date(en),
+                end:
+                    new Date(en),
 
-                calendar:cal.id,
+                calendar:
+                    cal.id,
 
-                calendarName:rename(cal.summary),
+                calendarName:
+                    rename(
+                        cal.summary
+                    ),
 
-                color:cal.backgroundColor,
+                color:
+                    cal.backgroundColor,
 
-                location:e.location||""
+                location:
+                    e.location || ""
 
             });
 
@@ -503,9 +639,15 @@ function activeCalendars(){
     let list=[];
 
 
-    document.querySelectorAll(".filterBtn.active").forEach(b=>{
+    document
+    .querySelectorAll(
+        ".filterBtn.active"
+    )
+    .forEach(b=>{
 
-        list.push(b.dataset.id);
+        list.push(
+            b.dataset.id
+        );
 
     });
 
@@ -521,16 +663,18 @@ function activeCalendars(){
 
 function iconsForEvent(e){
 
-    let text=(e.title).toLowerCase();
+    let text=
+        (e.title)
+        .toLowerCase();
 
-
-    // Vervoer heeft prioriteit
 
     if(
         text.includes("rijden van") ||
         text.includes("rijden naar")
     ){
+
         return ["auto"];
+
     }
 
 
@@ -538,7 +682,9 @@ function iconsForEvent(e){
         text.includes("fietsen van") ||
         text.includes("fietsen naar")
     ){
+
         return ["fietsen"];
+
     }
 
 
@@ -548,7 +694,9 @@ function iconsForEvent(e){
         text.includes("lopen van") ||
         text.includes("lopen naar")
     ){
+
         return ["wandelen_rugzak"];
+
     }
 
 
@@ -556,18 +704,22 @@ function iconsForEvent(e){
         text.includes("trein van") ||
         text.includes("trein naar")
     ){
+
         return ["trein"];
+
     }
 
 
     if(
         text.includes("bus van") ||
-        text.includes("bus naar")||
-        text.includes("openbaar vervoer nemen")||
+        text.includes("bus naar") ||
+        text.includes("openbaar vervoer nemen") ||
         text.includes("openbaar vervoer van") ||
         text.includes("openbaar vervoer naar")
     ){
+
         return ["bus"];
+
     }
 
 
@@ -575,7 +727,9 @@ function iconsForEvent(e){
         text.includes("metro van") ||
         text.includes("metro naar")
     ){
+
         return ["metro"];
+
     }
 
 
@@ -583,7 +737,9 @@ function iconsForEvent(e){
         text.includes("tram van") ||
         text.includes("tram naar")
     ){
+
         return ["tram"];
+
     }
 
 
@@ -591,7 +747,9 @@ function iconsForEvent(e){
         text.includes("vliegtuig van") ||
         text.includes("vliegtuig naar")
     ){
+
         return ["vliegtuig"];
+
     }
 
 
@@ -604,21 +762,26 @@ function iconsForEvent(e){
 
             let regex=
                 new RegExp(
-                    "\\b"+word.toLowerCase()+"\\b",
+                    "\\b"+
+                    word.toLowerCase()+
+                    "\\b",
                     "i"
                 );
 
 
-            let match=text.match(regex);
+            let match=
+                text.match(regex);
 
 
             if(match){
 
                 found.push({
 
-                    icon:icon,
+                    icon:
+                        icon,
 
-                    pos:match.index
+                    pos:
+                        match.index
 
                 });
 
@@ -629,13 +792,20 @@ function iconsForEvent(e){
     }
 
 
-    found.sort((a,b)=>a.pos-b.pos);
+    found.sort(
+        (a,b)=>
+            a.pos-b.pos
+    );
 
 
-    let icons=found.map(f=>f.icon);
+    let icons=
+        found.map(
+            f=>f.icon
+        );
 
 
-    icons=[...new Set(icons)];
+    icons=
+        [...new Set(icons)];
 
 
     return icons;
@@ -647,16 +817,27 @@ function iconsForEvent(e){
 // MEERDAAGSE EVENTS
 // =========================================================
 
-function eventsForDay(day,active){
+function eventsForDay(
+    day,
+    active
+){
 
-    let startDay=new Date(day);
+    let startDay=
+        new Date(day);
 
-    startDay.setHours(8,0,0,0);
+
+    startDay.setHours(
+        8,0,0,0
+    );
 
 
-    let endDay=new Date(day);
+    let endDay=
+        new Date(day);
 
-    endDay.setHours(23,0,0,0);
+
+    endDay.setHours(
+        23,0,0,0
+    );
 
 
     let list=[];
@@ -664,27 +845,48 @@ function eventsForDay(day,active){
 
     events.forEach(e=>{
 
-        if(!active.includes(e.calendar)) return;
-
-        if(e.end<=startDay) return;
-
-        if(e.start>=endDay) return;
-
-
-        let start=new Date(
-            Math.max(e.start,startDay)
-        );
+        if(
+            !active.includes(
+                e.calendar
+            )
+        )
+            return;
 
 
-        let end=new Date(
-            Math.min(e.end,endDay)
-        );
+        if(e.end<=startDay)
+            return;
+
+
+        if(e.start>=endDay)
+            return;
+
+
+        let start=
+            new Date(
+                Math.max(
+                    e.start,
+                    startDay
+                )
+            );
+
+
+        let end=
+            new Date(
+                Math.min(
+                    e.end,
+                    endDay
+                )
+            );
 
 
         list.push({
+
             ...e,
+
             start:start,
+
             end:end
+
         });
 
     });
@@ -701,29 +903,49 @@ function eventsForDay(day,active){
 
 function render(){
 
-    let agenda=document.getElementById("agenda");
+    let agenda=
+        document.getElementById(
+            "agenda"
+        );
+
 
     agenda.innerHTML="";
 
 
-    let start=getMonday(currentDate);
-
-    let days=dayMode?1:7;
-
-
-    let container=document.createElement("div");
-
-    container.className="week";
+    let start=
+        getMonday(
+            currentDate
+        );
 
 
-    let active=activeCalendars();
+    let days=
+        dayMode
+        ? 1
+        : 7;
+
+
+    let container=
+        document.createElement(
+            "div"
+        );
+
+
+    container.className=
+        "week";
+
+
+    let active=
+        activeCalendars();
 
 
     for(let i=0;i<days;i++){
 
-        let d=new Date(
-            dayMode ? currentDate : start
-        );
+        let d=
+            new Date(
+                dayMode
+                ? currentDate
+                : start
+            );
 
 
         if(!dayMode){
@@ -735,12 +957,18 @@ function render(){
         }
 
 
-        let col=document.createElement("div");
+        let col=
+            document.createElement(
+                "div"
+            );
 
-        col.className="day";
+
+        col.className=
+            "day";
 
 
-        let today=new Date();
+        let today=
+            new Date();
 
 
         if(
@@ -754,7 +982,8 @@ function render(){
         }
 
 
-        let now=new Date();
+        let now=
+            new Date();
 
 
         if(
@@ -762,9 +991,14 @@ function render(){
             sameDay(now,d)
         ){
 
-            let line=document.createElement("div");
+            let line=
+                document.createElement(
+                    "div"
+                );
 
-            line.className="currentTimeLine";
+
+            line.className=
+                "currentTimeLine";
 
 
             let minutesSince7=
@@ -776,25 +1010,35 @@ function render(){
                 minutesSince7+"px";
 
 
-            col.appendChild(line);
+            col.appendChild(
+                line
+            );
 
         }
 
 
         col.onclick=()=>{
 
-            currentDate=new Date(d);
+            currentDate=
+                new Date(d);
+
 
             dayMode=true;
+
 
             render();
 
         };
 
 
-        let head=document.createElement("div");
+        let head=
+            document.createElement(
+                "div"
+            );
 
-        head.className="dayHeader";
+
+        head.className=
+            "dayHeader";
 
 
         let dayIcons=[
@@ -808,7 +1052,8 @@ function render(){
         ];
 
 
-        let weekday=d.getDay();
+        let weekday=
+            d.getDay();
 
 
         head.innerHTML=
@@ -829,19 +1074,34 @@ function render(){
             );
 
 
-        col.appendChild(head);
+        col.appendChild(
+            head
+        );
 
 
-        for(let h=7;h<=23;h++){
+        for(
+            let h=7;
+            h<=23;
+            h++
+        ){
 
-            let line=document.createElement("div");
+            let line=
+                document.createElement(
+                    "div"
+                );
 
-            line.className="hour";
+
+            line.className=
+                "hour";
+
 
             line.style.top=
                 ((h-7)*60)+"px";
 
-            col.appendChild(line);
+
+            col.appendChild(
+                line
+            );
 
         }
 
@@ -859,12 +1119,16 @@ function render(){
         );
 
 
-        container.appendChild(col);
+        container.appendChild(
+            col
+        );
 
     }
 
 
-    agenda.appendChild(container);
+    agenda.appendChild(
+        container
+    );
 
 
     if(bigIcons)
@@ -874,7 +1138,9 @@ function render(){
 
 
     let todayCol=
-        document.getElementById("today");
+        document.getElementById(
+            "today"
+        );
 
 
     if(todayCol){
@@ -905,7 +1171,8 @@ function layoutEvents(
 ){
 
     list.sort(
-        (a,b)=>a.start-b.start
+        (a,b)=>
+            a.start-b.start
     );
 
 
@@ -964,7 +1231,9 @@ function layoutEvents(
 
 
                 let div=
-                    document.createElement("div");
+                    document.createElement(
+                        "div"
+                    );
 
 
                 div.className=
@@ -1029,11 +1298,13 @@ function layoutEvents(
 
                     ){
 
-                        extraClass="bigicon";
+                        extraClass=
+                            "bigicon";
 
                     }else{
 
-                        extraClass="smallicon";
+                        extraClass=
+                            "smallicon";
 
                     }
 
@@ -1055,16 +1326,17 @@ function layoutEvents(
                     (e.title||"");
 
 
-                let speechText=(
-                    "agenda "+
-                    e.calendarName+
-                    ": "+
-                    e.title+
-                    ". van "+
-                    time(e.start)+
-                    " tot "+
-                    time(e.end)
-                ).toLowerCase();
+                let speechText=
+                    (
+                        "agenda "+
+                        e.calendarName+
+                        ": "+
+                        e.title+
+                        ". van "+
+                        time(e.start)+
+                        " tot "+
+                        time(e.end)
+                    ).toLowerCase();
 
 
                 let words=
@@ -1101,6 +1373,7 @@ function layoutEvents(
 
                     ev.stopPropagation();
 
+
                     speak(
                         speechText,
                         div
@@ -1109,7 +1382,9 @@ function layoutEvents(
                 };
 
 
-                col.appendChild(div);
+                col.appendChild(
+                    div
+                );
 
             });
 
@@ -1147,14 +1422,19 @@ function time(d){
 
 function getMonday(d){
 
-    d=new Date(d);
+    d=
+        new Date(d);
 
-    let day=d.getDay();
+
+    let day=
+        d.getDay();
+
 
     let diff=
         d.getDate()-
         day+
         (day==0?-6:1);
+
 
     return new Date(
         d.setDate(diff)
@@ -1201,7 +1481,9 @@ function next(){
 
 function today(){
 
-    currentDate=new Date();
+    currentDate=
+        new Date();
+
 
     init();
 
@@ -1210,7 +1492,9 @@ function today(){
 
 function toggleView(){
 
-    dayMode=!dayMode;
+    dayMode=
+        !dayMode;
+
 
     render();
 
@@ -1220,10 +1504,14 @@ function toggleView(){
 function selectAll(){
 
     document
-    .querySelectorAll(".filterBtn")
+    .querySelectorAll(
+        ".filterBtn"
+    )
     .forEach(b=>{
 
-        b.classList.add("active");
+        b.classList.add(
+            "active"
+        );
 
     });
 
@@ -1236,10 +1524,14 @@ function selectAll(){
 function selectNone(){
 
     document
-    .querySelectorAll(".filterBtn")
+    .querySelectorAll(
+        ".filterBtn"
+    )
     .forEach(b=>{
 
-        b.classList.remove("active");
+        b.classList.remove(
+            "active"
+        );
 
     });
 
@@ -1262,35 +1554,42 @@ parseToken();
 
 function showNextEvents(){
 
-    let now=new Date();
+    let now=
+        new Date();
 
 
-    let upcoming=events
-    .filter(e=>{
+    let upcoming=
+        events
+        .filter(e=>{
 
-        let dur=
-            (e.end-e.start)/3600000;
-
-
-        if(dur>=15)
-            return false;
+            let dur=
+                (e.end-e.start)/3600000;
 
 
-        return e.start>now;
+            if(dur>=15)
+                return false;
 
-    })
-    .sort(
-        (a,b)=>a.start-b.start
-    )
-    .slice(0,4);
+
+            return e.start>now;
+
+        })
+        .sort(
+            (a,b)=>
+                a.start-b.start
+        )
+        .slice(0,4);
 
 
     let popup=
-        document.getElementById("popup");
+        document.getElementById(
+            "popup"
+        );
 
 
     let popupText=
-        document.getElementById("popupText");
+        document.getElementById(
+            "popupText"
+        );
 
 
     popupText.innerHTML="";
@@ -1298,19 +1597,18 @@ function showNextEvents(){
 
     upcoming.forEach(e=>{
 
-        let lineText=(
-
-            "agenda "+
-            (e.calendarName||"")+
-            ": van "+
-            time(e.start)+
-            " tot "+
-            time(e.end)+
-            " "+
-            (e.title||" ")+
-            "."
-
-        ).toLowerCase();
+        let lineText=
+            (
+                "agenda "+
+                (e.calendarName||"")+
+                ": van "+
+                time(e.start)+
+                " tot "+
+                time(e.end)+
+                " "+
+                (e.title||" ")+
+                "."
+            ).toLowerCase();
 
 
         let words=
@@ -1318,7 +1616,9 @@ function showNextEvents(){
 
 
         let lineDiv=
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         lineDiv.className=
@@ -1329,21 +1629,26 @@ function showNextEvents(){
             (w,i)=>{
 
                 let span=
-                    document.createElement("span");
+                    document.createElement(
+                        "span"
+                    );
 
 
                 span.className=
                     "speechWord";
 
 
-                span.dataset.index=i;
+                span.dataset.index=
+                    i;
 
 
                 span.innerText=
                     w+" ";
 
 
-                lineDiv.appendChild(span);
+                lineDiv.appendChild(
+                    span
+                );
 
             }
         );
@@ -1356,7 +1661,8 @@ function showNextEvents(){
     });
 
 
-    popup.style.display="flex";
+    popup.style.display=
+        "flex";
 
 
     speak(
@@ -1411,7 +1717,8 @@ function speak(
         );
 
 
-    msg.lang="nl-BE";
+    msg.lang=
+        "nl-BE";
 
 
     msg.onboundary=function(event){
@@ -1443,7 +1750,8 @@ function speak(
 
             if(total>charIndex){
 
-                currentWordIndex=i;
+                currentWordIndex=
+                    i;
 
                 break;
 
@@ -1453,7 +1761,10 @@ function speak(
 
 
         spans.forEach(
-            s=>s.classList.remove("active")
+            s=>
+                s.classList.remove(
+                    "active"
+                )
         );
 
 
@@ -1462,7 +1773,9 @@ function speak(
 
 
         if(span)
-            span.classList.add("active");
+            span.classList.add(
+                "active"
+            );
 
     };
 
@@ -1470,13 +1783,18 @@ function speak(
     msg.onend=()=>{
 
         spans.forEach(
-            s=>s.classList.remove("active")
+            s=>
+                s.classList.remove(
+                    "active"
+                )
         );
 
     };
 
 
-    speechSynthesis.speak(msg);
+    speechSynthesis.speak(
+        msg
+    );
 
 }
 
@@ -1488,8 +1806,11 @@ function speak(
 function closePopup(){
 
     document
-    .getElementById("popup")
-    .style.display="none";
+    .getElementById(
+        "popup"
+    )
+    .style.display=
+        "none";
 
 }
 
@@ -1542,7 +1863,9 @@ document.addEventListener(
 function printWeek(){
 
     let start=
-        getMonday(currentDate);
+        getMonday(
+            currentDate
+        );
 
 
     let printContainer=
@@ -1554,10 +1877,14 @@ function printWeek(){
     if(!printContainer){
 
         printContainer=
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         printContainer.id=
             "printContainer";
+
 
         document.body.appendChild(
             printContainer
@@ -1592,7 +1919,9 @@ function printWeek(){
 
 
         let dayDiv=
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         dayDiv.className=
@@ -1615,7 +1944,9 @@ function printWeek(){
 
 
         let h2=
-            document.createElement("h2");
+            document.createElement(
+                "h2"
+            );
 
 
         h2.innerText=
@@ -1630,11 +1961,15 @@ function printWeek(){
             );
 
 
-        dayDiv.appendChild(h2);
+        dayDiv.appendChild(
+            h2
+        );
 
 
         let dayContainer=
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
         dayContainer.className=
@@ -1653,7 +1988,9 @@ function printWeek(){
         ){
 
             let hourLine=
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             hourLine.className=
@@ -1707,7 +2044,9 @@ function printWeek(){
 // =========================================================
 
 let clockContainer=
-    document.createElement("div");
+    document.createElement(
+        "div"
+    );
 
 
 clockContainer.id=
@@ -1732,11 +2071,15 @@ clockContainer.style.gap=
 
 document
 .querySelector("header")
-.appendChild(clockContainer);
+.appendChild(
+    clockContainer
+);
 
 
 let clockTime=
-    document.createElement("div");
+    document.createElement(
+        "div"
+    );
 
 
 clockTime.id=
@@ -1761,7 +2104,9 @@ clockContainer.appendChild(
 
 
 let clockDate=
-    document.createElement("div");
+    document.createElement(
+        "div"
+    );
 
 
 clockDate.id=
@@ -1787,7 +2132,8 @@ clockContainer.appendChild(
 
 function updateClock(){
 
-    let now=new Date();
+    let now=
+        new Date();
 
 
     let hours=
@@ -1851,7 +2197,8 @@ updateClock();
 
 clockTime.onclick=()=>{
 
-    let now=new Date();
+    let now=
+        new Date();
 
 
     let hours=
@@ -1872,17 +2219,21 @@ clockTime.onclick=()=>{
         );
 
 
-    msg.lang="nl-BE";
+    msg.lang=
+        "nl-BE";
 
 
-    speechSynthesis.speak(msg);
+    speechSynthesis.speak(
+        msg
+    );
 
 };
 
 
 clockDate.onclick=()=>{
 
-    let now=new Date();
+    let now=
+        new Date();
 
 
     let weekday=
@@ -1921,53 +2272,54 @@ clockDate.onclick=()=>{
         );
 
 
-    msg.lang="nl-BE";
+    msg.lang=
+        "nl-BE";
 
 
-    speechSynthesis.speak(msg);
+    speechSynthesis.speak(
+        msg
+    );
 
 };
 
 
 // =========================================================
-// NIEUW
 // AFBEELDING VAN MORGEN
 // =========================================================
-//
-// Dit gedeelte gebruikt GEEN OpenAI API.
-// De afbeelding wordt volledig in de browser
-// gemaakt met HTML Canvas.
-//
-// =========================================================
-
 
 let tomorrowCanvas=null;
 
 let tomorrowImageDataUrl=null;
 
 
-// ---------------------------------------------------------
-// Morgen bepalen
-// ---------------------------------------------------------
+// =========================================================
+// MORGEN BEPALEN
+// =========================================================
 
 function getTomorrowDate(){
 
-    let tomorrow=new Date();
+    let tomorrow=
+        new Date();
 
-    tomorrow.setHours(0,0,0,0);
+
+    tomorrow.setHours(
+        0,0,0,0
+    );
+
 
     tomorrow.setDate(
         tomorrow.getDate()+1
     );
+
 
     return tomorrow;
 
 }
 
 
-// ---------------------------------------------------------
-// Afspraken van morgen ophalen
-// ---------------------------------------------------------
+// =========================================================
+// AFSRPRAKEN VAN MORGEN
+// =========================================================
 
 function getTomorrowEvents(){
 
@@ -2010,7 +2362,9 @@ function getTomorrowEvents(){
                 e.calendar
             )
         ){
+
             return false;
+
         }
 
 
@@ -2022,62 +2376,138 @@ function getTomorrowEvents(){
             return false;
 
 
-        // "Druppeltjes nemen" niet tonen
-        // in de afbeelding van morgen
         if(
-            (e.title || "")
-                .toLowerCase()
-                .includes("druppeltjes nemen")
+            (e.title||"")
+            .toLowerCase()
+            .includes(
+                "druppeltjes nemen"
+            )
         ){
+
             return false;
+
         }
 
 
         return true;
 
-        })
-        .map(e=>{
+    })
+    .map(e=>{
 
-            let start=
-                new Date(
-                    Math.max(
-                        e.start,
-                        startDay
-                    )
-                );
-
-
-            let end=
-                new Date(
-                    Math.min(
-                        e.end,
-                        endDay
-                    )
-                );
+        let start=
+            new Date(
+                Math.max(
+                    e.start,
+                    startDay
+                )
+            );
 
 
-            return {
+        let end=
+            new Date(
+                Math.min(
+                    e.end,
+                    endDay
+                )
+            );
 
-                ...e,
 
-                start:start,
+        return {
 
-                end:end
+            ...e,
 
-            };
+            start:start,
 
-        })
-        .sort(
-            (a,b)=>
-                a.start-b.start
-        );
+            end:end
+
+        };
+
+    })
+    .sort(
+        (a,b)=>
+            a.start-b.start
+    );
 
 }
 
 
-// ---------------------------------------------------------
-// Afbeelding + opdracht naar ChatGPT
-// ---------------------------------------------------------
+// =========================================================
+// POPUP OPENEN EN AFBEELDING MAKEN
+// =========================================================
+
+async function makeTomorrowImage(){
+
+    const popup=
+        document.getElementById(
+            "imagePopup"
+        );
+
+
+    const status=
+        document.getElementById(
+            "imageStatus"
+        );
+
+
+    tomorrowCanvas=
+        document.getElementById(
+            "tomorrowCanvas"
+        );
+
+
+    popup.style.display=
+        "flex";
+
+
+    status.innerText=
+        "⏳ Dagplanning voor morgen wordt gemaakt...";
+
+
+    tomorrowImageDataUrl=null;
+
+
+    try{
+
+        const tomorrowEvents=
+            getTomorrowEvents();
+
+
+        await drawTomorrowImage(
+            tomorrowEvents
+        );
+
+
+        if(tomorrowImageDataUrl){
+
+            status.innerText=
+                "✅ Dagplanning voor morgen is klaar!";
+
+        }else{
+
+            status.innerText=
+                "❌ De afbeelding kon niet worden gemaakt.";
+
+        }
+
+    }catch(error){
+
+        console.error(
+            "Fout bij maken dagplanning:",
+            error
+        );
+
+
+        status.innerText=
+            "❌ Er ging iets mis bij het maken van de afbeelding.";
+
+    }
+
+}
+
+
+// =========================================================
+// AFBEELDING + OPDRACHT NAAR CHATGPT
+// =========================================================
 
 async function shareTomorrowImage(){
 
@@ -2093,8 +2523,6 @@ async function shareTomorrowImage(){
 
 
     try{
-
-        // PNG uit Canvas halen
 
         const response=
             await fetch(
@@ -2132,9 +2560,9 @@ async function shareTomorrowImage(){
             );
 
 
-        // ================================================
+        // =================================================
         // OPDRACHT VOOR HET SLAAPVERHAAL
-        // ================================================
+        // =================================================
 
         const storyPrompt=
 
@@ -2159,9 +2587,9 @@ async function shareTomorrowImage(){
             "verhalenreeksje over Odin en Niel.";
 
 
-        // ================================================
+        // =================================================
         // SMARTPHONE / TABLET
-        // ================================================
+        // =================================================
 
         if(
             navigator.share &&
@@ -2185,24 +2613,20 @@ async function shareTomorrowImage(){
 
             });
 
+
             return;
 
         }
 
 
-        // ================================================
+        // =================================================
         // PC / DESKTOP
-        // ================================================
+        // =================================================
 
         if(
             navigator.clipboard &&
             window.ClipboardItem
         ){
-
-            /*
-             * We zetten zowel de afbeelding als de
-             * opdracht op het klembord.
-             */
 
             const clipboardItem=
                 new ClipboardItem({
@@ -2214,7 +2638,8 @@ async function shareTomorrowImage(){
                         new Blob(
                             [storyPrompt],
                             {
-                                type:"text/plain"
+                                type:
+                                    "text/plain"
                             }
                         )
 
@@ -2235,9 +2660,11 @@ async function shareTomorrowImage(){
 
 
             alert(
-                "✅ De dagplanning en de opdracht voor het verhaaltje staan klaar.\n\n" +
-                "ChatGPT is geopend.\n\n" +
+
+                "✅ De dagplanning en opdracht staan klaar.\n\n"+
+                "ChatGPT is geopend.\n\n"+
                 "Druk daar op Ctrl + V."
+
             );
 
 
@@ -2246,13 +2673,15 @@ async function shareTomorrowImage(){
         }
 
 
-        // ================================================
+        // =================================================
         // FALLBACK
-        // ================================================
+        // =================================================
 
         alert(
-            "Deze browser ondersteunt het rechtstreeks delen niet.\n\n" +
+
+            "Deze browser ondersteunt het rechtstreeks delen niet.\n\n"+
             "Gebruik daarom 'afbeelding opslaan' en voeg de afbeelding daarna toe aan ChatGPT."
+
         );
 
 
@@ -2265,7 +2694,7 @@ async function shareTomorrowImage(){
 
 
         if(
-            error.name === "AbortError"
+            error.name==="AbortError"
         ){
 
             return;
@@ -2274,17 +2703,20 @@ async function shareTomorrowImage(){
 
 
         alert(
-            "De afbeelding kon niet naar ChatGPT worden gestuurd.\n\n" +
+
+            "De afbeelding kon niet naar ChatGPT worden gestuurd.\n\n"+
             "Gebruik eventueel 'afbeelding opslaan'."
+
         );
 
     }
 
 }
 
-// ---------------------------------------------------------
-// Canvas tekenen
-// ---------------------------------------------------------
+
+// =========================================================
+// CANVAS TEKENEN
+// =========================================================
 
 async function drawTomorrowImage(
     dayEvents
@@ -2298,8 +2730,6 @@ async function drawTomorrowImage(
         canvas.getContext("2d");
 
 
-    // Afbeeldingformaat
-
     const width=1200;
 
     const headerHeight=170;
@@ -2308,7 +2738,6 @@ async function drawTomorrowImage(
         dayEvents.length>0
         ? 180
         : 220;
-
 
     const footerHeight=80;
 
@@ -2323,14 +2752,19 @@ async function drawTomorrowImage(
         footerHeight;
 
 
-    canvas.width=width;
+    canvas.width=
+        width;
 
-    canvas.height=height;
+
+    canvas.height=
+        height;
 
 
     // Achtergrond
 
-    ctx.fillStyle="#ffffff";
+    ctx.fillStyle=
+        "#ffffff";
+
 
     ctx.fillRect(
         0,
@@ -2342,7 +2776,9 @@ async function drawTomorrowImage(
 
     // Header
 
-    ctx.fillStyle="#4285F4";
+    ctx.fillStyle=
+        "#4285F4";
+
 
     ctx.fillRect(
         0,
@@ -2383,11 +2819,13 @@ async function drawTomorrowImage(
         );
 
 
-    // Titel
+    ctx.fillStyle=
+        "#ffffff";
 
-    ctx.fillStyle="#ffffff";
 
-    ctx.textAlign="center";
+    ctx.textAlign=
+        "center";
+
 
     ctx.font=
         "bold 48px Arial";
@@ -2418,7 +2856,9 @@ async function drawTomorrowImage(
 
     if(dayEvents.length===0){
 
-        ctx.fillStyle="#333333";
+        ctx.fillStyle=
+            "#333333";
+
 
         ctx.font=
             "bold 38px Arial";
@@ -2469,7 +2909,7 @@ async function drawTomorrowImage(
             i*eventHeight;
 
 
-        drawTomorrowEvent(
+        await drawTomorrowEvent(
             ctx,
             e,
             y,
@@ -2482,7 +2922,9 @@ async function drawTomorrowImage(
 
     // Footer
 
-    ctx.fillStyle="#f2f2f2";
+    ctx.fillStyle=
+        "#f2f2f2";
+
 
     ctx.fillRect(
         0,
@@ -2492,9 +2934,13 @@ async function drawTomorrowImage(
     );
 
 
-    ctx.fillStyle="#555";
+    ctx.fillStyle=
+        "#555";
 
-    ctx.textAlign="center";
+
+    ctx.textAlign=
+        "center";
+
 
     ctx.font=
         "22px Arial";
@@ -2514,9 +2960,9 @@ async function drawTomorrowImage(
 }
 
 
-// ---------------------------------------------------------
-// Eén afspraak tekenen
-// ---------------------------------------------------------
+// =========================================================
+// ÉÉN AFSPRAAK TEKENEN
+// =========================================================
 
 async function drawTomorrowEvent(
     ctx,
@@ -2526,10 +2972,9 @@ async function drawTomorrowEvent(
     height
 ){
 
-    // Kaart
-
     ctx.fillStyle=
-        event.color || "#4285F4";
+        event.color ||
+        "#4285F4";
 
 
     roundRect(
@@ -2547,9 +2992,13 @@ async function drawTomorrowEvent(
 
     // Tijd
 
-    ctx.fillStyle="#ffffff";
+    ctx.fillStyle=
+        "#ffffff";
 
-    ctx.textAlign="left";
+
+    ctx.textAlign=
+        "left";
+
 
     ctx.font=
         "bold 34px Arial";
@@ -2585,7 +3034,8 @@ async function drawTomorrowEvent(
 
 
     let title=
-        event.title || "Afspraak";
+        event.title ||
+        "Afspraak";
 
 
     let titleLines=
@@ -2602,24 +3052,27 @@ async function drawTomorrowEvent(
 
 
     titleLines
-        .slice(0,2)
-        .forEach(line=>{
+    .slice(0,2)
+    .forEach(line=>{
 
-            ctx.fillText(
-                line,
-                60,
-                titleY
-            );
+        ctx.fillText(
+            line,
+            60,
+            titleY
+        );
 
-            titleY+=45;
 
-        });
+        titleY+=45;
+
+    });
 
 
     // Pictogrammen
 
     let icons=
-        iconsForEvent(event);
+        iconsForEvent(
+            event
+        );
 
 
     let iconX=
@@ -2632,7 +3085,10 @@ async function drawTomorrowEvent(
 
     for(
         let i=0;
-        i<Math.min(icons.length,3);
+        i<Math.min(
+            icons.length,
+            3
+        );
         i++
     ){
 
@@ -2697,9 +3153,9 @@ async function drawTomorrowEvent(
 }
 
 
-// ---------------------------------------------------------
-// Canvas afronden / downloadklaar maken
-// ---------------------------------------------------------
+// =========================================================
+// CANVAS AFRONDEN
+// =========================================================
 
 function finishTomorrowCanvas(
     canvas
@@ -2711,185 +3167,11 @@ function finishTomorrowCanvas(
         );
 
 }
-// ---------------------------------------------------------
-// Afbeelding naar ChatGPT sturen
-// ---------------------------------------------------------
-
-async function shareTomorrowImage(){
-
-    if(!tomorrowImageDataUrl){
-
-        alert(
-            "De afbeelding is nog niet klaar."
-        );
-
-        return;
-
-    }
 
 
-    try{
-
-        // PNG uit Canvas halen
-
-        const response=
-            await fetch(
-                tomorrowImageDataUrl
-            );
-
-
-        const blob=
-            await response.blob();
-
-
-        // ================================================
-        // SMARTPHONE / TABLET
-        // ================================================
-
-        const tomorrow=
-            getTomorrowDate();
-
-
-        const date=
-            tomorrow.getFullYear()+
-            "-" +
-            String(
-                tomorrow.getMonth()+1
-            ).padStart(2,"0")+
-            "-" +
-            String(
-                tomorrow.getDate()
-            ).padStart(2,"0");
-
-
-        const file=
-            new File(
-                [blob],
-                "agenda-morgen-"+date+".png",
-                {
-                    type:"image/png"
-                }
-            );
-
-
-        // Als Web Share beschikbaar is:
-        // gebruik het normale deelvenster.
-
-        if(
-            navigator.share &&
-            navigator.canShare &&
-            navigator.canShare({
-                files:[file]
-            })
-        ){
-
-            await navigator.share({
-
-                title:
-                    "Dagplanning morgen",
-
-                text:
-                    "Dagplanning voor morgen",
-
-                files:[
-                    file
-                ]
-
-            });
-
-            return;
-
-        }
-
-
-        // ================================================
-        // PC / DESKTOP
-        // ================================================
-        //
-        // Geen Web Share?
-        // Dan proberen we de afbeelding naar het
-        // klembord te kopiëren.
-        //
-
-        if(
-            navigator.clipboard &&
-            window.ClipboardItem
-        ){
-
-            const clipboardItem=
-                new ClipboardItem({
-                    "image/png":blob
-                });
-
-
-            await navigator.clipboard.write([
-                clipboardItem
-            ]);
-
-
-            // ChatGPT openen
-
-            window.open(
-                "https://chatgpt.com/",
-                "_blank"
-            );
-
-
-            alert(
-                "✅ De dagplanning staat op het klembord.\n\n" +
-                "ChatGPT is geopend.\n\n" +
-                "Druk daar op Ctrl + V om de afbeelding te plakken."
-            );
-
-
-            return;
-
-        }
-
-
-        // ================================================
-        // LAATSTE FALLBACK
-        // ================================================
-
-        alert(
-            "Deze browser kan de afbeelding niet rechtstreeks delen of naar het klembord kopiëren.\n\n" +
-            "Gebruik daarom 'afbeelding opslaan' en voeg de afbeelding daarna toe aan ChatGPT."
-        );
-
-
-    }catch(error){
-
-        console.error(
-            "Afbeelding delen fout:",
-            error
-        );
-
-
-        // Gebruiker heeft deelvenster gesloten
-
-        if(
-            error.name === "AbortError"
-        ){
-
-            return;
-
-        }
-
-
-        alert(
-            "De afbeelding kon niet rechtstreeks naar ChatGPT worden gestuurd.\n\n" +
-            "Gebruik eventueel de knop 'afbeelding opslaan'."
-        );
-
-    }
-
-}
-
-
-
-// ---------------------------------------------------------
-// Afbeelding downloaden
-// ---------------------------------------------------------
+// =========================================================
+// AFBEELDING DOWNLOADEN
+// =========================================================
 
 function downloadTomorrowImage(){
 
@@ -2921,7 +3203,9 @@ function downloadTomorrowImage(){
 
 
     let link=
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
 
     link.download=
@@ -2945,9 +3229,9 @@ function downloadTomorrowImage(){
 }
 
 
-// ---------------------------------------------------------
-// Popup sluiten
-// ---------------------------------------------------------
+// =========================================================
+// POPUP SLUITEN
+// =========================================================
 
 function closeImagePopup(){
 
@@ -2957,14 +3241,15 @@ function closeImagePopup(){
         );
 
 
-    popup.style.display="none";
+    popup.style.display=
+        "none";
 
 }
 
 
-// ---------------------------------------------------------
-// Canvas hulpmiddelen
-// ---------------------------------------------------------
+// =========================================================
+// CANVAS HULPMIDDELEN
+// =========================================================
 
 function loadImage(src){
 
@@ -2981,15 +3266,18 @@ function loadImage(src){
 
 
             img.onerror=()=>{
+
                 reject(
                     new Error(
                         "Afbeelding niet gevonden: "+src
                     )
                 );
+
             };
 
 
-            img.src=src;
+            img.src=
+                src;
 
         }
     );
@@ -3006,12 +3294,18 @@ function roundRect(
     radius
 ){
 
-    if(width<2*radius)
-        radius=width/2;
+    if(
+        width<2*radius
+    )
+        radius=
+            width/2;
 
 
-    if(height<2*radius)
-        radius=height/2;
+    if(
+        height<2*radius
+    )
+        radius=
+            height/2;
 
 
     ctx.beginPath();
@@ -3093,7 +3387,9 @@ function wrapCanvasText(
 
 
         let metrics=
-            ctx.measureText(test);
+            ctx.measureText(
+                test
+            );
 
 
         if(
@@ -3111,7 +3407,8 @@ function wrapCanvasText(
 
         }else{
 
-            current=test;
+            current=
+                test;
 
         }
 
@@ -3119,7 +3416,9 @@ function wrapCanvasText(
 
 
     if(current)
-        lines.push(current);
+        lines.push(
+            current
+        );
 
 
     return lines;
@@ -3127,44 +3426,45 @@ function wrapCanvasText(
 }
 
 
-function capitalizeFirstLetter(text){
+function capitalizeFirstLetter(
+    text
+){
 
     if(!text)
         return text;
 
 
-    return text.charAt(0).toUpperCase()+
-           text.slice(1);
+    return(
+        text.charAt(0).toUpperCase()+
+        text.slice(1)
+    );
 
 }
 
 
 // =========================================================
-// Update lijn elke minuut
+// UPDATE LIJN ELKE MINUUT
 // =========================================================
-//
-// In jouw huidige script staat deze functie niet.
-// Daarom controleren we eerst of ze bestaat.
-// Zo kan ze nooit meer de hele script.js laten crashen.
-//
 
 setInterval(
     ()=>{
+
         if(
-            typeof updateCurrentTimeLine ===
+            typeof updateCurrentTimeLine===
             "function"
         ){
 
             updateCurrentTimeLine();
 
         }
+
     },
     60000
 );
 
 
 if(
-    typeof updateCurrentTimeLine ===
+    typeof updateCurrentTimeLine===
     "function"
 ){
 
