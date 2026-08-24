@@ -7,8 +7,9 @@
 
 <link rel="icon" href="favicon.ico">
 <link rel="shortcut icon" href="/favicon.ico">
-    
+
 <link rel="stylesheet" href="style.css">
+
 <style>
 #speechOverlay{
     position:fixed;
@@ -24,48 +25,120 @@
     font-size:14px;
     line-height:1.4;
 }
-
 </style>
+
 </head>
 
 <body>
 
 <header>
+
 <button onclick="login()">🔐 login</button>
+
 <button onclick="logout()">🚪 logout</button>
+
 <button onclick="prev()">⬅ vorige</button>
+
 <button onclick="today()">📅 vandaag</button>
+
 <button onclick="next()">➡ volgende</button>
+
 <button onclick="toggleView()">🗓 dag/week</button>
+
 <button onclick="selectAll()">✅ alles</button>
+
 <button onclick="selectNone()">❌ niets</button>
 
 <button onclick="printWeek()">🖨 print week</button>
-    
+
 <!-- Toon en lees komende 4 agendapunten -->
 <button onclick="showNextEvents()">🔊 afspraken</button>
 
+<!-- NIEUW -->
+<button
+    id="tomorrowImageButton"
+    onclick="makeTomorrowImage()">
+    🖼️ morgen
+</button>
+
 <div id="liveClock" style="font-weight:bold; cursor:pointer;"></div>
-    
+
 </header>
 
 
-    
 <div id="filters"></div>
+
 <div id="agenda"></div>
+
 
 <!-- Overlay voor spraaktekst -->
 <div id="speechOverlay" style="display:none;"></div>
 
+
+<!-- ========================= -->
+<!-- AFBEELDING MORGEN POPUP -->
+<!-- ========================= -->
+
+<div id="tomorrowImagePopup" class="tomorrowPopup">
+
+    <div class="tomorrowPopupContent">
+
+        <button
+            class="tomorrowCloseButton"
+            onclick="closeTomorrowImage()">
+            ✖
+        </button>
+
+        <h2>
+            🌙 Planning voor morgen
+        </h2>
+
+        <div id="tomorrowImageInfo">
+            Even geduld...
+        </div>
+
+        <div id="tomorrowImageContainer">
+            <!-- Hier komt de afbeelding -->
+        </div>
+
+        <div class="tomorrowImageButtons">
+
+            <button onclick="downloadTomorrowImage()">
+                💾 Afbeelding opslaan
+            </button>
+
+            <button onclick="printTomorrowImage()">
+                🖨️ Afdrukken
+            </button>
+
+            <button onclick="closeTomorrowImage()">
+                ✅ sluiten
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script src="config.js"></script>
+
 <script src="script.js"></script>
-    
+
+
 <div id="popup" class="popup">
-<div class="popupContent">
-<div id="popupText"></div>
-<button onclick="closePopup()">OK</button>
+
+    <div class="popupContent">
+
+        <div id="popupText"></div>
+
+        <button onclick="closePopup()">OK</button>
+
+    </div>
+
 </div>
-</div>
-    
+
+
 </body>
 </html>
