@@ -2076,15 +2076,15 @@ function getTomorrowEvents(){
 
 
 // ---------------------------------------------------------
-// Afbeelding maken
+// Afbeelding + opdracht naar ChatGPT
 // ---------------------------------------------------------
 
-async function makeTomorrowImage(){
+async function shareTomorrowImage(){
 
-    if(!token){
+    if(!tomorrowImageDataUrl){
 
         alert(
-            "Je bent nog niet ingelogd."
+            "De afbeelding is nog niet klaar."
         );
 
         return;
@@ -2092,75 +2092,195 @@ async function makeTomorrowImage(){
     }
 
 
-    let popup=
-        document.getElementById(
-            "imagePopup"
-        );
-
-
-    let status=
-        document.getElementById(
-            "imageStatus"
-        );
-
-
-    tomorrowCanvas=
-        document.getElementById(
-            "tomorrowCanvas"
-        );
-
-
-    popup.style.display="flex";
-
-
-    status.innerText=
-        "📅 afspraken van morgen ophalen...";
-
-
     try{
 
-        // Eerst opnieuw laden zodat eventuele
-        // nieuwe afspraken zeker aanwezig zijn.
+        // PNG uit Canvas halen
 
-        await loadEvents();
-
-
-        let tomorrowEvents=
-            getTomorrowEvents();
+        const response=
+            await fetch(
+                tomorrowImageDataUrl
+            );
 
 
-        status.innerText=
-            "🖼️ afbeelding maken...";
+        const blob=
+            await response.blob();
 
 
-        await drawTomorrowImage(
-            tomorrowEvents
-        );
+        const tomorrow=
+            getTomorrowDate();
 
 
-        status.innerText =
-        tomorrowEvents.length +
-        (tomorrowEvents.length === 1
-            ? " afspraak gevonden."
-            : " afspraken gevonden."
+        const date=
+            tomorrow.getFullYear()+
+            "-" +
+            String(
+                tomorrow.getMonth()+1
+            ).padStart(2,"0")+
+            "-" +
+            String(
+                tomorrow.getDate()
+            ).padStart(2,"0");
+
+
+        const file=
+            new File(
+                [blob],
+                "agenda-morgen-"+date+".png",
+                {
+                    type:"image/png"
+                }
+            );
+
+
+        // ================================================
+        // OPDRACHT VOOR HET SLAAPVERHAAL
+        // ================================================
+
+        const storyPrompt=
+
+            "Gebruik deze dagplanning om het volgende " +
+            "hoofdstuk te maken van het verhaaltjesverhaal " +
+            "over kabouters Odin en Niel. " +
+
+            "Verwerk de activiteiten van morgen in een " +
+            "leuk, rustig en kindvriendelijk avontuur. " +
+
+            "Maak er een slaapverhaal van van ongeveer " +
+            "8 tot 10 minuten. " +
+
+            "Noem de afspraken niet letterlijk op als een " +
+            "agenda, maar verwerk ze natuurlijk in het verhaal. " +
+
+            "Het verhaal mag fantasierijk, warm en grappig zijn, " +
+            "maar moet rustig genoeg zijn om voor het slapen " +
+            "te lezen. " +
+
+            "Dit is het volgende hoofdstuk van het bestaande " +
+            "verhalenreeksje over Odin en Niel.";
+
+
+        // ================================================
+        // SMARTPHONE / TABLET
+        // ================================================
+
+        if(
+            navigator.share &&
+            navigator.canShare &&
+            navigator.canShare({
+                files:[file]
+            })
+        ){
+
+            await navigator.share({
+
+                title:
+                    "Verhaaltje voor Odin en Niel",
+
+                text:
+                    storyPrompt,
+
+                files:[
+                    file
+                ]
+
+            });
+
+            return;
+
+        }
+
+
+        // ================================================
+        // PC / DESKTOP
+        // ================================================
+
+        if(
+            navigator.clipboard &&
+            window.ClipboardItem
+        ){
+
+            /*
+             * We zetten zowel de afbeelding als de
+             * opdracht op het klembord.
+             */
+
+            const clipboardItem=
+                new ClipboardItem({
+
+                    "image/png":
+                        blob,
+
+                    "text/plain":
+                        new Blob(
+                            [storyPrompt],
+                            {
+                                type:"text/plain"
+                            }
+                        )
+
+                });
+
+
+            await navigator.clipboard.write([
+                clipboardItem
+            ]);
+
+
+            // ChatGPT openen
+
+            window.open(
+                "https://chatgpt.com/",
+                "_blank"
+            );
+
+
+            alert(
+                "✅ De dagplanning en de opdracht voor het verhaaltje staan klaar.\n\n" +
+                "ChatGPT is geopend.\n\n" +
+                "Druk daar op Ctrl + V."
+            );
+
+
+            return;
+
+        }
+
+
+        // ================================================
+        // FALLBACK
+        // ================================================
+
+        alert(
+            "Deze browser ondersteunt het rechtstreeks delen niet.\n\n" +
+            "Gebruik daarom 'afbeelding opslaan' en voeg de afbeelding daarna toe aan ChatGPT."
         );
 
 
     }catch(error){
 
         console.error(
-            "Afbeelding maken fout:",
+            "Verhaaltje delen fout:",
             error
         );
 
 
-        status.innerText=
-            "❌ Er ging iets mis bij het maken van de afbeelding.";
+        if(
+            error.name === "AbortError"
+        ){
+
+            return;
+
+        }
+
+
+        alert(
+            "De afbeelding kon niet naar ChatGPT worden gestuurd.\n\n" +
+            "Gebruik eventueel 'afbeelding opslaan'."
+        );
 
     }
 
 }
-
 
 // ---------------------------------------------------------
 // Canvas tekenen
