@@ -2127,15 +2127,12 @@ async function makeTomorrowImage(){
         );
 
 
-        status.innerText=
-            tomorrowEvents.length+
-            " afspraak"+
-            (
-                tomorrowEvents.length===1
-                ? ""
-                : "pen"
-            )+
-            " gevonden.";
+        tatus.innerText =
+        tomorrowEvents.length +
+        (tomorrowEvents.length === 1
+            ? " afspraak gevonden."
+            : " afspraken gevonden."
+        );
 
 
     }catch(error){
