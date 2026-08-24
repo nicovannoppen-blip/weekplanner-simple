@@ -2506,7 +2506,7 @@ async function makeTomorrowImage(){
 
 
 // =========================================================
-// AFBEELDING + OPDRACHT NAAR CHATGPT
+// AFBEELDING NAAR CHATGPT STUREN
 // =========================================================
 
 async function shareTomorrowImage(){
@@ -2521,36 +2521,38 @@ async function shareTomorrowImage(){
 
     }
 
-
     try{
 
-        const response=
+        // =================================================
+        // CANVAS → PNG
+        // =================================================
+
+        const response =
             await fetch(
                 tomorrowImageDataUrl
             );
 
-
-        const blob=
+        const blob =
             await response.blob();
 
 
-        const tomorrow=
+        const tomorrow =
             getTomorrowDate();
 
 
-        const date=
-            tomorrow.getFullYear()+
+        const date =
+            tomorrow.getFullYear() +
             "-" +
             String(
                 tomorrow.getMonth()+1
-            ).padStart(2,"0")+
+            ).padStart(2,"0") +
             "-" +
             String(
                 tomorrow.getDate()
             ).padStart(2,"0");
 
 
-        const file=
+        const file =
             new File(
                 [blob],
                 "agenda-morgen-"+date+".png",
@@ -2558,33 +2560,6 @@ async function shareTomorrowImage(){
                     type:"image/png"
                 }
             );
-
-
-        // =================================================
-        // OPDRACHT VOOR HET SLAAPVERHAAL
-        // =================================================
-
-        const storyPrompt=
-
-            "Gebruik deze dagplanning om het volgende " +
-            "hoofdstuk te maken van het verhaaltjesverhaal " +
-            "over kabouters Odin en Niel. " +
-
-            "Verwerk de activiteiten van morgen in een " +
-            "leuk, rustig en kindvriendelijk avontuur. " +
-
-            "Maak er een slaapverhaal van van ongeveer " +
-            "8 tot 10 minuten. " +
-
-            "Noem de afspraken niet letterlijk op als een " +
-            "agenda, maar verwerk ze natuurlijk in het verhaal. " +
-
-            "Het verhaal mag fantasierijk, warm en grappig zijn, " +
-            "maar moet rustig genoeg zijn om voor het slapen " +
-            "te lezen. " +
-
-            "Dit is het volgende hoofdstuk van het bestaande " +
-            "verhalenreeksje over Odin en Niel.";
 
 
         // =================================================
@@ -2602,17 +2577,16 @@ async function shareTomorrowImage(){
             await navigator.share({
 
                 title:
-                    "Verhaaltje voor Odin en Niel",
+                    "Dagplanning morgen",
 
                 text:
-                    storyPrompt,
+                    "Gebruik deze dagplanning om het volgende hoofdstuk te maken van het slaapverhaal over kabouters Odin en Niel.",
 
                 files:[
                     file
                 ]
 
             });
-
 
             return;
 
@@ -2622,26 +2596,26 @@ async function shareTomorrowImage(){
         // =================================================
         // PC / DESKTOP
         // =================================================
+        //
+        // BELANGRIJK:
+        // Alleen de afbeelding op het klembord zetten.
+        //
+        // Geen text/plain meer!
+        //
+        // Hierdoor plakt Ctrl+V in ChatGPT
+        // daadwerkelijk de afbeelding.
+        // =================================================
 
         if(
             navigator.clipboard &&
             window.ClipboardItem
         ){
 
-            const clipboardItem=
+            const clipboardItem =
                 new ClipboardItem({
 
                     "image/png":
-                        blob,
-
-                    "text/plain":
-                        new Blob(
-                            [storyPrompt],
-                            {
-                                type:
-                                    "text/plain"
-                            }
-                        )
+                        blob
 
                 });
 
@@ -2660,11 +2634,9 @@ async function shareTomorrowImage(){
 
 
             alert(
-
-                "✅ De dagplanning en opdracht staan klaar.\n\n"+
-                "ChatGPT is geopend.\n\n"+
-                "Druk daar op Ctrl + V."
-
+                "✅ De dagplanning staat klaar op het klembord.\n\n" +
+                "ChatGPT is geopend.\n\n" +
+                "Open het gesprek 'Verhaaltjes' en druk daar op Ctrl + V."
             );
 
 
@@ -2678,23 +2650,23 @@ async function shareTomorrowImage(){
         // =================================================
 
         alert(
-
-            "Deze browser ondersteunt het rechtstreeks delen niet.\n\n"+
+            "Deze browser kan de afbeelding niet rechtstreeks kopiëren.\n\n" +
             "Gebruik daarom 'afbeelding opslaan' en voeg de afbeelding daarna toe aan ChatGPT."
-
         );
 
 
     }catch(error){
 
         console.error(
-            "Verhaaltje delen fout:",
+            "Afbeelding delen fout:",
             error
         );
 
 
+        // Gebruiker heeft het deelvenster gesloten
+
         if(
-            error.name==="AbortError"
+            error.name === "AbortError"
         ){
 
             return;
@@ -2703,17 +2675,13 @@ async function shareTomorrowImage(){
 
 
         alert(
-
-            "De afbeelding kon niet naar ChatGPT worden gestuurd.\n\n"+
+            "De afbeelding kon niet rechtstreeks naar ChatGPT worden gestuurd.\n\n" +
             "Gebruik eventueel 'afbeelding opslaan'."
-
         );
 
     }
 
 }
-
-
 // =========================================================
 // CANVAS TEKENEN
 // =========================================================
