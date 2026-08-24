@@ -2591,6 +2591,130 @@ function finishTomorrowCanvas(
         );
 
 }
+// ---------------------------------------------------------
+// naar chatgpt
+// ---------------------------------------------------------
+async function shareTomorrowImage(){
+
+    if(!tomorrowImageDataUrl){
+
+        alert(
+            "De afbeelding is nog niet klaar."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        // PNG uit Canvas halen
+
+        const response=
+            await fetch(
+                tomorrowImageDataUrl
+            );
+
+
+        const blob=
+            await response.blob();
+
+
+        // Bestandsnaam
+
+        let tomorrow=
+            getTomorrowDate();
+
+
+        let date=
+            tomorrow.getFullYear()+
+            "-" +
+            String(
+                tomorrow.getMonth()+1
+            ).padStart(2,"0")+
+            "-" +
+            String(
+                tomorrow.getDate()
+            ).padStart(2,"0");
+
+
+        const file=
+            new File(
+                [blob],
+                "agenda-morgen-"+date+".png",
+                {
+                    type:"image/png"
+                }
+            );
+
+
+        // Controleren of delen met bestanden
+        // door het toestel wordt ondersteund
+
+        if(
+            navigator.share &&
+            navigator.canShare &&
+            navigator.canShare({
+                files:[file]
+            })
+        ){
+
+            await navigator.share({
+
+                title:
+                    "Dagplanning morgen",
+
+                text:
+                    "Dagplanning voor morgen",
+
+                files:[
+                    file
+                ]
+
+            });
+
+            return;
+
+        }
+
+
+        // Fallback wanneer delen niet ondersteund wordt
+
+        alert(
+            "Je toestel of browser ondersteunt het rechtstreeks delen van afbeeldingen niet. " +
+            "Gebruik daarom de knop 'afbeelding opslaan' en voeg de afbeelding daarna toe aan ChatGPT."
+        );
+
+
+    }catch(error){
+
+        // Annuleren van het deelvenster
+        // is geen echte fout
+
+        if(
+            error.name === "AbortError"
+        ){
+
+            return;
+
+        }
+
+
+        console.error(
+            "Afbeelding delen fout:",
+            error
+        );
+
+
+        alert(
+            "De afbeelding kon niet worden gedeeld."
+        );
+
+    }
+
+}
+
 
 
 // ---------------------------------------------------------
