@@ -29,7 +29,7 @@ function rename(name){
 
 
 // =========================================================
-// VOLGORDE FILTER
+// Volgorde filters
 // =========================================================
 
 const CALENDAR_ORDER=[
@@ -53,7 +53,7 @@ const CALENDAR_ORDER=[
 const ICON_AI={
 
 school:["school","klas","les"],
-thuis:["thuis","huis"],    
+thuis:["thuis","huis"],
 kunstschool:["beeldatelier"],
 bus:["bus"],
 zwemmen:["zwem","zwembad","zwemmen","plopsaqua"],
@@ -82,7 +82,7 @@ bakfiets:["bakfiets"],
 bezoek_van:["bezoek van","komt","komen"],
 boot:["boot"],
 bos:["bos"],
-camper:["camper","mobilhome"],
+camper:["camper"],
 camping_caravan:["camping caravan"],
 camping:["camping"],
 carnaval:["carnaval"],
@@ -121,7 +121,7 @@ naschoolse_opvang:["strooppotje"],
 Ophelie:["ophelie","ophélie"],
 Vansenne:["vansenne"],
 SylvieEnKids:["sylvie en kids","sylvie en kindjes","sylvie met kindjes","sylvie met de kindjes"],
-IrenaGezin:["irena","irena","irena"],
+IrenaGezin:["irena"],
 Irena:["irena alleen"],
 AnthonyEnkids:["anthony en kids","anthony en kindjes","anthony met kindjes","anthony met de kindjes"],
 IrenaEnJulian:["julian"],
@@ -160,12 +160,12 @@ steffifamilie:["steffie","steffi"],
 Koen:["koen","koentje"],
 Bhodi:["bhodi","bodi","bohdi"],
 concert:["concert","festival","optreden"],
-inpakken:["inpakken"],   
-opzetten_tent:["opzetten"],   
+inpakken:["inpakken"],
+opzetten_tent:["opzetten"],
 safari:["safari","safaripark"],
-zeehond:["zeehond"],   
-reptiel:["reptiel","reptielen"], 
-dierenwinkel:["dierenwinkel","schoubben"],  
+zeehond:["zeehond"],
+reptiel:["reptiel","reptielen"],
+dierenwinkel:["dierenwinkel","schoubben"],
 gezin:["gezin"],
 Johnny:["johnny","papa"],
 verhuizen:["verhuizen","tent opruimen"],
@@ -210,6 +210,7 @@ cinema:["cinema","kinepolis","euroscoop"],
 medicatie_druppels:["druppeltjes"],
 gezelschapsspel:["gezelschapsspel"],
 kamp:["kamp","bivak"],
+camper:["camper","mobilhome"],
 fotograaf:["fotograaf","fotoshoot","photoshoot"],
 sanne:["sanne"],
 koken:["koken"],
@@ -326,14 +327,15 @@ async function init(){
 // GOOGLE CALENDAR
 // =========================================================
 
-async function loadCalendars(){   
+async function loadCalendars(){
 
     let r=
         await fetch(
             "https://www.googleapis.com/calendar/v3/users/me/calendarList",
             {
                 headers:{
-                    Authorization:"Bearer "+token
+                    Authorization:
+                        "Bearer "+token
                 }
             }
         );
@@ -384,11 +386,11 @@ async function loadCalendars(){
                     );
 
 
-                if(ia==-1)
+                if(ia===-1)
                     ia=999;
 
 
-                if(ib==-1)
+                if(ib===-1)
                     ib=999;
 
 
@@ -491,10 +493,7 @@ function getContrastColor(hex){
 
 
     let rgb=
-        parseInt(
-            c,
-            16
-        );
+        parseInt(c,16);
 
 
     let r=
@@ -506,7 +505,7 @@ function getContrastColor(hex){
 
 
     let b=
-        (rgb>>0)&0xff;
+        rgb&0xff;
 
 
     let luminance=
@@ -583,12 +582,12 @@ async function loadEvents(){
         data.items.forEach(e=>{
 
             let s=
-                e.start.dateTime ||
+                e.start.dateTime||
                 e.start.date;
 
 
             let en=
-                e.end.dateTime ||
+                e.end.dateTime||
                 e.end.date;
 
 
@@ -599,7 +598,7 @@ async function loadEvents(){
             events.push({
 
                 title:
-                    e.summary || "",
+                    e.summary||"",
 
                 start:
                     new Date(s),
@@ -619,7 +618,7 @@ async function loadEvents(){
                     cal.backgroundColor,
 
                 location:
-                    e.location || ""
+                    e.location||""
 
             });
 
@@ -669,7 +668,7 @@ function iconsForEvent(e){
 
 
     if(
-        text.includes("rijden van") ||
+        text.includes("rijden van")||
         text.includes("rijden naar")
     ){
 
@@ -679,7 +678,7 @@ function iconsForEvent(e){
 
 
     if(
-        text.includes("fietsen van") ||
+        text.includes("fietsen van")||
         text.includes("fietsen naar")
     ){
 
@@ -689,9 +688,9 @@ function iconsForEvent(e){
 
 
     if(
-        text.includes("wandelen van") ||
-        text.includes("wandelen naar") ||
-        text.includes("lopen van") ||
+        text.includes("wandelen van")||
+        text.includes("wandelen naar")||
+        text.includes("lopen van")||
         text.includes("lopen naar")
     ){
 
@@ -701,7 +700,7 @@ function iconsForEvent(e){
 
 
     if(
-        text.includes("trein van") ||
+        text.includes("trein van")||
         text.includes("trein naar")
     ){
 
@@ -711,10 +710,10 @@ function iconsForEvent(e){
 
 
     if(
-        text.includes("bus van") ||
-        text.includes("bus naar") ||
-        text.includes("openbaar vervoer nemen") ||
-        text.includes("openbaar vervoer van") ||
+        text.includes("bus van")||
+        text.includes("bus naar")||
+        text.includes("openbaar vervoer nemen")||
+        text.includes("openbaar vervoer van")||
         text.includes("openbaar vervoer naar")
     ){
 
@@ -724,7 +723,7 @@ function iconsForEvent(e){
 
 
     if(
-        text.includes("metro van") ||
+        text.includes("metro van")||
         text.includes("metro naar")
     ){
 
@@ -734,7 +733,7 @@ function iconsForEvent(e){
 
 
     if(
-        text.includes("tram van") ||
+        text.includes("tram van")||
         text.includes("tram naar")
     ){
 
@@ -744,7 +743,7 @@ function iconsForEvent(e){
 
 
     if(
-        text.includes("vliegtuig van") ||
+        text.includes("vliegtuig van")||
         text.includes("vliegtuig naar")
     ){
 
@@ -777,11 +776,9 @@ function iconsForEvent(e){
 
                 found.push({
 
-                    icon:
-                        icon,
+                    icon:icon,
 
-                    pos:
-                        match.index
+                    pos:match.index
 
                 });
 
@@ -793,8 +790,7 @@ function iconsForEvent(e){
 
 
     found.sort(
-        (a,b)=>
-            a.pos-b.pos
+        (a,b)=>a.pos-b.pos
     );
 
 
@@ -804,8 +800,9 @@ function iconsForEvent(e){
         );
 
 
-    icons=
-        [...new Set(icons)];
+    icons=[
+        ...new Set(icons)
+    ];
 
 
     return icons;
@@ -919,9 +916,7 @@ function render(){
 
 
     let days=
-        dayMode
-        ? 1
-        : 7;
+        dayMode?1:7;
 
 
     let container=
@@ -967,14 +962,14 @@ function render(){
             "day";
 
 
-        let today=
+        let todayDate=
             new Date();
 
 
         if(
-            d.getDate()==today.getDate() &&
-            d.getMonth()==today.getMonth() &&
-            d.getFullYear()==today.getFullYear()
+            d.getDate()==todayDate.getDate()&&
+            d.getMonth()==todayDate.getMonth()&&
+            d.getFullYear()==todayDate.getFullYear()
         ){
 
             col.id="today";
@@ -987,7 +982,7 @@ function render(){
 
 
         if(
-            !dayMode ||
+            !dayMode||
             sameDay(now,d)
         ){
 
@@ -1010,9 +1005,7 @@ function render(){
                 minutesSince7+"px";
 
 
-            col.appendChild(
-                line
-            );
+            col.appendChild(line);
 
         }
 
@@ -1022,9 +1015,7 @@ function render(){
             currentDate=
                 new Date(d);
 
-
             dayMode=true;
-
 
             render();
 
@@ -1042,6 +1033,7 @@ function render(){
 
 
         let dayIcons=[
+
             "☀️",
             "🌙",
             "🔥",
@@ -1049,6 +1041,7 @@ function render(){
             "⭐",
             "🎉",
             "🌈"
+
         ];
 
 
@@ -1074,16 +1067,10 @@ function render(){
             );
 
 
-        col.appendChild(
-            head
-        );
+        col.appendChild(head);
 
 
-        for(
-            let h=7;
-            h<=23;
-            h++
-        ){
+        for(let h=7;h<=23;h++){
 
             let line=
                 document.createElement(
@@ -1091,17 +1078,14 @@ function render(){
                 );
 
 
-            line.className=
-                "hour";
+            line.className="hour";
 
 
             line.style.top=
                 ((h-7)*60)+"px";
 
 
-            col.appendChild(
-                line
-            );
+            col.appendChild(line);
 
         }
 
@@ -1119,9 +1103,7 @@ function render(){
         );
 
 
-        container.appendChild(
-            col
-        );
+        container.appendChild(col);
 
     }
 
@@ -1171,8 +1153,7 @@ function layoutEvents(
 ){
 
     list.sort(
-        (a,b)=>
-            a.start-b.start
+        (a,b)=>a.start-b.start
     );
 
 
@@ -1285,15 +1266,15 @@ function layoutEvents(
 
                     if(
 
-                        ic==="steffifamilie" ||
-                        ic==="IrenaGezin" ||
-                        ic==="kindjeshalen" ||
-                        ic==="kindjesnaar" ||
-                        ic==="Jana_en_Vinny" ||
-                        ic==="SylvieEnKids" ||
-                        ic==="Vansenne" ||
-                        ic==="AnthonyEnkids" ||
-                        ic==="IrenaEnJulian" ||
+                        ic==="steffifamilie"||
+                        ic==="IrenaGezin"||
+                        ic==="kindjeshalen"||
+                        ic==="kindjesnaar"||
+                        ic==="Jana_en_Vinny"||
+                        ic==="SylvieEnKids"||
+                        ic==="Vansenne"||
+                        ic==="AnthonyEnkids"||
+                        ic==="IrenaEnJulian"||
                         ic==="vannoppen"
 
                     ){
@@ -1311,7 +1292,7 @@ function layoutEvents(
 
                     iconHTML+=
                         `<img src="icons/${ic}.png"
-                         class="picto ${extraClass}">`;
+                        class="picto ${extraClass}">`;
 
                 });
 
@@ -1373,7 +1354,6 @@ function layoutEvents(
 
                     ev.stopPropagation();
 
-
                     speak(
                         speechText,
                         div
@@ -1382,9 +1362,7 @@ function layoutEvents(
                 };
 
 
-                col.appendChild(
-                    div
-                );
+                col.appendChild(div);
 
             });
 
@@ -1400,9 +1378,11 @@ function layoutEvents(
 
 function sameDay(a,b){
 
-    return a.getFullYear()==b.getFullYear() &&
-           a.getMonth()==b.getMonth() &&
-           a.getDate()==b.getDate();
+    return(
+        a.getFullYear()==b.getFullYear()&&
+        a.getMonth()==b.getMonth()&&
+        a.getDate()==b.getDate()
+    );
 
 }
 
@@ -1444,7 +1424,7 @@ function getMonday(d){
 
 
 // =========================================================
-// NAVIGATION
+// NAVIGATIE
 // =========================================================
 
 function prev(){
@@ -1484,7 +1464,6 @@ function today(){
     currentDate=
         new Date();
 
-
     init();
 
 }
@@ -1494,7 +1473,6 @@ function toggleView(){
 
     dayMode=
         !dayMode;
-
 
     render();
 
@@ -1574,8 +1552,7 @@ function showNextEvents(){
 
         })
         .sort(
-            (a,b)=>
-                a.start-b.start
+            (a,b)=>a.start-b.start
         )
         .slice(0,4);
 
@@ -1638,17 +1615,14 @@ function showNextEvents(){
                     "speechWord";
 
 
-                span.dataset.index=
-                    i;
+                span.dataset.index=i;
 
 
                 span.innerText=
                     w+" ";
 
 
-                lineDiv.appendChild(
-                    span
-                );
+                lineDiv.appendChild(span);
 
             }
         );
@@ -1668,7 +1642,6 @@ function showNextEvents(){
     speak(
 
         upcoming.map(e=>
-
             "agenda "+
             (e.calendarName||"")+
             ": van "+
@@ -1677,7 +1650,6 @@ function showNextEvents(){
             time(e.end)+
             " "+
             (e.title||"")
-
         ).join(". "),
 
         popupText
@@ -1688,7 +1660,7 @@ function showNextEvents(){
 
 
 // =========================================================
-// STEM
+// SPRAAK
 // =========================================================
 
 function speak(
@@ -1750,8 +1722,7 @@ function speak(
 
             if(total>charIndex){
 
-                currentWordIndex=
-                    i;
+                currentWordIndex=i;
 
                 break;
 
@@ -1792,9 +1763,7 @@ function speak(
     };
 
 
-    speechSynthesis.speak(
-        msg
-    );
+    speechSynthesis.speak(msg);
 
 }
 
@@ -1929,6 +1898,7 @@ function printWeek(){
 
 
         let dayIcons=[
+
             "☀️",
             "🌙",
             "🔥",
@@ -1936,6 +1906,7 @@ function printWeek(){
             "⭐",
             "🎉",
             "🌈"
+
         ];
 
 
@@ -1961,9 +1932,7 @@ function printWeek(){
             );
 
 
-        dayDiv.appendChild(
-            h2
-        );
+        dayDiv.appendChild(h2);
 
 
         let dayContainer=
@@ -2223,9 +2192,7 @@ clockTime.onclick=()=>{
         "nl-BE";
 
 
-    speechSynthesis.speak(
-        msg
-    );
+    speechSynthesis.speak(msg);
 
 };
 
@@ -2276,9 +2243,7 @@ clockDate.onclick=()=>{
         "nl-BE";
 
 
-    speechSynthesis.speak(
-        msg
-    );
+    speechSynthesis.speak(msg);
 
 };
 
@@ -2318,7 +2283,7 @@ function getTomorrowDate(){
 
 
 // =========================================================
-// AFSRPRAKEN VAN MORGEN
+// AFSPRAKEN VAN MORGEN
 // =========================================================
 
 function getTomorrowEvents(){
@@ -2331,22 +2296,12 @@ function getTomorrowEvents(){
         new Date(tomorrow);
 
 
-    startDay.setHours(
-        0,0,0,0
-    );
-
-
     let endDay=
         new Date(tomorrow);
 
 
     endDay.setDate(
         endDay.getDate()+1
-    );
-
-
-    endDay.setHours(
-        0,0,0,0
     );
 
 
@@ -2412,7 +2367,7 @@ function getTomorrowEvents(){
             );
 
 
-        return {
+        return{
 
             ...e,
 
@@ -2432,256 +2387,84 @@ function getTomorrowEvents(){
 
 
 // =========================================================
-// POPUP OPENEN EN AFBEELDING MAKEN
+// AFBEELDING MORGEN MAKEN
 // =========================================================
 
 async function makeTomorrowImage(){
 
-    const popup=
-        document.getElementById(
-            "imagePopup"
-        );
-
-
-    const status=
-        document.getElementById(
-            "imageStatus"
-        );
-
-
-    tomorrowCanvas=
-        document.getElementById(
-            "tomorrowCanvas"
-        );
-
-
-    popup.style.display=
-        "flex";
-
-
-    status.innerText=
-        "⏳ Dagplanning voor morgen wordt gemaakt...";
-
-
-    tomorrowImageDataUrl=null;
-
-
     try{
 
-        const tomorrowEvents=
+        tomorrowCanvas=
+            document.getElementById(
+                "tomorrowCanvas"
+            );
+
+
+        if(!tomorrowCanvas){
+
+            alert(
+                "De afbeelding kan niet worden gemaakt."
+            );
+
+            return;
+
+        }
+
+
+        let popup=
+            document.getElementById(
+                "imagePopup"
+            );
+
+
+        let status=
+            document.getElementById(
+                "imageStatus"
+            );
+
+
+        popup.style.display=
+            "flex";
+
+
+        status.innerText=
+            "⏳ Dagplanning wordt gemaakt...";
+
+
+        tomorrowImageDataUrl=
+            null;
+
+
+        let dayEvents=
             getTomorrowEvents();
 
 
         await drawTomorrowImage(
-            tomorrowEvents
-        );
-
-
-        if(tomorrowImageDataUrl){
-
-            status.innerText=
-                "✅ Dagplanning voor morgen is klaar!";
-
-        }else{
-
-            status.innerText=
-                "❌ De afbeelding kon niet worden gemaakt.";
-
-        }
-
-    }catch(error){
-
-        console.error(
-            "Fout bij maken dagplanning:",
-            error
+            dayEvents
         );
 
 
         status.innerText=
-            "❌ Er ging iets mis bij het maken van de afbeelding.";
-
-    }
-
-}
-
-
-// =========================================================
-// AFBEELDING NAAR CHATGPT STUREN
-// =========================================================
-
-async function shareTomorrowImage(){
-
-    if(!tomorrowImageDataUrl){
-
-        alert(
-            "De afbeelding is nog niet klaar."
-        );
-
-        return;
-
-    }
-
-    try{
-
-        // =================================================
-        // CANVAS → PNG
-        // =================================================
-
-        const response =
-            await fetch(
-                tomorrowImageDataUrl
-            );
-
-        const blob =
-            await response.blob();
-
-
-        const tomorrow =
-            getTomorrowDate();
-
-
-        const date =
-            tomorrow.getFullYear() +
-            "-" +
-            String(
-                tomorrow.getMonth()+1
-            ).padStart(2,"0") +
-            "-" +
-            String(
-                tomorrow.getDate()
-            ).padStart(2,"0");
-
-
-        const file =
-            new File(
-                [blob],
-                "agenda-morgen-"+date+".png",
-                {
-                    type:"image/png"
-                }
-            );
-
-
-        // =================================================
-        // SMARTPHONE / TABLET
-        // =================================================
-
-        if(
-            navigator.share &&
-            navigator.canShare &&
-            navigator.canShare({
-                files:[file]
-            })
-        ){
-
-            await navigator.share({
-
-                title:
-                    "Dagplanning morgen",
-
-                text:
-                    "Gebruik deze dagplanning om het volgende hoofdstuk te maken van het slaapverhaal over kabouters Odin en Niel.",
-
-                files:[
-                    file
-                ]
-
-            });
-
-            return;
-
-        }
-
-
-        // =================================================
-        // PC / DESKTOP
-        // =================================================
-        //
-        // BELANGRIJK:
-        // Alleen de afbeelding op het klembord zetten.
-        //
-        // Geen text/plain meer!
-        //
-        // Hierdoor plakt Ctrl+V in ChatGPT
-        // daadwerkelijk de afbeelding.
-        // =================================================
-
-        if(
-            navigator.clipboard &&
-            window.ClipboardItem
-        ){
-
-            const clipboardItem =
-                new ClipboardItem({
-
-                    "image/png":
-                        blob
-
-                });
-
-
-            await navigator.clipboard.write([
-                clipboardItem
-            ]);
-
-
-            // ChatGPT openen
-
-            window.open(
-                "https://chatgpt.com/",
-                "_blank"
-            );
-
-
-            alert(
-                "✅ De dagplanning staat klaar op het klembord.\n\n" +
-                "ChatGPT is geopend.\n\n" +
-                "Open het gesprek 'Verhaaltjes' en druk daar op Ctrl + V."
-            );
-
-
-            return;
-
-        }
-
-
-        // =================================================
-        // FALLBACK
-        // =================================================
-
-        alert(
-            "Deze browser kan de afbeelding niet rechtstreeks kopiëren.\n\n" +
-            "Gebruik daarom 'afbeelding opslaan' en voeg de afbeelding daarna toe aan ChatGPT."
-        );
+            "✅ Dagplanning voor morgen is klaar!";
 
 
     }catch(error){
 
         console.error(
-            "Afbeelding delen fout:",
+            "Afbeelding morgen fout:",
             error
         );
 
 
-        // Gebruiker heeft het deelvenster gesloten
-
-        if(
-            error.name === "AbortError"
-        ){
-
-            return;
-
-        }
-
-
         alert(
-            "De afbeelding kon niet rechtstreeks naar ChatGPT worden gestuurd.\n\n" +
-            "Gebruik eventueel 'afbeelding opslaan'."
+            "De dagplanning kon niet worden gemaakt."
         );
 
     }
 
 }
+
+
 // =========================================================
 // CANVAS TEKENEN
 // =========================================================
@@ -2698,16 +2481,22 @@ async function drawTomorrowImage(
         canvas.getContext("2d");
 
 
-    const width=1200;
+    const width=
+        1200;
 
-    const headerHeight=170;
+
+    const headerHeight=
+        170;
+
 
     const eventHeight=
         dayEvents.length>0
         ? 180
         : 220;
 
-    const footerHeight=80;
+
+    const footerHeight=
+        80;
 
 
     const height=
@@ -2728,8 +2517,6 @@ async function drawTomorrowImage(
         height;
 
 
-    // Achtergrond
-
     ctx.fillStyle=
         "#ffffff";
 
@@ -2741,8 +2528,6 @@ async function drawTomorrowImage(
         height
     );
 
-
-    // Header
 
     ctx.fillStyle=
         "#4285F4";
@@ -2761,6 +2546,7 @@ async function drawTomorrowImage(
 
 
     let dayIcons=[
+
         "☀️",
         "🌙",
         "🔥",
@@ -2768,6 +2554,7 @@ async function drawTomorrowImage(
         "⭐",
         "🎉",
         "🌈"
+
     ];
 
 
@@ -2800,12 +2587,16 @@ async function drawTomorrowImage(
 
 
     ctx.fillText(
+
         dayIcons[weekday]+" "+
         capitalizeFirstLetter(
             dateText
         ),
+
         width/2,
+
         75
+
     );
 
 
@@ -2819,8 +2610,6 @@ async function drawTomorrowImage(
         125
     );
 
-
-    // Geen afspraken
 
     if(dayEvents.length===0){
 
@@ -2860,8 +2649,6 @@ async function drawTomorrowImage(
     }
 
 
-    // Afspraken
-
     for(
         let i=0;
         i<dayEvents.length;
@@ -2887,8 +2674,6 @@ async function drawTomorrowImage(
 
     }
 
-
-    // Footer
 
     ctx.fillStyle=
         "#f2f2f2";
@@ -2941,7 +2726,7 @@ async function drawTomorrowEvent(
 ){
 
     ctx.fillStyle=
-        event.color ||
+        event.color||
         "#4285F4";
 
 
@@ -2957,8 +2742,6 @@ async function drawTomorrowEvent(
 
     ctx.fill();
 
-
-    // Tijd
 
     ctx.fillStyle=
         "#ffffff";
@@ -2977,7 +2760,7 @@ async function drawTomorrowEvent(
 
 
     if(
-        event.end &&
+        event.end&&
         event.end>event.start
     ){
 
@@ -2995,14 +2778,12 @@ async function drawTomorrowEvent(
     );
 
 
-    // Titel
-
     ctx.font=
         "bold 38px Arial";
 
 
     let title=
-        event.title ||
+        event.title||
         "Afspraak";
 
 
@@ -3035,12 +2816,8 @@ async function drawTomorrowEvent(
     });
 
 
-    // Pictogrammen
-
     let icons=
-        iconsForEvent(
-            event
-        );
+        iconsForEvent(event);
 
 
     let iconX=
@@ -3072,7 +2849,8 @@ async function drawTomorrowEvent(
                 );
 
 
-            let maxSize=90;
+            let maxSize=
+                90;
 
 
             let ratio=
@@ -3122,7 +2900,7 @@ async function drawTomorrowEvent(
 
 
 // =========================================================
-// CANVAS AFRONDEN
+// CANVAS KLAARMAKEN
 // =========================================================
 
 function finishTomorrowCanvas(
@@ -3133,6 +2911,294 @@ function finishTomorrowCanvas(
         canvas.toDataURL(
             "image/png"
         );
+
+}
+
+
+// =========================================================
+// VERHAALPROMPT
+// =========================================================
+
+function getStoryPrompt(){
+
+    return (
+
+        "Gebruik de bijgevoegde dagplanning om het volgende " +
+        "hoofdstuk te maken van het bestaande verhaaltjesverhaal " +
+        "over kabouters Odin en Niel.\n\n" +
+
+        "Verwerk alle activiteiten van morgen natuurlijk " +
+        "in het verhaal.\n\n" +
+
+        "Maak er een warm, leuk, grappig en rustig slaapverhaal " +
+        "van van ongeveer 8 tot 10 minuten.\n\n" +
+
+        "Noem de afspraken niet letterlijk als agenda-items, " +
+        "maar verwerk ze als gebeurtenissen in het avontuur.\n\n" +
+
+        "Het verhaal moet aansluiten op de eerdere hoofdstukken " +
+        "van de bestaande verhalenreeks over Odin en Niel.\n\n" +
+
+        "Maak het verhaal geschikt om rustig voor het slapen " +
+        "voor te lezen."
+
+    );
+
+}
+
+
+// =========================================================
+// VERHAALTJE MAKEN
+// =========================================================
+
+async function makeTomorrowStory(){
+
+    if(!tomorrowImageDataUrl){
+
+        alert(
+            "De afbeelding is nog niet klaar."
+        );
+
+        return;
+
+    }
+
+
+    const storyPrompt=
+        getStoryPrompt();
+
+
+    try{
+
+        const response=
+            await fetch(
+                tomorrowImageDataUrl
+            );
+
+
+        const blob=
+            await response.blob();
+
+
+        const tomorrow=
+            getTomorrowDate();
+
+
+        const date=
+            tomorrow.getFullYear()+
+            "-"+
+            String(
+                tomorrow.getMonth()+1
+            ).padStart(2,"0")+
+            "-"+
+            String(
+                tomorrow.getDate()
+            ).padStart(2,"0");
+
+
+        const file=
+            new File(
+
+                [blob],
+
+                "agenda-morgen-"+date+".png",
+
+                {
+                    type:"image/png"
+                }
+
+            );
+
+
+        // =================================================
+        // SMARTPHONE / TABLET
+        // =================================================
+
+        if(
+            navigator.share&&
+            navigator.canShare&&
+            navigator.canShare({
+                files:[file]
+            })
+        ){
+
+            await navigator.share({
+
+                title:
+                    "Verhaaltje voor Odin en Niel",
+
+                text:
+                    storyPrompt,
+
+                files:[
+                    file
+                ]
+
+            });
+
+
+            return;
+
+        }
+
+
+        // =================================================
+        // PC
+        // =================================================
+
+        if(
+            navigator.clipboard&&
+            window.ClipboardItem
+        ){
+
+            const clipboardItem=
+                new ClipboardItem({
+
+                    "image/png":
+                        blob
+
+                });
+
+
+            await navigator.clipboard.write([
+                clipboardItem
+            ]);
+
+
+            // Rechtstreeks naar jouw gesprek
+
+            window.open(
+
+                "https://chatgpt.com/c/69d7eaf7-5944-8332-a62e-602280ea89e2",
+
+                "_blank"
+
+            );
+
+
+            // Popup met opdracht
+
+            document.getElementById(
+                "storyPromptText"
+            ).value=
+                storyPrompt;
+
+
+            document.getElementById(
+                "storyInstructionsPopup"
+            ).style.display=
+                "flex";
+
+
+            return;
+
+        }
+
+
+        // =================================================
+        // FALLBACK
+        // =================================================
+
+        alert(
+
+            "Deze browser ondersteunt het rechtstreeks delen " +
+            "van de afbeelding niet.\n\n" +
+
+            "Gebruik daarom 'afbeelding opslaan' en voeg " +
+            "de afbeelding daarna toe aan ChatGPT."
+
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "Verhaaltje maken fout:",
+            error
+        );
+
+
+        if(
+            error.name==="AbortError"
+        ){
+
+            return;
+
+        }
+
+
+        alert(
+
+            "De afbeelding kon niet rechtstreeks worden " +
+            "klaargezet voor ChatGPT.\n\n" +
+
+            "Gebruik eventueel 'afbeelding opslaan'."
+
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// OPDRACHT KOPIËREN
+// =========================================================
+
+async function copyStoryPrompt(){
+
+    const textarea=
+        document.getElementById(
+            "storyPromptText"
+        );
+
+
+    const text=
+        textarea.value;
+
+
+    try{
+
+        await navigator.clipboard.writeText(
+            text
+        );
+
+
+        alert(
+            "✅ De opdracht is gekopieerd.\n\n" +
+            "Ga naar het gesprek 'Verhaaltjes', " +
+            "klik onder de afbeelding en druk Ctrl + V."
+        );
+
+
+    }catch(error){
+
+        textarea.select();
+
+        document.execCommand(
+            "copy"
+        );
+
+
+        alert(
+            "✅ De opdracht is gekopieerd."
+        );
+
+    }
+
+}
+
+
+// =========================================================
+// INSTRUCTIEPOPUP SLUITEN
+// =========================================================
+
+function closeStoryInstructions(){
+
+    document.getElementById(
+        "storyInstructionsPopup"
+    ).style.display=
+        "none";
 
 }
 
@@ -3160,11 +3226,11 @@ function downloadTomorrowImage(){
 
     let date=
         tomorrow.getFullYear()+
-        "-" +
+        "-"+
         String(
             tomorrow.getMonth()+1
         ).padStart(2,"0")+
-        "-" +
+        "-"+
         String(
             tomorrow.getDate()
         ).padStart(2,"0");
@@ -3198,7 +3264,7 @@ function downloadTomorrowImage(){
 
 
 // =========================================================
-// POPUP SLUITEN
+// AFBEELDING POPUP SLUITEN
 // =========================================================
 
 function closeImagePopup(){
@@ -3237,7 +3303,8 @@ function loadImage(src){
 
                 reject(
                     new Error(
-                        "Afbeelding niet gevonden: "+src
+                        "Afbeelding niet gevonden: "+
+                        src
                     )
                 );
 
@@ -3262,18 +3329,12 @@ function roundRect(
     radius
 ){
 
-    if(
-        width<2*radius
-    )
-        radius=
-            width/2;
+    if(width<2*radius)
+        radius=width/2;
 
 
-    if(
-        height<2*radius
-    )
-        radius=
-            height/2;
+    if(height<2*radius)
+        radius=height/2;
 
 
     ctx.beginPath();
@@ -3361,7 +3422,7 @@ function wrapCanvasText(
 
 
         if(
-            metrics.width>maxWidth &&
+            metrics.width>maxWidth&&
             current
         ){
 
@@ -3394,9 +3455,7 @@ function wrapCanvasText(
 }
 
 
-function capitalizeFirstLetter(
-    text
-){
+function capitalizeFirstLetter(text){
 
     if(!text)
         return text;
@@ -3411,10 +3470,11 @@ function capitalizeFirstLetter(
 
 
 // =========================================================
-// UPDATE LIJN ELKE MINUUT
+// UPDATE TIJDLIJN
 // =========================================================
 
 setInterval(
+
     ()=>{
 
         if(
@@ -3427,7 +3487,9 @@ setInterval(
         }
 
     },
+
     60000
+
 );
 
 
