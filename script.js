@@ -215,7 +215,8 @@ fotograaf:["fotograaf","fotoshoot","photoshoot"],
 sanne:["sanne"],
 koken:["koken"],
 kampvuur:["kampvuur"],
-oogarts:["oogarts"]
+oogarts:["oogarts"],
+communie:["communie"],
 
 }
 
