@@ -217,6 +217,7 @@ koken:["koken"],
 kampvuur:["kampvuur"],
 oogarts:["oogarts"],
 communie:["communie"],
+camper:["camper"],
 
 }
 
