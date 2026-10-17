@@ -52,14 +52,14 @@ const CALENDAR_ORDER=[
 
 const ICON_AI={
 
-kapper= ["kapper","kapsalon"],
+kapper: ["kapper","kapsalon"],
 chiro:["chiro"],
 school:["school","klas","les"],
 thuis:["thuis","huis"],
 kunstschool:["beeldatelier"],
 bus:["bus"],
 zwemmen:["zwem","zwembad","zwemmen","plopsaqua"],
-dokter:["dokter","arts","ziekenhuis"],
+dokter:["dokter","arts"],
 tandarts:["tandarts"],
 beugel:["beugel"],
 auto:["auto","rijden"],
@@ -84,7 +84,6 @@ bakfiets:["bakfiets"],
 bezoek_van:["bezoek van","komt","komen"],
 boot:["boot"],
 bos:["bos"],
-camper:["camper"],
 camping_caravan:["camping caravan"],
 camping:["camping"],
 carnaval:["carnaval"],
@@ -115,7 +114,7 @@ Steven:["steven"],
 Thomas:["thomas"],
 trein:["trein"],
 tuin:["tuin","snoeien","planten","oogsten"],
-verpleegster:["v18","n14","l80","l89","l90","v18","v23"],
+verpleegster:["n14","l80","l89","l90","v18","v23"],
 Vinny:["vinny"],
 vliegtuig:["vliegtuig","airport","luchthaven"],
 vorming:["vorming","Bedrijfseerstehulp"],
@@ -219,8 +218,7 @@ koken:["koken"],
 kampvuur:["kampvuur"],
 oogarts:["oogarts"],
 communie:["communie"],
-camper:["camper"],
-
+    
 }
 
 
