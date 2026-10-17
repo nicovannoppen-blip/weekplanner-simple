@@ -52,6 +52,7 @@ const CALENDAR_ORDER=[
 
 const ICON_AI={
 
+kapper= ["kapper","kapsalon"],
 chiro:["chiro"],
 school:["school","klas","les"],
 thuis:["thuis","huis"],
