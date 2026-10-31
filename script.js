@@ -52,6 +52,7 @@ const CALENDAR_ORDER=[
 
 const ICON_AI={
 
+spaghetti: ["spaghetti"],
 golf: ["golf","minigolf"],
 halloween: ["halloween"],    
 kapper: ["kapper","kapsalon"],
