@@ -52,6 +52,7 @@ const CALENDAR_ORDER=[
 
 const ICON_AI={
 
+halloween: ["halloween"],    
 kapper: ["kapper","kapsalon"],
 chiro:["chiro"],
 school:["school","klas","les"],
